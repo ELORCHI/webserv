@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: yhebbat <yhebbat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/04/30 18:03:07 by yhebbat           #+#    #+#             */
-/*   Updated: 2022/04/30 18:03:08 by yhebbat          ###   ########.fr       */
+/*   Created: 2022/05/01 02:38:52 by yhebbat           #+#    #+#             */
+/*   Updated: 2022/05/01 02:38:53 by yhebbat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define SERVER_HPP
 #include "parse_confile.hpp"
 #include "location.hpp"
+#include "cgi.hpp"
 #include <string>
 #include <iostream>
 class location;
@@ -62,6 +63,8 @@ public:
     std::string                  get_root() const;
     std::string                  get_upload_path() const;
     location                     get_location(int i) const;
+    unsigned int                 get_location_size() const;
+    unsigned int                 get_cgi_size() const;
     cgi                          get_cgi(int i) const;
     unsigned int                 get_client_max_body_size() const;
     unsigned int                 get_allowed_methods_size() const;
@@ -70,7 +73,6 @@ public:
     unsigned int                 fill_allowed_methods(std::vector<std::string>, unsigned int);
     unsigned int                 fill_index(std::vector<std::string>, unsigned int);
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
-    // unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
     unsigned int                 fill_location(std::vector<std::string>, unsigned int, bool&);
     unsigned int                 fill_cgi(std::vector<std::string>, unsigned int, bool&);
 };

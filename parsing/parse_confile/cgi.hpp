@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: yhebbat <yhebbat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/04/30 18:02:29 by yhebbat           #+#    #+#             */
-/*   Updated: 2022/04/30 18:02:30 by yhebbat          ###   ########.fr       */
+/*   Created: 2022/05/01 02:38:21 by yhebbat           #+#    #+#             */
+/*   Updated: 2022/05/01 02:38:22 by yhebbat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ public:
     void                        set_cgi_path(std::string &cgi_path);
     void                        set_cgi_methods(std::string &methods);
     void                        set_cgi_name(std::string &name);
+    unsigned int                get_cgi_methods_size();
 };
 
 #endif

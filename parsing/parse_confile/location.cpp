@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: yhebbat <yhebbat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/04/30 18:02:48 by yhebbat           #+#    #+#             */
-/*   Updated: 2022/04/30 18:02:49 by yhebbat          ###   ########.fr       */
+/*   Created: 2022/05/01 02:38:24 by yhebbat           #+#    #+#             */
+/*   Updated: 2022/05/01 02:38:25 by yhebbat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ std::vector<std::string>    &location::get_methods() { return this->_allow_metho
 std::string                 &location::get_root() { return this->_root; }
 bool                        &location::get_autoindex() { return this->_autoindex; }
 std::string                 &location::get_client_max_body_size() { return this->_client_max_body_size; }
-std::vector<std::string>    &location::get_index() { return this->_index; }
+
 /*
 * SETTERS
 */
@@ -83,5 +83,66 @@ unsigned int location::fill_autoindex(std::vector<std::string> words, unsigned i
     return i;
 }
 
+unsigned int location::get_index_size() const
+{
+    return (_index.size());
+}
 
 
+std::string                 location::get_index(unsigned int i) const
+{
+    return  (this->_index[i]);
+}
+
+unsigned int location::get_methods_size() const
+{
+    return (_allow_methods.size());
+}
+
+
+std::string                 location::get_methods(unsigned int i) const
+{
+    return  (this->_allow_methods[i]);
+}
+unsigned int location::fill_cgi(std::vector<std::string> words, unsigned int i, bool &cgi_flag)
+{
+    cgi_flag = true;
+    cgi c;
+    c.set_cgi_name(words[i + 1]);
+    while (1)
+    {
+        if (i >= words.size() || (words[i] == "}" && cgi_flag))
+            break ;
+        if (words[i] == "cgi_path")
+            c.set_cgi_path(words[i + 1]);
+        else if (words[i] == "allow_methods")
+        {
+            i++;
+            while (i < words.size() && words[i] != "}" && (words[i] == "POST" || words[i] == "GET" || words[i] == "DELETE"))
+            {
+                c.set_cgi_methods(words[i]);
+                i++;
+            }
+            i--;
+        }
+        i++;
+    }
+    cgi_flag = false;
+    set_cgi(c);
+    return i;
+}
+
+void    location::set_cgi(cgi cgi)
+{
+    _cgi.push_back(cgi);
+}
+
+unsigned int location::get_cgi_size() const
+{
+    return _cgi.size();
+}
+
+cgi     location::get_cgi(int i) const
+{
+    return _cgi[i];
+}

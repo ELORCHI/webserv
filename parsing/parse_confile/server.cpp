@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: yhebbat <yhebbat@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/04/30 18:03:04 by yhebbat           #+#    #+#             */
-/*   Updated: 2022/04/30 18:03:05 by yhebbat          ###   ########.fr       */
+/*   Created: 2022/05/01 02:38:48 by yhebbat           #+#    #+#             */
+/*   Updated: 2022/05/01 02:38:49 by yhebbat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,7 +255,9 @@ unsigned int server::fill_autoindex(std::vector<std::string> words, unsigned int
 unsigned int server::fill_location(std::vector<std::string> words, unsigned int i, bool &location_flag)
 {
     location_flag = true;
+    bool cgi_flag = false;
     location l;
+    l.set_locations_path(words[i + 1]);
     while (1)
     {
         if (i >= words.size() || (words[i] == "}" && location_flag))
@@ -268,6 +270,8 @@ unsigned int server::fill_location(std::vector<std::string> words, unsigned int 
             i = l.fill_index(words, i);
         else if (words[i] == "autoindex")
             i = l.fill_autoindex(words, i);
+        else if (words[i] == "cgi")
+            i = l.fill_cgi(words, i, cgi_flag);
         i++;
     }
     location_flag = false;
@@ -278,6 +282,16 @@ unsigned int server::fill_location(std::vector<std::string> words, unsigned int 
 unsigned int server::get_index_size() const
 {
     return (_index.size());
+}
+
+unsigned int server::get_location_size() const
+{
+    return _location.size();
+}
+
+unsigned int server::get_cgi_size() const
+{
+    return _cgi.size();
 }
 
 std::string                  server::get_index(int i) const
