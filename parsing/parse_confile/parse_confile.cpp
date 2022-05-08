@@ -88,7 +88,9 @@ unsigned int   parse_config::server_parsing(unsigned int &i)
     {
         if (i >= _words.size() || (_words[i] == "}" && !location_flag && !cgi_flag))
             break ;
-        if (_words[i] == "listen")
+        if (_words[i] == "server_names")
+            i = s.fill_name(_words, i);
+        else if (_words[i] == "listen")
             s.set_listen(_words[i + 1]);
         else if (_words[i] == "root")
             s.set_root(_words[i + 1]);

@@ -22,7 +22,7 @@ class cgi;
 class server
 {
 private:
-    std::string                             _name;
+    std::vector<std::string>                _name;
     std::string                             _listen_port;
     std::string                             _listen_host;
     std::vector<std::string>                _allowed_methods;
@@ -35,7 +35,7 @@ private:
     std::vector<cgi>                        _cgi;
     unsigned int                            _client_max_body_size;
     bool                                    _autoindex;
-    int                                     _accolade;
+    // int                                     _accolade;
 public:
     server();
     ~server();
@@ -51,7 +51,7 @@ public:
     void                         set_cgi(cgi cgi);
     void                         set_client_max_body_size(unsigned int client_max_body_size);
     void                         set_autoindex(bool autoindex);
-    std::string                  get_name() const;
+    std::string                  get_name(int) const;
     std::string                  get_listen_host() const;
     std::string                  get_listen_port() const;
     std::string                  get_allowed_methods(int i) const;
@@ -71,6 +71,7 @@ public:
     bool                         get_autoindex() const;
     unsigned int                 get_index_size() const;
     unsigned int                 fill_allowed_methods(std::vector<std::string>, unsigned int);
+    unsigned int                 fill_name(std::vector<std::string>, unsigned int);
     unsigned int                 fill_index(std::vector<std::string>, unsigned int);
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
     unsigned int                 fill_location(std::vector<std::string>, unsigned int, bool&);

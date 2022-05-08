@@ -20,7 +20,7 @@
 
 //-------------constructor--------------
 server::server():
-    _name(""),
+    _name(),
     _listen_port(),
     _listen_host(),
     _allowed_methods(),
@@ -45,7 +45,7 @@ server::~server()
 
 void    server::set_name(std::string name)
 {
-    _name = name;
+    _name.push_back(name);
 }
 
 void    server::set_upload_path(std::string upload_path)
@@ -136,9 +136,9 @@ void    server::set_cgi(cgi cgi)
 
 //-------------geters------------------
 
-std::string    server::get_name() const
+std::string    server::get_name(int i) const
 {
-    return _name;
+    return _name[i];
 }
 
 std::string    server::get_upload_path() const
@@ -226,12 +226,29 @@ unsigned int server::fill_allowed_methods(std::vector<std::string> words, unsign
     return i;
 }
 
+unsigned int server::fill_name(std::vector<std::string> words, unsigned int i)
+{
+    i++;
+    while (i < words.size() && words[i] != "}" && words[i] != "server" && words[i] != "{" && words[i] != "listen" 
+            && words[i] != "root" && words[i] != "allow_methods" && words[i] != "server_names"
+            && words[i] != "upload_path" && words[i] != "index"
+            && words[i] != "error_page" && words[i] != "autoindex"
+            && words[i] != "redirection" && words[i] != "client_max_body_size"
+            && words[i] != "location" && words[i] != "cgi")
+    {
+        set_name(words[i]);
+        i++;
+    }
+    i--;
+    return i;
+}
+
 unsigned int server::fill_index(std::vector<std::string> words, unsigned int i)
 {
     i++;
     while (i < words.size() && words[i] != "}" && words[i] != "server" && words[i] != "{" && words[i] != "listen" 
             && words[i] != "root" && words[i] != "allow_methods"
-            && words[i] != "upload_path" && words[i] != "index"
+            && words[i] != "upload_path" && words[i] != "index" && words[i] != "server_names"
             && words[i] != "error_page" && words[i] != "autoindex"
             && words[i] != "redirection" && words[i] != "client_max_body_size"
             && words[i] != "location" && words[i] != "cgi")
