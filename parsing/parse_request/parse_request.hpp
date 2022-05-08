@@ -15,7 +15,8 @@ class parse_request
         std::vector<std::string> _lines;
         std::string _http_version;
         std::string _http_method;
-        std::string _http_path;
+        // std::string _http_path;
+        std::map<std::string, std::string> _http_path;
         std::map<std::string, std::string> _http_headers;
         std::string _http_body;
     public:

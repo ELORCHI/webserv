@@ -62,7 +62,29 @@ void    parse_request::set_http_vmp(std::string line)
         }
         else if (i == 1)
         {
-            _http_path = token;
+			size_t found;
+			size_t found1;
+			found = token.find('?');
+			found1 = token.find('#');
+			if (found != std::string::npos && found1 != std::string::npos)
+			{
+				_http_path["path"].assign(token, 0, found);
+				_http_path["query"].assign(token, found + 1, (found1 - found - 1));
+				_http_path["fragment"].assign(token, found1 + 1, (token.size() - found1));
+			}
+			else if (found != std::string::npos && found1 == std::string::npos)
+			{
+				_http_path["path"].assign(token, 0, found);
+				_http_path["query"].assign(token, found + 1, (token.size() - found));
+			}
+			else if (found == std::string::npos && found1 != std::string::npos)
+			{
+				_http_path["path"].assign(token, 0, found1);
+				_http_path["fragment"].assign(token, found1 + 1, (token.size() - (found1 + 1)));
+			}
+			else
+				_http_path["path"] = token;
+            // _http_path = token;
         }
         else if (i == 2)
         {
@@ -118,8 +140,11 @@ void    parse_request::start_parsing(char *buffer)
 		i++;
 	}
     std::cout << _http_method << std::endl;
-    std::cout << _http_path << std::endl;
     std::cout << _http_version << std::endl;
+    // std::cout << _http_path << std::endl;
+	std::cout << "fragment: " << _http_path["fragment"] << std::endl;
+	std::cout << "path: " << _http_path["path"] << std::endl;
+	std::cout << "query: " <<_http_path["query"] << std::endl;
 	for(std::map <std::string, std::string>::iterator it=_http_headers.begin(); it!=_http_headers.end(); ++it)
    	{
        std::cout << it->first << " => " << it->second << '\n';

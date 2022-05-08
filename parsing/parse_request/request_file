@@ -1,4 +1,4 @@
-GET / HTTP/1.1
+GET https://greenbytes.de/tech/webdav/?draft-ietf-httpbis-http2-09.html HTTP/1.1
 gdndfgn: dfgndfgn
 User-Agent: PostmanRuntime/7.29.0
 Accept: */*

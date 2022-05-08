@@ -5,14 +5,14 @@ int main()
     std::ifstream file("./request_file");
     std::string line;
     std::vector<std::string> lines;
-    char *buffer;
+    // char *buffer;
     int i = 0;
     while (std::getline(file, line))
     {
         lines.push_back(line);
     }
     file.close();
-    unsigned int sz = 0;
+    size_t sz = 0;
     i =0;
     while (i < lines.size())
     {
@@ -21,7 +21,8 @@ int main()
     }
     sz += i;
     // std::cout << sz << std::endl;
-    buffer = new char[sz];
+    // buffer = new char[sz];
+    char buffer[sz];
     i = 0;
     int k = 0;
     while (i < lines.size())
@@ -37,7 +38,7 @@ int main()
         k++;
         i++;
     }
-    buffer[sz] = '\0';
+    buffer[k] = '\0';
     // buffer = new char[lines.size()];
     // while (i < lines.size())
     // {
