@@ -70,6 +70,7 @@ public:
     unsigned int                 get_allowed_methods_size() const;
     bool                         get_autoindex() const;
     unsigned int                 get_index_size() const;
+    unsigned int                 get_name_size() const;
     unsigned int                 fill_allowed_methods(std::vector<std::string>, unsigned int);
     unsigned int                 fill_name(std::vector<std::string>, unsigned int);
     unsigned int                 fill_index(std::vector<std::string>, unsigned int);

@@ -78,6 +78,7 @@ void       parse_config::split_by_space()
     }
 }
 
+
 unsigned int   parse_config::server_parsing(unsigned int &i)
 {
     // server *s = new server();
@@ -118,33 +119,88 @@ unsigned int   parse_config::server_parsing(unsigned int &i)
     return i;
 }
 
+void    parse_config::specified_words(std::string &tmp)
+{
+    std::string err;
+    err = "Error: ";
+    err += tmp;
+    err += " undefined";
+    if (tmp != "server_names" && tmp != "server" && tmp != "cgi_path" && tmp != "root" &&
+        tmp != "allow_methods" && tmp != "upload_path" && tmp != "index"
+        && tmp != "error_page" && tmp != "autoindex" && tmp != "redirection"
+        && tmp != "client_max_body_size" && tmp != "location" && tmp != "cgi"
+        && tmp != "{" && tmp != "}" && tmp != "listen")
+        throw std::runtime_error(err);
+}
+
+void    parse_config::syntax_error()
+{
+    for (std::vector<std::string>::iterator it = _lines.begin(); it != _lines.end(); ++it)
+    {
+        std::string line = *it;
+        std::stringstream ss(line);
+        std::string tmp;
+        if (!line.empty())
+        {
+            while (std::getline(ss, tmp, ' '))
+            {
+                if (tmp == "")
+                    continue;
+                break;
+            }
+            specified_words(tmp);
+        }
+    }
+}
+
+void    parse_config::check_host_server_names_error()
+{
+    size_t i = 0;
+    while (i < _servers.size())
+    {
+        size_t k = i + 1;
+        while (k < _servers.size())
+        {
+            if ((_servers[i].get_listen_port().compare(_servers[k].get_listen_port()) == 0))
+            {
+                size_t t = 0;
+                while (t < _servers[i].get_name_size())
+                {
+                    size_t y = 0;
+                    while (y < _servers[k].get_name_size())
+                    {
+                        if (_servers[i].get_name(t).compare(_servers[k].get_name(y)) == 0)
+                            throw std::runtime_error("Error: there is two server have same server_name and port");
+                        y++;
+                    }
+                    t++;
+                }
+            }
+            k++;
+        }
+        i++;
+    }
+}
+
 void    parse_config::start_parsing()
 {
     split_by_space();
     if (_words.size() == 0)
         throw std::runtime_error("Error: no words in the file");
     accolade_error();
-    for (unsigned int i = 0; i < _words.size(); i++){
+    syntax_error();
+    for (unsigned int i = 0; i < _words.size(); i++)
+    {
 		if (_words[i] == "server")
         {
 			i++;
-            // std::cout << _words[i] << std::endl;
 			if (_words[i] == "{")
 				i = parse_config::server_parsing(i);
-            // i++;
 		}
 		else
-        {
-            std::cout << _words[i] << std::endl;
-            std::cout << _words[i - 1] << std::endl;
-            throw std::runtime_error("Error: every bracket must be startes by server or cgi or location");
-        }
+            throw std::runtime_error("Error: every server configuration must be startes by server");
 	}
-}
-
-void    parse_config::read_data()
-{
-//     std::cout << this
+    check_host_server_names_error();
 }
 
 void    parse_config::read_server()
@@ -153,10 +209,18 @@ void    parse_config::read_server()
     while (i < _servers.size())
     {
         std::cout << "--------------SERVER" << i << "---------------" <<std::endl;
+        unsigned int j = 0;
+        std::cout << "server_names: ";
+        while (j < this->_servers[i].get_name_size())
+        {
+            std::cout << this->_servers[i].get_name(j) << " ";
+            j++;
+        }
+        std::cout << std::endl;
         std::cout << "listen_host: " << this->_servers[i].get_listen_host() << std::endl;
         std::cout << "listen_port: " <<this->_servers[i].get_listen_port() << std::endl;
         std::cout << "root: " << this->_servers[i].get_root() << std::endl;
-        unsigned int j = 0;
+        j = 0;
         std::cout << "allowed_methods: ";
         while (j < this->_servers[i].get_allowed_methods_size())
         {

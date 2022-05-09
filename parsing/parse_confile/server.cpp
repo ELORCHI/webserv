@@ -311,6 +311,11 @@ unsigned int server::get_cgi_size() const
     return _cgi.size();
 }
 
+unsigned int server::get_name_size() const
+{
+    return _name.size();
+}
+
 std::string                  server::get_index(int i) const
 {
     return  (_index[i]);
