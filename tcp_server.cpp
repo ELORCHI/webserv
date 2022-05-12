@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sys/_types/_socklen_t.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string>
@@ -13,10 +14,15 @@
 #include <string.h>
 #include <sys/event.h>
 
-
+#define NUM_CLIENTS 10
 #define PORT 8080
+#define MAX_EVENTS 32
 
 
+struct client_data
+{
+    int fd;
+} cients[NUM_CLIENTS];
 
 // void create_server_and_listen(int port)
 // {
@@ -61,12 +67,37 @@ int create_server_and_listen(int port)
 
 }
 
+
+
+void run_event_loop(int kq, int local_s)
+{
+    struct kevent evSet;
+    struct kevent evList[MAX_EVENTS];
+    struct sockaddr_storage addr;
+    socklen_t socklen = sizeof(addr);
+
+    while (1)
+    {
+        int num_events = kevent(kq, NULL, 0, evList, MAX_EVENTS, NULL); //get list of triggered events
+        for (int i = 0; i < num_events; i++)
+        {
+            if (evList[i].ident == local_s) //if triggered event identifier is the same as the our server soccket fd then 
+            {
+                int fd = accept(evList[i].ident, (struct sockaddr *)&addr, &socklen);
+                EV_SET(&evSet, fd, EV_SET(kevp, a, b, c, d, e, f), c, d, e, f)
+
+            }
+        }
+    }
+}
+
 int main(void)
 {
     int local_s = create_server_and_listen(PORT); 
     int kq = kqueue(); //creating an event queue
     struct kevent evSet;
-    EV_SET(&evSet, local_s, EVFILT_READ, EV_ADD, 0, 0, NULL);
+    EV_SET(&evSet, local_s, EVFILT_READ, EV_ADD, 0, 0, NULL); //setting the event for being triggered whenever there's data to read
+    kevent(kq, &evSet, 1, NULL, 0, NULL); // adding the event to the kqueue
 
     //create_server_and_listen(8081);
     // const char *s = std::string("").c_str();
