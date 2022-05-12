@@ -58,7 +58,6 @@ int create_server_and_listen(int port)
     (void)bind(local_s, addr->ai_addr, addr->ai_addrlen);
     (void)listen(local_s, 5);
     return (local_s);
-
 }
 
 int main(void)
@@ -66,8 +65,9 @@ int main(void)
     int local_s = create_server_and_listen(PORT); 
     int kq = kqueue(); //creating an event queue
     struct kevent evSet;
-    EV_SET(&evSet, local_s, EVFILT_READ, EV_ADD, 0, 0, NULL);
-
+    EV_SET(&evSet, local_s, EVFILT_READ, EV_ADD, 0, 0, NULL); //setting the event to get triggered on data avilable for reading, and adding it
+    kevent(kq, &evSet, 1, NULL, 0, NULL);
+    // keven
     //create_server_and_listen(8081);
     // const char *s = std::string("").c_str();
     // std::cout << s << std::endl;
