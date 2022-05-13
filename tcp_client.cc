@@ -15,13 +15,11 @@ void download(std::string server, int port)
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     int kq = kqueue();
     struct kevent evSet;
-    //EV_SET(&evSet, )
     struct sockaddr_in serv_addr;
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
     inet_pton(AF_INET, server.c_str(), &serv_addr.sin_addr);
-
     const char *message = "hello from client\n";
 
     connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
@@ -36,6 +34,6 @@ void download(std::string server, int port)
 
 int main()
 {
-    download("127.0.0.1", 8081);
+    download("127.0.0.1", 1236);
     return (0);
 }

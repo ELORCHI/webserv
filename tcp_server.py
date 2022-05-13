@@ -19,7 +19,7 @@ def server(ip, port):
     s.close()
 
 def main():
-    server("localhost", 8081)
+    server("localhost", 1236)
 
 if __name__ == "__main__":
     main()
