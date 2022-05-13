@@ -124,7 +124,7 @@ void run_event_loop(int kq, int local_s)
                 EV_SET(&evSet, fd, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
                 kevent(kq, &evSet, 1, NULL, 0, NULL);
                 //send data to client
-                // test_send_data_to_client(fd);
+                 test_send_data_to_client(fd);
             }
             else if (evList[i].flags & EV_EOF) {
             /*
@@ -142,15 +142,11 @@ void run_event_loop(int kq, int local_s)
                 //read data from evList[i].ident
                 recv_msg(evList[i].ident);
                 // test_send_data_to_client(evList[i].ident);
-                // send_welcome_msg(evList[i].ident);
-                // if (evList[i].filter & EVFILT_WRITE) {
-                //write to the client after proccessing what we got from the client
-                    // test_send_data_to_client(evList[i].ident);
-            //}
+                // send_welcome_msg(evList[i].ident); 
             } 
-            // else if (evList[i].filter & EVFILT_WRITE) {
-                // test_send_data_to_client(evList[i].ident);
-            // }
+            else if (evList[i].filter & EVFILT_WRITE) {
+                test_send_data_to_client(evList[i].ident);
+            }
         }
     }
 }
