@@ -20,18 +20,32 @@
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
+#include <exception>
+#include "error_exception.hpp"
+#include <fcntl.h>
 
 #define NUM_CLIENTS 10
 #define PORT 1236 
 #define MAX_EVENTS 32
 #define MAX_MSG_SIZE 256
+#define INVALID_SOCKET -1
+#define MAX_EVENTS 1000
 
 class server {
-    int listentingServerFd;
-    int listeningServerPort;
-    int listeningServerAddress
-    int serverKqueueFd;
-    void 
+    int listenServerFd;
+    int listenServerPort;
+    struct sockaddr_in listeningServAddr;
+
+    int serverKqFd;
+    bool canRun;
+    struct kevent _eventList[MAX_EVENTS];
+    
+    public:
+        server(int port);
+        ~server();
+        bool start();
+        void stop();
+        void run();
 
 };
 
