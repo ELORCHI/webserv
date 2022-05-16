@@ -23,10 +23,12 @@
 #include <exception>
 #include "error_exception.hpp"
 #include <fcntl.h>
+#include "clients.h"
+#include <unordered_map>
+#include <algorithm>
 
 #define NUM_CLIENTS 10
 #define PORT 1236 
-#define MAX_EVENTS 32
 #define MAX_MSG_SIZE 256
 #define INVALID_SOCKET -1
 #define MAX_EVENTS 1000
@@ -35,10 +37,11 @@ class server {
     int listenServerFd;
     int listenServerPort;
     struct sockaddr_in listeningServAddr;
-
+    
     int serverKqFd;
     bool canRun;
     struct kevent _eventList[MAX_EVENTS];
+    std::unordered_map<int, client*>clientmap;
     
     public:
         server(int port);
@@ -46,7 +49,8 @@ class server {
         bool start();
         void stop();
         void run();
-
+        void acceptConnection();
+        void disconnectClient(client *c, bool is_delete);
 };
 
 #endif
