@@ -1,7 +1,6 @@
-#ifndef SERVER_HPP
-#define SERVER_HPP
-
+#pragma once
 #include <iostream>
+#include <sys/_types/_size_t.h>
 #include <sys/_types/_socklen_t.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -51,6 +50,5 @@ class server {
         void run();
         void acceptConnection();
         void disconnectClient(client *c, bool is_delete);
+        void read_from_client(client *c, long data_length);
 };
-
-#endif
