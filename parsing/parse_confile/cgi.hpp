@@ -20,7 +20,7 @@
 
 class cgi
 {
-private:
+protected:
     std::string           _name;
     std::string                 _cgi_path;
     std::vector<std::string>    _allow_methods;

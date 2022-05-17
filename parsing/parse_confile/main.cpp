@@ -12,10 +12,10 @@
 
 #include "parse_confile.hpp"
 
-int	parsing_conf(int ac, char const **av)
+int	parsing_conf(int ac, char const **av,parse_config *conf)
 {
 	// parse_server_config *conf = new parse_server_config;
-	parse_config conf;
+	// parse_config conf;
 
 	if (ac != 2)
 	{
@@ -33,18 +33,18 @@ int	parsing_conf(int ac, char const **av)
 	while (std::getline(file, line))
 		lines.push_back(line);
 	file.close();
-	conf.set_lines(lines);
+	conf->set_lines(lines);
 	// conf.read_lines();
 	try
 	{
-		conf.start_parsing();
+		conf->start_parsing();
 	}
 	catch (std::runtime_error &e)
 	{
 		std::cout << e.what() << std::endl;
 		return (0);
 	}
-	conf.read_server();
+	// conf->read_server();
 	// std::cout << conf. << std::endl;
 	// delete conf;
 	return (1);
@@ -52,7 +52,11 @@ int	parsing_conf(int ac, char const **av)
 
 int main(int ac, char const **av)
 {
-	if(!parsing_conf(ac, av))
+	parse_config conf;
+
+	// *conf = NULL;
+	if(!parsing_conf(ac, av, &conf))
 		return (0);
+	conf.read_server();
 	return (0);
 }
