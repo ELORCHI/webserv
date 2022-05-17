@@ -21,7 +21,7 @@ class location;
 class cgi;
 class server
 {
-private:
+protected:
     std::vector<std::string>                _name;
     std::string                             _listen_port;
     std::string                             _listen_host;
