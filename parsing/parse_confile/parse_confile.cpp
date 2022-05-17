@@ -161,7 +161,7 @@ void    parse_config::check_host_server_names_error()
         size_t k = i + 1;
         while (k < _servers.size())
         {
-            if ((_servers[i].get_listen_port().compare(_servers[k].get_listen_port()) == 0))
+            if ((_servers[i].get_listen_port() == _servers[k].get_listen_port()))
             {
                 size_t t = 0;
                 while (t < _servers[i].get_name_size())
@@ -205,7 +205,10 @@ void    parse_config::start_parsing()
 
 void    parse_config::read_server()
 {
+    // std::vector <server> test;
     size_t i = 0;
+
+    // test = _servers;
     while (i < _servers.size())
     {
         std::cout << "--------------SERVER" << i << "---------------" <<std::endl;
@@ -353,3 +356,145 @@ void   parse_config::set_lines(std::vector<std::string> lines)
 }
 
 //--------operators--------
+// std::vector<server>& parse_config::operator=(std::vector<server> const & rhs)
+// {
+//     // std::cout << "assignment operator called"<< std::endl;
+//     if (this->_servers != &rhs)
+//     {
+//         size_t i = 0;
+//     while (i < rhs.size())
+//     {
+//         std::cout << "--------------SERVER" << i << "---------------" <<std::endl;
+//         unsigned int j = 0;
+//         std::cout << "server_names: ";
+//         while (j < this->_servers[i].get_name_size())
+//         {
+//             this->_servers[i].set_name(rhs[i].get_name(j));
+//             j++;
+//         }
+//         std::cout << std::endl;
+//         std::cout << "listen_host: " << this->_servers[i].get_listen_host() << std::endl;
+//         std::cout << "listen_port: " <<this->_servers[i].get_listen_port() << std::endl;
+//         std::cout << "root: " << this->_servers[i].get_root() << std::endl;
+//         j = 0;
+//         std::cout << "allowed_methods: ";
+//         while (j < this->_servers[i].get_allowed_methods_size())
+//         {
+//             std::cout << this->_servers[i].get_allowed_methods(j) << " ";
+//             j++;
+//         }
+//         std::cout << std::endl;
+//         std::cout << "upload_path: " << this->_servers[i].get_upload_path() << std::endl;
+//         j = 0;
+//         std::cout << "index: ";
+//         while (j < this->_servers[i].get_index_size())
+//         {
+//             std::cout << this->_servers[i].get_index(j) << " ";
+//             j++;
+//         }
+//         std::cout << std::endl;
+//         if (this->_servers[i].get_autoindex())
+//             std::cout << "auto index: on" << std::endl;
+//         else
+//             std::cout << "auto index: off" << std::endl;
+//         j = 0;
+//         while (j < _servers[i].get_error_pages_size())
+//         {
+//             std::cout << "error_pages: ";
+//             std::vector<std::string> tmp;
+//             tmp = _servers[i].get_error_pages(j);
+//             std::cout << tmp[0];
+//             std::cout << "   ";
+//             std::cout << tmp[1] << std::endl;
+//             j++;
+//         }
+//         j = 0;
+//         while (j < _servers[i].get_redirections_size())
+//         {
+//             std::cout << "redirections: ";
+//             std::vector<std::string> tmp;
+//             tmp = _servers[i].get_redirections(j);
+//             std::cout << tmp[0];
+//             std::cout << "   ";
+//             std::cout << tmp[1] << std::endl;
+//             j++;
+//         }
+//         std::cout << "client_max_body_size: " << this->_servers[i].get_client_max_body_size() << std::endl;
+//         j = 0;
+//         std::cout << "********location*********" << std::endl;
+//         while (j < _servers[i].get_location_size())
+//         {
+//             location t = this->_servers[i].get_location(j);
+//             std::cout << "location_path: "<< t.get_locations_path() << std::endl;
+//             unsigned int k = 0;
+//             std::cout << "root: "<< t.get_root() << std::endl;
+//             if (t.get_autoindex())
+//                 std::cout << "auto index: on" << std::endl;
+//             else
+//                 std::cout << "auto index: off" << std::endl;
+//             std::cout << "index: ";
+//             while (k < t.get_index_size())
+//             {
+//                 std::cout << t.get_index(k) << " ";
+//                 k++;
+//             }
+//             std::cout << std::endl;
+//             k = 0;
+//             std::cout << "allowed_methods: ";
+//             while (k < t.get_methods_size())
+//             {
+//                 std::cout << t.get_methods(k) << " ";
+//                 k++;
+//             }
+//             if (t.get_cgi_size() != 0)
+//             {
+//                 size_t m = 0;
+//                 std::cout << std::endl;
+//                 std::cout << "********CGI_LOCATION*********" << std::endl;
+//                 while (m < t.get_cgi_size())
+//                 {
+//                     cgi p = t.get_cgi(m);
+//                     std::cout << "cgi name:" << p.get_cgi_name() << std::endl;
+//                     std::cout << "cgi_path: "<< p.get_cgi_path() << std::endl;
+//                     unsigned int k = 0;
+//                     k = 0;
+//                     std::cout << "cgi_methods: ";
+//                     while (k < p.get_cgi_methods_size())
+//                     {
+//                         std::cout << p.get_cgi_methods(k) << " ";
+//                         k++;
+//                     }
+//                     std::cout << std::endl;
+//                     std::cout << "***********************" << std::endl;
+//                     m++;
+//                 }
+//             }
+//             std::cout << std::endl;
+//             std::cout << "***********************" << std::endl;
+//             j++;
+//         }
+//         j = 0;
+//         std::cout << "********CGI*********" << std::endl;
+//         while (j < _servers[i].get_cgi_size())
+//         {
+//             cgi t = this->_servers[i].get_cgi(j);
+//             std::cout << "cgi name:" << t.get_cgi_name() << std::endl;
+//             std::cout << "cgi_path: "<< t.get_cgi_path() << std::endl;
+//             unsigned int k = 0;
+//             k = 0;
+//             std::cout << "cgi_methods: ";
+//             while (k < t.get_cgi_methods_size())
+//             {
+//                 std::cout << t.get_cgi_methods(k) << " ";
+//                 k++;
+//             }
+//             std::cout << std::endl;
+//             std::cout << "***********************" << std::endl;
+//             j++;
+//         }
+//         i++;
+//     }
+//     }
+//         // this->_value = rhs._value;
+//     return (*this);
+// }

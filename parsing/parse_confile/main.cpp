@@ -45,18 +45,17 @@ int	parsing_conf(int ac, char const **av,parse_config *conf)
 		return (0);
 	}
 	// conf->read_server();
-	// std::cout << conf. << std::endl;
-	// delete conf;
 	return (1);
 }
 
 int main(int ac, char const **av)
 {
 	parse_config conf;
+	// std::vector<server> test;
 
-	// *conf = NULL;
 	if(!parsing_conf(ac, av, &conf))
 		return (0);
 	conf.read_server();
+	// test = conf.get_server_vect();
 	return (0);
 }

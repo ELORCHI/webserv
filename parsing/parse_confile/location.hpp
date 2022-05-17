@@ -27,8 +27,8 @@ protected:
     std::string                 _root;
     std::string                 _client_max_body_size;
     std::vector<std::string>    _index;
-    std::vector<cgi>                        _cgi;
-    bool                         _autoindex;
+    std::vector<cgi>            _cgi;
+    bool                        _autoindex;
 public:
     location();
     ~location();
