@@ -77,5 +77,6 @@ public:
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
     unsigned int                 fill_location(std::vector<std::string>, unsigned int, bool&);
     unsigned int                 fill_cgi(std::vector<std::string>, unsigned int, bool&);
+    server                         &operator=(server const & rhs);
 };
 #endif

@@ -353,3 +353,24 @@ unsigned int server::fill_cgi(std::vector<std::string> words, unsigned int i, bo
     set_cgi(c);
     return i;
 }
+
+/*
+    operator
+*/
+
+server    &server::operator=(server const &rhs)
+{
+    if (this != &rhs)
+    {
+        _name = rhs._name;
+        _index = rhs._index;
+        _autoindex = rhs._autoindex;
+        _client_max_body_size = rhs._client_max_body_size;
+        _allowed_methods = rhs._allowed_methods;
+        _location = rhs._location;
+        _cgi = rhs._cgi;
+        _redirections = rhs._redirections;
+        _root = rhs._root;
+    }
+    return *this;
+}

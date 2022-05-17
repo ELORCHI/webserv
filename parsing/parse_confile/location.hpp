@@ -55,6 +55,7 @@ public:
     unsigned int                 fill_index(std::vector<std::string>, unsigned int);
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
     unsigned int                 fill_cgi(std::vector<std::string>, unsigned int, bool&);
+    location                    &operator=(location const & rhs);
 };
 
 #endif
