@@ -2,9 +2,8 @@
 
 void IniteServers(std::vector<Servers> &servers, std::vector<server> ServersConf)
 {
-    for (std::vector<Servers>::iterator it = servers.begin(); it < servers.end(); i++)
+    for (std::vector<Servers>::iterator it = servers.begin(); it < servers.end(); it++)
     {
-        //do all the shity work
-        //
+        it++;
     }
 }
