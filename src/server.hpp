@@ -27,7 +27,7 @@
 #include <algorithm>
 
 #define NUM_CLIENTS 10
-#define PORT 1236 
+#define PORT 6000
 #define MAX_MSG_SIZE 256
 #define INVALID_SOCKET -1
 #define MAX_EVENTS 1000
@@ -44,7 +44,7 @@ class server {
     
     public:
         server(int port);
-        ~server();
+        ~server() {}
         bool start();
         void stop();
         void run();

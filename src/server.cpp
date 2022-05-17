@@ -14,7 +14,7 @@ server::server(int port)
     memset(&listeningServAddr, 0, sizeof listeningServAddr);
     listeningServAddr.sin_family = AF_INET; //IP v4 family
     listeningServAddr.sin_port = htons(listenServerPort); //The htons function takes a 16-bit number in host byte order and returns a 16-bit number in network byte order used in TCP/IP networks
-    listeningServAddr.sin_addr.s_addr = INADDR_ANY; //accept all connections aka set address to 0.0.0.0
+    listeningServAddr.sin_addr.s_addr = htonl(INADDR_ANY); //accept all connections aka set address to 0.0.0.0
 }
 
 
@@ -26,10 +26,12 @@ bool server::start() {
         if (listenServerFd == INVALID_SOCKET)
             throw MyException("failed at creating the server socket!");
         int bind_r = bind(listenServerFd, (struct sockaddr*)&listeningServAddr, sizeof(listeningServAddr));
-        if (bind_r != 0) 
+        if (bind_r != 0)
+        {
             throw MyException("binding address to socket failed!");
-        if (listen(listenServerPort, 1000) != 0) {
-            throw MyException("binding address to server socket failed!");
+        }
+        if (listen(listenServerFd, 100) != 0) {
+            throw MyException("failed to put socket in listening state!");
         }
         if ((serverKqFd = kqueue()) == -1)
             throw MyException("failure at creating the kernel queue");
@@ -114,7 +116,6 @@ void server::read_from_client(client *c, long data_length)
 {
     if (!c)
         return ;
-
     char *c_buffer = new char[data_length];
     int bytesRead = recv(c->getClientFd(), c_buffer, data_length, 0);
     if (bytesRead <= 0)
@@ -123,7 +124,7 @@ void server::read_from_client(client *c, long data_length)
     {
         c->appendToReadBuffer(c_buffer);
     }
-
+    delete[] c_buffer;
 }
 
 void server::run()
@@ -168,10 +169,13 @@ void server::run()
                     //read data from client socket
                     read_from_client(cl, _eventList[i].data);
                     //have kqueue disable tracking read events and enable write events
-                    // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
-                    // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                    // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_ENABLE, 0, 0, NULL);
-                    // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                    if (cl->is_reading_complete())
+                    {
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_ENABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                    }
                 }
                 // else if (_eventList[i].filter == EVFILT_WRITE)
                 // {
