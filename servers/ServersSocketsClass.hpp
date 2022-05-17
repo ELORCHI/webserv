@@ -30,4 +30,4 @@ class Servers : public server
 };
 
 int webserv(char *ConfFile);
-Servers IniteServer(std::vector<Servers> &servers, std::vector<server> ServersConf);
+void IniteServers(std::vector<Servers> &servers, std::vector<server> ServersConf);
