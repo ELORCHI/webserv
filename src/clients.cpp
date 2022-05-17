@@ -1,5 +1,6 @@
 #include "clients.h"
 #include <iostream>
+#include "request.hpp"
 
 client::client(int fd, struct sockaddr_in addr)
 {
@@ -13,10 +14,8 @@ client::client(int fd, struct sockaddr_in addr)
 void client::appendToReadBuffer(char *buffer)
 {
     read_buffer += buffer;
-    if (read_buffer.find("\n\n") != std::string::npos)
-    {
-        std::cout << "header found" << std::endl;
-    }
+    if (request::is_request_complete(read_buffer))
+        is_done_reading_from = true;
 }
 
 

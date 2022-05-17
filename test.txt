@@ -1,0 +1,12 @@
+GET https://greenbytes.de/tech/webdav/?draft-ietf-httpbis-http2-09.html HTTP/1.1
+gdndfgn: dfgndfgn
+User-Agent: PostmanRuntime/7.29.0
+Accept: */*
+Postman-Token: 6305b045-e7a3-47e2-a600-571810aa3cec
+Host: localhost:8080
+Accept-Encoding: gzip, deflate, br
+Connection: keep-alive
+Content-Length: 5
+Content-Type: application/octet-stream
+
+1234\n
