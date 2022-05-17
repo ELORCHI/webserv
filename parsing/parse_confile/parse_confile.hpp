@@ -27,7 +27,7 @@ class location;
 class server;
 class parse_config
 {
-    private:
+    protected:
         std::vector<std::string> _lines;
         std::vector<std::string> _words;
         std::vector<server> _servers;
@@ -42,6 +42,7 @@ class parse_config
         void                specified_words(std::string&);
         unsigned int        server_parsing(unsigned int&);
         size_t              get_lines_size() const;
+        std::vector<server> get_server_vect() const { return _servers;};
         void                set_lines(std::vector<std::string> lines);
         void                read_lines();
         void                read_server();
