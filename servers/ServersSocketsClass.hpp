@@ -6,6 +6,7 @@
 // and add some subclasses for managing requests and preparing for responses
 
 #include <netinet/in.h>
+# define ALLOWED_QUEUE 5
 
 class SocketData
 {
@@ -16,6 +17,7 @@ class SocketData
         int setSocketFd(void);
         int setSocketaddress(int port);
         int bindSocket(void) const;
+        int listenSocket(void) const;
 };
 
 class Servers : public server
@@ -39,10 +41,12 @@ int Servers::setSocket(void)
 {
     if (Socket.setSocketFd() || Socket.setSocketaddress(atoi(_listen_port.c_str())))
         return (1);
-    if (Socket.bindSocket() == -1)
+    if (Socket.bindSocket())
     {
         return (1);
     }
+    if (Socket.listenSocket())
+        return (1);
     return (0);
 }
 
@@ -71,4 +75,11 @@ int SocketData::bindSocket(void) const
     {
         return (1);
     }
+}
+
+int SocketData::listenSocket(void) const
+{
+    if (listen(socketfd, ALLOWED_QUEUE) == -1)
+        return (1);
+    return (0);
 }
