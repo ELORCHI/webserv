@@ -13,7 +13,7 @@
 
 int main(int argc, char **argv)
 {  
-    httpServer::get_httpServers(argc, argv);
+    // httpServer::get_httpServers(argc, argv);
     // parse_config conf;
 	// std::vector<server> parsed_servers_data;
 

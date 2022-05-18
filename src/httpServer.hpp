@@ -65,7 +65,7 @@ class httpServer {
     public:
         static std::unordered_map<int, socket_data> sharedPortsSockets;
         static std::vector<httpServer> servers;
-        static std::unordered_set<int> httpServer::getRepeatedPorts(std::vector<server> parsed_servers_data);
+        static std::unordered_set<int> getRepeatedPorts(std::vector<server> parsed_servers_data);
         static void get_httpServers(int argc, char **argv);
         static void httpServers_repl();
 };

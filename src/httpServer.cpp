@@ -22,6 +22,7 @@ socket_data create_listening_socket(int port)
         throw MyException("binding address to socket failed!");
     if (listen(sd.listenServerFd, 100) != 0) 
         throw MyException("failed to put socket in listening state!"); 
+    return sd;
 }
 
 int	parsing_conf(int ac, char **av,parse_config *conf)
@@ -78,11 +79,9 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     listenServerPort = server_parsed_data.get_listen_port(); 
     canRun = false;
     serverKqFd = -1;
-}
-bool httpServer::start() {
     canRun = false;
     listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
-    socket_data sd;
+    this->server_parsed_data = server_parsed_data;
     try {
         if (listenServerFd == INVALID_SOCKET)
             throw MyException("failed at creating the server socket!");
@@ -94,18 +93,17 @@ bool httpServer::start() {
         if (listen(listenServerFd, 100) != 0) {
             throw MyException("failed to put socket in listening state!");
         }
-        sd = create_listening_socket(listenServerPort);
+        if (!is_shared_port)
+            *sd = create_listening_socket(listenServerPort);
         if ((serverKqFd = kqueue()) == -1)
             throw MyException("failure at creating the kernel queue");
-        
     }
     catch (std::exception &e)
     {
         std::cerr << e.what() << std::endl;
-        return false;
     }
-    listenServerFd = sd.listenServerFd;
-    listeningServAddr = sd.listeningServAddr;
+    listenServerFd = (*sd).listenServerFd;
+    listeningServAddr = (*sd).listeningServAddr;
     //set server listening socket as non blockin
     fcntl(listenServerFd, F_SETFL, O_NONBLOCK);
 
@@ -114,8 +112,46 @@ bool httpServer::start() {
     EV_SET(&_kEvent, listenServerFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
     kevent(serverKqFd, &_kEvent, 1, NULL, 0, NULL);
     canRun = true;
-    return true;
+    //return true;
 }
+
+// bool httpServer::start() {
+//     canRun = false;
+//     listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
+//     socket_data sd;
+//     try {
+//         if (listenServerFd == INVALID_SOCKET)
+//             throw MyException("failed at creating the server socket!");
+//         int bind_r = bind(listenServerFd, (struct sockaddr*)&listeningServAddr, sizeof(listeningServAddr));
+//         if (bind_r != 0)
+//         {
+//             throw MyException("binding address to socket failed!");
+//         }
+//         if (listen(listenServerFd, 100) != 0) {
+//             throw MyException("failed to put socket in listening state!");
+//         }
+//         sd = create_listening_socket(listenServerPort);
+//         if ((serverKqFd = kqueue()) == -1)
+//             throw MyException("failure at creating the kernel queue");
+        
+//     }
+//     catch (std::exception &e)
+//     {
+//         std::cerr << e.what() << std::endl;
+//         return false;
+//     }
+//     listenServerFd = sd.listenServerFd;
+//     listeningServAddr = sd.listeningServAddr;
+//     //set server listening socket as non blockin
+//     fcntl(listenServerFd, F_SETFL, O_NONBLOCK);
+
+//     //add event read event to kqueue
+//     struct kevent _kEvent;
+//     EV_SET(&_kEvent, listenServerFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
+//     kevent(serverKqFd, &_kEvent, 1, NULL, 0, NULL);
+//     canRun = true;
+//     return true;
+// }
 
 
 void httpServer::stop()
@@ -286,9 +322,11 @@ void httpServer::get_httpServers(int argc, char **argv)
     for (int i = 0; i < parsed_servers_data.size(); i++)
     {
         int port = parsed_servers_data[i].get_listen_port();
-        if (replicatedPorts.find(port) == replicatedPorts.end())
-            sharedPortsSockets[port] =  create_listening_socket(port);
+        if (replicatedPorts.find(port) == replicatedPorts.end()) {
+            sharedPortsSockets[port] = create_listening_socket(port);
+            // servers.push_back(httpServer(parsed_servers_data[i], true, &sharedPortsSockets[port]));
+        }
+        // else 
+        //     servers.push_back(httpServer(parsed_servers_data[i], false, NULL));
     }
-
-
 }
