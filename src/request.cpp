@@ -16,7 +16,7 @@ bool request::is_chunked_request_complete(std::string buffer)
 {
     if (buffer.find("0\r\n\r\n") != std::string::npos)
         return true;
-    return false
+    return false;
 }
 
 bool request::is_request_complete(std::string buffer)

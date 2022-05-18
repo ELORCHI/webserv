@@ -1,4 +1,4 @@
-#include "src/server.hpp"
+#include "src/httpServer.hpp"
 #include <string>
 #include <iostream>
 #include "src/request.hpp"
@@ -10,12 +10,20 @@
 #include <streambuf>
 
 
-int main(int argc, char *argv[])
-{
 
-    server s(4201);
-    s.start();
-    s.run();
+int main(int argc, char **argv)
+{  
+    httpServer::get_httpServers(argc, argv);
+    // parse_config conf;
+	// std::vector<server> parsed_servers_data;
+
+	// if(!parsing_conf(argc, argv, &conf))
+		// return (0);
+	// parsed_servers_data = conf.get_server_vect();
+    //conf.read_server();
+    // httpServer s(4201);
+    // s.start();
+    // s.run();
     // std::stringstream ss;
     // std::string s;
     // std::ifstream file;

@@ -146,3 +146,19 @@ cgi     location::get_cgi(int i) const
 {
     return _cgi[i];
 }
+
+
+/*
+    operator
+*/
+
+location    &location::operator=(location const &rhs)
+{
+    this->_locations_path = rhs._locations_path;
+    this->_allow_methods = rhs._allow_methods;
+    this->_root = rhs._root;
+    this->_autoindex = rhs._autoindex;
+    this->_client_max_body_size = rhs._client_max_body_size;
+    this->_index = rhs._index;
+    return *this;
+}

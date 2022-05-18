@@ -55,3 +55,14 @@ unsigned int cgi::get_cgi_methods_size()
     return this->_allow_methods.size();
 }
 
+/*
+    operator
+*/
+
+cgi    &cgi::operator=(cgi const &rhs)
+{
+    this->_name = rhs._name;
+    this->_cgi_path = rhs._cgi_path;
+    this->_allow_methods = rhs._allow_methods;
+    return *this;
+}

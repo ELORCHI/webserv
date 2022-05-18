@@ -25,14 +25,23 @@
 #include "clients.h"
 #include <unordered_map>
 #include <algorithm>
+#include "../parsing/parse_confile/parse_confile.hpp"
+#include <unordered_set>
 
 #define NUM_CLIENTS 10
 #define PORT 6000
 #define MAX_MSG_SIZE 256
 #define INVALID_SOCKET -1
 #define MAX_EVENTS 1000
+class parse_config;
 
-class server {
+typedef struct {
+    int listenServerFd;
+    int listenServerPort;
+    struct sockaddr_in listeningServAddr; 
+} socket_data;
+
+class httpServer {
     int listenServerFd;
     int listenServerPort;
     struct sockaddr_in listeningServAddr; 
@@ -40,9 +49,12 @@ class server {
     bool canRun;
     struct kevent _eventList[MAX_EVENTS];
     std::unordered_map<int, client*>clientmap;
+    bool is_shared_port;
+    server server_parsed_data;
     public:
-        server(int port);
-        ~server() {}
+        // httpServer(int port);
+        httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd);
+        ~httpServer() {}
         bool start();
         void stop();
         void run();
@@ -51,6 +63,9 @@ class server {
         void read_from_client(client *c, long data_length);
     //handeling multiple servers interface
     public:
-        static std::vector<server> servers;
-        static servers_repl();
+        static std::unordered_map<int, socket_data> sharedPortsSockets;
+        static std::vector<httpServer> servers;
+        static std::unordered_set<int> httpServer::getRepeatedPorts(std::vector<server> parsed_servers_data);
+        static void get_httpServers(int argc, char **argv);
+        static void httpServers_repl();
 };

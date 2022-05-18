@@ -27,8 +27,8 @@ protected:
     std::string                 _root;
     std::string                 _client_max_body_size;
     std::vector<std::string>    _index;
-    std::vector<cgi>                        _cgi;
-    bool                         _autoindex;
+    std::vector<cgi>            _cgi;
+    bool                        _autoindex;
 public:
     location();
     ~location();
@@ -55,6 +55,7 @@ public:
     unsigned int                 fill_index(std::vector<std::string>, unsigned int);
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
     unsigned int                 fill_cgi(std::vector<std::string>, unsigned int, bool&);
+    location                    &operator=(location const & rhs);
 };
 
 #endif

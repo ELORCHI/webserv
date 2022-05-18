@@ -23,7 +23,7 @@ class server
 {
 protected:
     std::vector<std::string>                _name;
-    std::string                             _listen_port;
+    int                                     _listen_port;
     std::string                             _listen_host;
     std::vector<std::string>                _allowed_methods;
     std::vector<std::string>                _index;
@@ -53,7 +53,7 @@ public:
     void                         set_autoindex(bool autoindex);
     std::string                  get_name(int) const;
     std::string                  get_listen_host() const;
-    std::string                  get_listen_port() const;
+    int                          get_listen_port() const;
     std::string                  get_allowed_methods(int i) const;
     std::string                  get_index(int i) const;
     std::vector<std::string>     get_error_pages(int i) const;
@@ -77,5 +77,6 @@ public:
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
     unsigned int                 fill_location(std::vector<std::string>, unsigned int, bool&);
     unsigned int                 fill_cgi(std::vector<std::string>, unsigned int, bool&);
+    server                         &operator=(server const & rhs);
 };
 #endif

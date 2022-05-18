@@ -1,27 +1,88 @@
-#include "server.hpp"
+#include "httpServer.hpp"
 #include <netinet/in.h>
 #include <sys/event.h>
 #include <sys/fcntl.h>
 #include <sys/socket.h>
 #include <utility>
 
-server::server(int port)
+socket_data create_listening_socket(int port)
 {
-    listenServerFd = INVALID_SOCKET;
-    listenServerPort = port; 
-    canRun = false;
-    serverKqFd = -1;
-    memset(&listeningServAddr, 0, sizeof listeningServAddr);
-    listeningServAddr.sin_family = AF_INET; //IP v4 family
-    listeningServAddr.sin_port = htons(listenServerPort); //The htons function takes a 16-bit number in host byte order and returns a 16-bit number in network byte order used in TCP/IP networks
-    listeningServAddr.sin_addr.s_addr = htonl(INADDR_ANY); //accept all connections aka set address to 0.0.0.0
+    socket_data sd;
+
+    sd.listenServerPort = port;
+    memset(&sd.listeningServAddr, 0, sizeof sd.listeningServAddr);
+    sd.listeningServAddr.sin_family = AF_INET; 
+    sd.listeningServAddr.sin_port = htons(port); //The htons function takes a 16-bit number in host byte order and returns a 16-bit number in network byte order used in TCP/IP networks
+    sd.listeningServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    sd.listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sd.listenServerFd == INVALID_SOCKET)
+        throw MyException("failed at creating the server socket!");
+    int bind_r = bind(sd.listenServerFd, (struct sockaddr*)&sd.listeningServAddr, sizeof(sd.listeningServAddr));
+    if (bind_r != 0)
+        throw MyException("binding address to socket failed!");
+    if (listen(sd.listenServerFd, 100) != 0) 
+        throw MyException("failed to put socket in listening state!"); 
 }
 
+int	parsing_conf(int ac, char **av,parse_config *conf)
+{
+	// parse_server_config *conf = new parse_server_config;
+	// parse_config conf;
 
-bool server::start() {
+	if (ac != 2)
+	{
+		std::cout << "Usage: ./parse_confile <path_to_config_file>" << std::endl;
+		return (0);
+	}
+	std::ifstream file(av[1]);
+	if (!file.is_open())
+	{
+		std::cout << "Error: file " << av[1] << " not found" << std::endl;
+		return (0);
+	}
+	std::string line;
+	std::vector<std::string> lines;
+	while (std::getline(file, line))
+		lines.push_back(line);
+	file.close();
+	conf->set_lines(lines);
+	// conf.read_lines();
+	try
+	{
+		conf->start_parsing();
+	}
+	catch (std::runtime_error &e)
+	{
+		std::cout << e.what() << std::endl;
+		return (0);
+	}
+	// conf->read_server();
+	return (1);
+}
+
+// httpServer::httpServer(int port)
+// {
+//     listenServerFd = INVALID_SOCKET;
+//     listenServerPort = port; 
+//     canRun = false;
+//     serverKqFd = -1;
+//     memset(&listeningServAddr, 0, sizeof listeningServAddr);
+//     listeningServAddr.sin_family = AF_INET; //IP v4 family
+//     listeningServAddr.sin_port = htons(listenServerPort); //The htons function takes a 16-bit number in host byte order and returns a 16-bit number in network byte order used in TCP/IP networks
+//     listeningServAddr.sin_addr.s_addr = htonl(INADDR_ANY); //accept all connections aka set address to 0.0.0.0
+// }
+
+httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd)
+{
+    listenServerFd = INVALID_SOCKET;
+    listenServerPort = server_parsed_data.get_listen_port(); 
+    canRun = false;
+    serverKqFd = -1;
+}
+bool httpServer::start() {
     canRun = false;
     listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
-
+    socket_data sd;
     try {
         if (listenServerFd == INVALID_SOCKET)
             throw MyException("failed at creating the server socket!");
@@ -33,6 +94,7 @@ bool server::start() {
         if (listen(listenServerFd, 100) != 0) {
             throw MyException("failed to put socket in listening state!");
         }
+        sd = create_listening_socket(listenServerPort);
         if ((serverKqFd = kqueue()) == -1)
             throw MyException("failure at creating the kernel queue");
         
@@ -42,7 +104,8 @@ bool server::start() {
         std::cerr << e.what() << std::endl;
         return false;
     }
-
+    listenServerFd = sd.listenServerFd;
+    listeningServAddr = sd.listeningServAddr;
     //set server listening socket as non blockin
     fcntl(listenServerFd, F_SETFL, O_NONBLOCK);
 
@@ -55,7 +118,7 @@ bool server::start() {
 }
 
 
-void server::stop()
+void httpServer::stop()
 {
     canRun = false;
     if (listenServerFd != INVALID_SOCKET)
@@ -76,7 +139,7 @@ void server::stop()
     }
 }
 
-void server::acceptConnection()
+void httpServer::acceptConnection()
 {
     struct sockaddr_in clientAddr;
     int clientAddrlen = sizeof(clientAddr);
@@ -99,7 +162,7 @@ void server::acceptConnection()
     //test block
 }
 
-void server::disconnectClient(client *c, bool is_delete)
+void httpServer::disconnectClient(client *c, bool is_delete)
 {
     struct kevent kEv;
 
@@ -115,7 +178,7 @@ void server::disconnectClient(client *c, bool is_delete)
     delete c;
 }
 
-void server::read_from_client(client *c, long data_length)
+void httpServer::read_from_client(client *c, long data_length)
 {
     if (!c)
         return ; 
@@ -130,7 +193,7 @@ void server::read_from_client(client *c, long data_length)
     delete[] c_buffer;
 }
 
-void server::run()
+void httpServer::run()
 {
     int num_events = 0;
     client *cl;
@@ -141,7 +204,7 @@ void server::run()
         //get all the triggered events
         num_events = kevent(serverKqFd, NULL, 0, _eventList, MAX_EVENTS, NULL);
         if (num_events <= 0)
-            continue ;
+            return ;
         for (int i = 0; i < num_events; i++)
         {
             if (_eventList[i].ident == listenServerFd) //a client is waiting to connect
@@ -196,7 +259,36 @@ void server::run()
     }
 }
 
+std::unordered_set<int> httpServer::getRepeatedPorts(std::vector<server> parsed_servers_data)
+{
+    std::vector<int> ports;
+    for (int i = 0; i < parsed_servers_data.size(); i++)
+        ports.push_back(parsed_servers_data[i].get_listen_port());
+    std::unordered_set<int> nums_set;
+    for (int i = 0; i < ports.size(); i++)
+    {
+        if (nums_set.find(ports[i]) == nums_set.end())
+            nums_set.insert(ports[i]);
+    }
+    return (nums_set);
+}
+
+void httpServer::get_httpServers(int argc, char **argv)
+{
+    parse_config conf;
+    std::vector<server> parsed_servers_data;
+    if(!parsing_conf(argc, argv, &conf))
+		return ;
+	parsed_servers_data = conf.get_server_vect();
+    for (int i = 0; i < parsed_servers_data.size(); i++)
+        std::cout << parsed_servers_data[i].get_listen_port() << std::endl; 
+    std::unordered_set<int> replicatedPorts = getRepeatedPorts(parsed_servers_data);
+    for (int i = 0; i < parsed_servers_data.size(); i++)
+    {
+        int port = parsed_servers_data[i].get_listen_port();
+        if (replicatedPorts.find(port) == replicatedPorts.end())
+            sharedPortsSockets[port] =  create_listening_socket(port);
+    }
 
 
-
-
+}
