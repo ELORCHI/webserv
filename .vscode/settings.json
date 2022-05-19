@@ -69,5 +69,8 @@
         "utility": "cpp",
         "vector": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Disabled"
+    "C_Cpp.errorSquiggles": "Disabled",
+    "C_Cpp.dimInactiveRegions": false,
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": false
 }

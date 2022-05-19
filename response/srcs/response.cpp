@@ -3,11 +3,9 @@
 
 const server& response::serverIdentify(const std::vector<server>& Servers, const parse_request request)
 {
-	std::vector<server>	tmp;
-	int		port;
-	int		serverName;
+	std::vector<server> mathces;
 	for (std::vector<server>::iterator it, it < Servers.end(), it++)
 	{
-		if 
+		if ((it->get_listen_port().c_str) == )
 	}
 }
