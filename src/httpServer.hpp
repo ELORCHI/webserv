@@ -27,6 +27,7 @@
 #include <algorithm>
 #include "../parsing/parse_confile/parse_confile.hpp"
 #include <unordered_set>
+#include <set>
 
 #define NUM_CLIENTS 10
 #define PORT 6000
@@ -63,9 +64,9 @@ class httpServer {
         void read_from_client(client *c, long data_length);
     //handeling multiple servers interface
     public:
-        static std::unordered_map<int, socket_data> sharedPortsSockets;
         static std::vector<httpServer> servers;
-        static std::unordered_set<int> getRepeatedPorts(std::vector<server> parsed_servers_data);
-        static void get_httpServers(int argc, char **argv);
-        static void httpServers_repl();
+        static std::set<int> getRepeatedPorts(std::vector<server> parsed_servers_data);
+        static socket_data *create_listening_socket(int port);
+        static int	parsing_conf(int ac, char **av,parse_config *conf);
+
 };

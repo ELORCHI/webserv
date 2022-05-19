@@ -8,11 +8,14 @@
 #include <sstream>
 #include <string>
 #include <streambuf>
-
+#include "src/servers.hpp"
 
 
 int main(int argc, char **argv)
-{  
+{ 
+    httpServers _servers(argc, argv);
+    _servers.httpServers_repl();
+    
     // httpServer::get_httpServers(argc, argv);
     // parse_config conf;
 	// std::vector<server> parsed_servers_data;
