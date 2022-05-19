@@ -8,12 +8,10 @@ parse_request::parse_request():
     _http_headers(),
     _http_body()
 {
-
 }
 
 parse_request::~parse_request()
 {
-
 }
 
 void    parse_request::set_lines(char *buffer)
@@ -23,7 +21,7 @@ void    parse_request::set_lines(char *buffer)
 	int k = 0;
 	while (1)
 	{
-		found = line.find("\n",found + 1);//replace "\n" by "\r\n"
+		found = line.find("\r\n",found + 1);//replace "\n" by "\r\n"
 		if (found == std::string::npos)
 		{
 			std::string tmp;// = line.substr(k, line.size());
@@ -114,10 +112,22 @@ void    parse_request::set_http_headers(std::string line)
 	_http_headers[key] = value;
 }
 
-void	parse_request::set_http_body(std::string line)
+void	parse_request::set_http_body(std::vector<std::string> line)
 {
-	_http_body += line;
-	_http_body += "\n";
+	int chunked = 0;
+	if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers["Transfer-Encoding"] == "chunked")
+		chunked = 1;
+	
+	// while (_lines.size() > i)
+	// {
+	// 	if (chunked)
+	// 		i = this->set_chunked_http_body(_lines, i);
+	// 	else
+	// 		this->set_http_body(_lines[i]);
+	// 	i++;
+	// }
+	// _http_body += line;
+	// _http_body += "\n";
 }
 
 void    parse_request::start_parsing(char *buffer)
@@ -125,36 +135,50 @@ void    parse_request::start_parsing(char *buffer)
     int i = 1;
     this->set_lines(buffer);
     this->set_http_vmp(_lines[0]);
-    while (_lines.size() > i && _lines[i][0] != '\n')//_lines[i][0] != '\r'
+    while (_lines.size() > i && _lines[i][0] != '\r' && _lines[i][1] != '\n')
     {
-		set_http_headers(_lines[i]);
+		this->set_http_headers(_lines[i]);
 		i++;
 	}
 	i++;
-	while (_lines.size() > i)
-	{
-		int chunked = 0;
-		for(std::map <std::string, std::string>::iterator it=_http_headers.begin(); it!=_http_headers.end(); ++it)
-		{
-			if (it->first == "Transfer-Encoding" && it->second == "chunked")
-			{
-				chunked = 1;
-				break ;
-			}
-		}
-		this->set_http_body(_lines[i]);
-		// if (chunked)
-		// 	this->reset_http_body();
-		i++;
-	}
+	set_http_body(_lines, i);
     std::cout << _http_method << std::endl;
     std::cout << _http_version << std::endl;
 	std::cout << "fragment: " << _http_path["fragment"] << std::endl;
 	std::cout << "path: " << _http_path["path"] << std::endl;
 	std::cout << "query: " <<_http_path["query"] << std::endl;
-	for(std::map <std::string, std::string>::iterator it=_http_headers.begin(); it!=_http_headers.end(); ++it)
+	for(std::map <std::string, std::string>::iterator it =_http_headers.begin(); it!=_http_headers.end(); ++it)
    	{
        std::cout << it->first << " => " << it->second << '\n';
    	}
 	std::cout << " \n body: \n"<< _http_body;
+}
+
+int	parse_request::set_chunked_http_body(std::vector<std::string> lines, int i)
+{
+	int chunk_size = 0;
+	while (lines.size() > i)
+	{
+		std::stringstream ss(lines[i]);
+		std::string token;
+		while (std::getline(ss, token, '\n'))
+		{
+			if (token.size() == 0)
+				return (i);
+			chunk_size = std::stoi(token);
+			i++;
+			if (chunk_size == 0)
+				return (i + 1);
+			int j = 0;
+			while (chunk_size > j)
+			{
+				_http_body += lines[i][j];
+				j++;
+			}
+			// _http_body.append("\n");
+			// i++;
+		}
+		i++;
+	}
+	return i;
 }

@@ -1,6 +1,6 @@
 
-#ifndef PARSE_CONFILE_HPP
-#define PARSE_CONFILE_HPP
+#ifndef PARSE_REQUEST_HPP
+#define PARSE_REQUEST_HPP
 
 #include <iostream>
 #include <fstream>
@@ -29,6 +29,7 @@ class parse_request
         // void set_http_path(std::string http_path);
         void set_http_headers(std::string);
         void set_http_body(std::string http_body);
+        int set_chunked_http_body(std::vector<std::string>, int);
         //getters
         std::string get_http_version();
         std::string get_http_method();
