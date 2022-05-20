@@ -186,9 +186,9 @@ int main()
     int x, y;
     std::stringstream stream;
 
-    std::cin >> x;
-    stream << x;
-    stream >> std::hex;
+    // std::cin >> x;
+    stream << "22";
+    stream >> std::hex >> y;
 	stream >> y;
     std::cout << y;
 
