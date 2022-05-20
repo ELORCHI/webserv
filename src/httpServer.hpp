@@ -26,8 +26,10 @@
 #include <unordered_map>
 #include <algorithm>
 #include "../parsing/parse_confile/parse_confile.hpp"
+#include "../parsing/parse_request/parse_request.hpp"
 #include <unordered_set>
 #include <set>
+
 
 #define NUM_CLIENTS 10
 #define PORT 6000
@@ -42,7 +44,8 @@ typedef struct {
     struct sockaddr_in listeningServAddr; 
 } socket_data;
 
-class httpServer {
+class httpServer
+{
     int listenServerFd;
     int listenServerPort;
     struct sockaddr_in listeningServAddr; 
@@ -68,5 +71,4 @@ class httpServer {
         static std::set<int> getRepeatedPorts(std::vector<server> parsed_servers_data);
         static socket_data *create_listening_socket(int port);
         static int	parsing_conf(int ac, char **av,parse_config *conf);
-
 };

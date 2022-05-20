@@ -35,10 +35,12 @@ protected:
     std::vector<cgi>                        _cgi;
     unsigned int                            _client_max_body_size;
     bool                                    _autoindex;
+
     // int                                     _accolade;
 public:
     server();
     ~server();
+    void                         set_to_default();
     void                         set_name(std::string name);
     void                         set_listen(std::string listen);
     void                         set_allowed_methods(std::string allowed_methods);

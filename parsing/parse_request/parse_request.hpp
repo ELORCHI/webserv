@@ -1,6 +1,6 @@
 
-#ifndef PARSE_CONFILE_HPP
-#define PARSE_CONFILE_HPP
+#ifndef PARSE_REQUEST_HPP
+#define PARSE_REQUEST_HPP
 
 #include <iostream>
 #include <fstream>
@@ -15,6 +15,7 @@ class parse_request
         std::vector<std::string> _lines;
         std::string _http_version;
         std::string _http_method;
+        unsigned int _port_request;
         // std::string _http_path;
         std::map<std::string, std::string> _http_path;
         std::map<std::string, std::string> _http_headers;
@@ -28,7 +29,10 @@ class parse_request
         // void set_http_method(std::string http_method);
         // void set_http_path(std::string http_path);
         void set_http_headers(std::string);
-        void set_http_body(std::string http_body);
+        void set_http_body(std::vector<std::string>, int);
+        void set_chunked_http_body(std::vector<std::string>, int);
+        void set_unchunked_http_body(std::vector<std::string>, int);
+        size_t hex_to_dec(std::string num);
         //getters
         std::string get_http_version();
         std::string get_http_method();
@@ -36,6 +40,8 @@ class parse_request
         std::map<std::string, std::string> get_http_headers();
         std::string get_http_body();
         std::vector<std::string> get_lines();
+        bool    is_number(const std::string&);
+
         //methods
         void start_parsing(char *buffer);
 };

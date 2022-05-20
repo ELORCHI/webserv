@@ -284,7 +284,9 @@ void httpServer::run()
                     //have kqueue disable tracking read events and enable write events
                     if (cl->is_reading_complete())
                     {
+                        
                         std::cout << cl->getReadBuffer() << std::endl;
+                        //do smth with the data recieved
                         EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
                         kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
                         EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_ENABLE, 0, 0, NULL);

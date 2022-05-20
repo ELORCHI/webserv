@@ -2,6 +2,9 @@
 #include <netinet/in.h>
 #include <vector>
 #include <string>
+#include "../parsing/parse_request/parse_request.hpp"
+
+
 
 class client {
     int clientFd;
@@ -25,6 +28,7 @@ class client {
 
         bool is_reading_complete() { return is_done_reading_from; }
         void set_reading_status (bool status) { is_done_reading_from = status; }
-        void appendToReadBuffer(char *buffer); 
+        void appendToReadBuffer(char *buffer);
+        
         std::string getReadBuffer() {return read_buffer;}
 };

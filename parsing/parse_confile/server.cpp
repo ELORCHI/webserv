@@ -53,6 +53,15 @@ void    server::set_upload_path(std::string upload_path)
     _upload_path = upload_path;
 }
 
+void    server::set_to_default()
+{
+    if (_listen_host.empty() || _listen_port == -1)
+    {
+        _listen_host = "0.0.0.0" ;
+        _listen_port = 80;
+    }
+}
+
 void    server::set_listen(std::string listen)
 {
     if (!_listen_host.empty() || _listen_port != -1)

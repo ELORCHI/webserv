@@ -47,7 +47,8 @@ class parse_config
         void                read_lines();
         void                read_server();
         std::string         get_lines(int i)const;
-        // std::vector<server>& operator=(std::vector<server> const & rhs);
+        int                 parsing_conf(int ac, char const **av);
+        int                 basic_error(std::string , char const *, std::string);
 };
 
 #endif
