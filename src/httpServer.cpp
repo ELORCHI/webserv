@@ -5,6 +5,22 @@
 #include <sys/socket.h>
 #include <utility>
 
+bool httpServer::doesHttpRequestBelongs(request *rq)
+{
+    bool doesRequestHostBelong = false;
+    bool doesRequestPortBelong = false;
+    for (int i = 0; i < server_parsed_data.get_name_size(); i++)
+    {
+        if (server_parsed_data.get_name(i) == rq->getHost())
+            doesRequestHostBelong = true;
+    }
+    if (server_parsed_data.get_listen_port() == rq->getPort())
+        doesRequestPortBelong = true;
+    if (doesRequestHostBelong && doesRequestPortBelong)
+        return true;
+    return false;
+}
+
 std::set<int> httpServer::getRepeatedPorts(std::vector<server> parsed_servers_data)
 {
     std::vector<int> ports;
@@ -24,15 +40,17 @@ std::set<int> httpServer::getRepeatedPorts(std::vector<server> parsed_servers_da
     return (repeatedPorts);
 }
 
-socket_data *httpServer::create_listening_socket(int port)
+socket_data *httpServer::create_listening_socket(int port, std::string host)
 {
     socket_data *sd = new socket_data;
-
+    if (host == "localhost")
+        host = "127.0.0.1";
     sd->listenServerPort = port;
     memset(&sd->listeningServAddr, 0, sizeof sd->listeningServAddr);
     sd->listeningServAddr.sin_family = AF_INET; 
     sd->listeningServAddr.sin_port = htons(port); //The htons function takes a 16-bit number in host byte order and returns a 16-bit number in network byte order used in TCP/IP networks
-    sd->listeningServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    // sd->listeningServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    inet_pton(AF_INET, host.c_str(), &(sd->listeningServAddr));
     sd->listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
     if (sd->listenServerFd == INVALID_SOCKET)
         throw MyException("failed at creating the server socket!");
@@ -99,12 +117,12 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     canRun = false;
     serverKqFd = -1;
     canRun = false;
-    listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
+    // listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
     this->server_parsed_data = server_parsed_data;
         // std::cerr << is_shared_port << std::endl;
     try {
         if (!is_shared_port) 
-            sd = create_listening_socket(listenServerPort);
+            sd = create_listening_socket(listenServerPort, server_parsed_data.get_listen_host());
         if ((serverKqFd = kqueue()) == -1)
             throw MyException("failure at creating the kernel queue");
     }
@@ -287,20 +305,27 @@ void httpServer::run()
                         
                         std::cout << cl->getReadBuffer() << std::endl;
                         //do smth with the data recieved
-                        EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
-                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                        EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_ENABLE, 0, 0, NULL);
-                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        // request
+                        request *rq = new request(cl->getReadBuffer(), listenServerPort, &server_parsed_data);
+                        if (doesHttpRequestBelongs(rq))
+                            cl->addToReadyRequests(rq);
+                        else
+                            delete rq;
+                        // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
+                        // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_ENABLE, 0, 0, NULL);
+                        // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
                     }
                 }
-                // else if (_eventList[i].filter == EVFILT_WRITE)
-                // {
-                //     //have kqueue disable tracking write events and enable read events after data sending is done
-                //     // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
-                //     // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                //     // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
-                //     // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                // }
+                else if (_eventList[i].filter == EVFILT_WRITE)
+                {
+
+                    // have kqueue disable tracking write events and enable read events after data sending is done
+                    // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
+                    // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                    // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
+                    // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                }
                 //TODO: a client fd can be either ready for read or write or at the end of file
                 //de
             }

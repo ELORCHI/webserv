@@ -20,7 +20,7 @@ httpServers::httpServers(int argc, char **argv)
         int port = parsed_servers_data[i].get_listen_port();
         if (std::find(sharedPorts.begin(), sharedPorts.end(), port) != sharedPorts.end()) {
             if (bindedSharedPorts.find(port) == bindedSharedPorts.end()) {
-                shared_sockets[port] =  httpServer::create_listening_socket(port);
+                shared_sockets[port] =  httpServer::create_listening_socket(port, parsed_servers_data[i].get_listen_host());
                 bindedSharedPorts.insert(port);
             }
         }

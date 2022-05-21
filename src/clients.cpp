@@ -20,3 +20,8 @@ void client::appendToReadBuffer(char *buffer)
 
 
 client::~client() {}
+
+void client::addToReadyRequests(request *rq)
+{
+    ready_requests.push(rq);
+}

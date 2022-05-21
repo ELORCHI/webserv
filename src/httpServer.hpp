@@ -27,6 +27,7 @@
 #include <algorithm>
 #include "../parsing/parse_confile/parse_confile.hpp"
 #include "../parsing/parse_request/parse_request.hpp"
+#include "../src/request.hpp"
 #include <unordered_set>
 #include <set>
 
@@ -65,10 +66,11 @@ class httpServer
         void acceptConnection();
         void disconnectClient(client *c, bool is_delete);
         void read_from_client(client *c, long data_length);
+        bool doesHttpRequestBelongs(request *rq);
     //handeling multiple servers interface
     public:
         static std::vector<httpServer> servers;
         static std::set<int> getRepeatedPorts(std::vector<server> parsed_servers_data);
-        static socket_data *create_listening_socket(int port);
+        static socket_data *create_listening_socket(int port, std::string host);
         static int	parsing_conf(int ac, char **av,parse_config *conf);
 };
