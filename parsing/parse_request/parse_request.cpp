@@ -63,6 +63,21 @@ void    parse_request::set_lines(char *buffer)
 	// exit(0);
 }
 
+// HTTP/1.1
+void    parse_request::set_http_method(std::string &line)
+{
+	if (line != "POST" && line != "GET" && line != "DELETE")
+		throw std::runtime_error("Error: BAD METHOD");
+	_http_method = token;
+}
+
+void    parse_request::set_http_version(std::string &line)
+{
+	if (line != "HTTP/1.1")
+		throw std::runtime_error("Error: BAD VERSION");
+	_http_version = token;
+}
+
 void    parse_request::set_http_vmp(std::string line)
 {
     int i = 0;
@@ -71,9 +86,7 @@ void    parse_request::set_http_vmp(std::string line)
     while (std::getline(ss, token, ' '))
     {
         if (i == 0)
-        {
-            _http_method = token;
-        }
+			set_method(token);
         else if (i == 1)
         {
 			size_t found;
@@ -100,9 +113,7 @@ void    parse_request::set_http_vmp(std::string line)
 				_http_path["path"] = token;
         }
         else if (i == 2)
-        {
-            _http_version = token;
-        }
+			set_version(token);
         i++;
     }
 }
@@ -114,6 +125,8 @@ void    parse_request::set_http_headers(std::string line)
 	std::string token;
 	std::string key;
 	std::string value;
+	if (line.find(":") == std::string::npos)
+		throw std::runtime_error("Error: BAD REQUEST");
 	while (std::getline(ss, token, ':'))
 	{
 		if (i == 0)
