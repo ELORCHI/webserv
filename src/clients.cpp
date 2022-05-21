@@ -20,3 +20,19 @@ void client::appendToReadBuffer(char *buffer)
 
 
 client::~client() {}
+
+void client::addToReadyRequests(request *rq)
+{
+    ready_requests.push(rq);
+}
+
+std::queue<request*> client::getRequestsQueue()
+{
+    return ready_requests;
+}
+bool client::isRequestsQueueEmpty()
+{
+    if (ready_requests.size() == 0)
+        return false;
+    return true; 
+}
