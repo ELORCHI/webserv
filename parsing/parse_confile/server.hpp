@@ -53,6 +53,7 @@ public:
     std::string                  get_root() const;
     std::string                  get_upload_path() const;
     location                     get_location(int i) const;
+	std::vector<location>		 get_locations(void);
     unsigned int                 get_location_size() const;
     unsigned int                 get_cgi_size() const;
     cgi                          get_cgi(int i) const;

@@ -201,6 +201,10 @@ location   server::get_location(int i) const
 {
     return _location[i];
 }
+std::vector<location> server::get_locations(void)
+{
+	return _location;
+}
 
 cgi     server::get_cgi(int i) const
 {
