@@ -2,24 +2,21 @@
 #include "../../includes/webserv.hpp"
 
 
-class searchLocatin
-{
-
-};
-
 class response
 {
 	public:
 		response(client client);
 		~response();
-		searchLocation searchLocatin;
 		send();
+		location getSearchLocation(server server);
+		char *buffer;
     private:
 		int status;
+		location searchLocatin;
 };
 
 
 response::response(client client)
 {
-	
+
 }
