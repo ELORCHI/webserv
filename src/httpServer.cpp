@@ -319,7 +319,11 @@ void httpServer::run()
                 }
                 else if (_eventList[i].filter == EVFILT_WRITE)
                 {
-
+                    if (cl->isRequestsQueueEmpty() == false)
+                    {
+                        response *res = new response(cl)
+                        
+                    }
                     // have kqueue disable tracking write events and enable read events after data sending is done
                     // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
                     // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);

@@ -34,5 +34,6 @@ class client {
         
         std::string getReadBuffer() {return read_buffer;}
         void addToReadyRequests(request *rq);
-        
+        std::queue<request*> getRequestsQueue();
+        bool isRequestsQueueEmpty();
 };
