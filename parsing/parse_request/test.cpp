@@ -181,11 +181,31 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+
+bool is_hexnumber(const std::string& str)
+{
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		char current = str[i];
+		if (current >= '0' && current <= '9')
+			continue;
+		if (current >= 'A' && current <= 'F')
+			continue;
+		if (current >= 'a' && current <= 'f')
+			continue;
+		return false;
+	}
+	return true;
+}
+
 int main()
 {
     int x, y;
     std::stringstream stream;
 
+    if (is_hexnumber("1C"))
+        std::cout << "1"; 
+    exit(0);
     // std::cin >> x;
     stream << "22";
     stream >> std::hex >> y;
@@ -197,4 +217,4 @@ int main()
 
 
 
-4\r\nWiki\r\n6\r\npedia \r\nE\r\nin\r\n\r\nchunks.\r\n0\r\n\r\n
+// 4\r\nWiki\r\n6\r\npedia \r\nE\r\nin\r\n\r\nchunks.\r\n0\r\n\r\n
