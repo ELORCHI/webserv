@@ -1,4 +1,4 @@
-// #include "request.hpp"
+//#include "request.hpp"
 
 // int			badRequest(request& req){
 // 	req.setCode(400);
@@ -194,3 +194,7 @@ int main()
 
     return 0;
 }
+
+
+
+4\r\nWiki\r\n6\r\npedia \r\nE\r\nin\r\n\r\nchunks.\r\n0\r\n\r\n
