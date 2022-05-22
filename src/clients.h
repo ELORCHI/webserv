@@ -13,8 +13,8 @@ class client {
     struct sockaddr_in clientAddr;
     bool is_done_reading_from;
     std::string read_buffer;
+	request* ready_request;
      public:
-        std::queue<request*> ready_requests;
         client(int fd, struct sockaddr_in addr);
         ~client();
 
@@ -33,7 +33,9 @@ class client {
         void appendToReadBuffer(char *buffer);
         
         std::string getReadBuffer() {return read_buffer;}
-        void addToReadyRequests(request *rq);
-        std::queue<request*> getRequestsQueue();
+        request *getReadyRequest();
         bool isRequestsQueueEmpty();
+        bool isThereARequestReady();
+		void setRequest(request *rq);
+
 };

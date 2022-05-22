@@ -308,7 +308,7 @@ void httpServer::run()
                         // request
                         request *rq = new request(cl->getReadBuffer(), listenServerPort, &server_parsed_data);
                         if (doesHttpRequestBelongs(rq))
-                            cl->addToReadyRequests(rq);
+                            cl->setRequest(rq);
                         else
                             delete rq;
                         // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
@@ -319,7 +319,7 @@ void httpServer::run()
                 }
                 else if (_eventList[i].filter == EVFILT_WRITE)
                 {
-                    if (cl->isRequestsQueueEmpty() == false)
+                    if (cl->isThereARequestReady() == true)
                     {
                         response *res = new response(cl)
                         

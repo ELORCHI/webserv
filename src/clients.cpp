@@ -8,6 +8,8 @@ client::client(int fd, struct sockaddr_in addr)
     clientAddr = addr;
     is_done_reading_from = false;
     read_buffer.resize(8000);
+	ready_request = NULL;
+
 }
 
 
@@ -19,20 +21,25 @@ void client::appendToReadBuffer(char *buffer)
 }
 
 
-client::~client() {}
-
-void client::addToReadyRequests(request *rq)
-{
-    ready_requests.push(rq);
+client::~client() {
+	if (ready_request)
+		delete ready_request;
 }
 
-std::queue<request*> client::getRequestsQueue()
+request *client::getReadyRequest()
 {
-    return ready_requests;
+	return (this->ready_request);
 }
-bool client::isRequestsQueueEmpty()
+
+
+bool client::isThereARequestReady()
 {
-    if (ready_requests.size() == 0)
-        return false;
-    return true; 
+	if (this->ready_request)
+		return true;
+	return false;
+}
+
+void client::setRequest(request *rq)
+{
+	this->ready_request = rq;
 }
