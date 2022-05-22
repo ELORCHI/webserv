@@ -36,7 +36,12 @@ class parse_request
         size_t hex_to_dec(std::string num);
 
         //getters
-        // std::string	get_http_v
+        std::string get_http_method() const {return _http_method;};  
+        std::string get_http_version() const {return _http_version;};  
+        std::string get_http_path() {return _http_path["path"];};
+        std::string get_http_query() {return _http_path["query"];};
+        std::map<std::string, std::string> get_http_headers() const {return _http_headers;};
+        std::string get_http_body() const {return _http_body;};
 
         //methods
         bool	is_number(const std::string&);

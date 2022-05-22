@@ -221,15 +221,15 @@ void    parse_request::start_parsing(char *buffer)
     headers = this->set_http_vmp(_headers_part);
 	this->set_http_headers(headers);
 	set_http_body(_body_part);
-	std::cout << "Method: " << _http_method << std::endl;
-	std::cout << "Version: " << _http_version << std::endl;
-	std::cout << "Path: " << _http_path["path"] << std::endl;
-	std::cout << "Query: " << _http_path["query"] << std::endl;
-	std::cout << "Fragment: " << _http_path["fragment"] << std::endl;
+	std::cout << "Method: " << get_http_method() << std::endl;
+	std::cout << "Version: " << get_http_version() << std::endl;
+	std::cout << "Path: " << get_http_path() << std::endl;
+	std::cout << "Query: " << get_http_query() << std::endl;
+	// std::cout << "Fragment: " << _http_path["fragment"] << std::endl;
 	std::cout << "Headers: " << std::endl;
 	for(std::map <std::string, std::string>::iterator it =_http_headers.begin(); it!=_http_headers.end(); ++it)
    	{
        std::cout << it->first << " => " << it->second << '\n';
    	}
-	std::cout << "body: \n"<< _http_body;
+	std::cout << "body: \n"<< get_http_body();
 }
