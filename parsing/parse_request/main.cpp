@@ -2,7 +2,7 @@
 
 int main()
 {
-    char buffer[221] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nWiki\r\n6\r\npedia \r\nE\r\nin \r\n\r\nchunks.\r\n0\r\n\r\n";
+    char buffer[221] = "GET https://greenbytes.de/tech/webdav/?draft-ietf-httpbis-http2-09.html HTTP/1.1\r\nContent-Type: text/plain\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nWiki\r\n6\r\npedia \r\nE\r\nin \r\n\r\nchunks.\r\n0\r\n\r\n";
     
     // 26\r\n
     // Voici les données du premier morceau\r\n
@@ -16,6 +16,7 @@ int main()
     // sans saut de ligne\r\n
     // 0\r\n
     // \r\n
+     // namespace name
     
     
     // std::ifstream file("./request_file");

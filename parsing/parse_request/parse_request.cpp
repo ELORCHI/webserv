@@ -5,7 +5,10 @@ parse_request::parse_request():
     _http_method(),
     _http_path(),
     _http_headers(),
-    _http_body()
+    _http_body(),
+	_headers_part(),
+	_body_part(),
+	_port_request(0)
 {
 }
 
@@ -33,21 +36,21 @@ void    parse_request::set_lines(char *buffer)
 
 void    parse_request::set_http_method(std::string &line)
 {
-	// if (line != "POST" && line != "GET" && line != "DELETE")
-	// {
-	// 	std::cout << "Error: bad request" << std::endl;
-	// 	exit(0);
-	// }
+	if (line != "POST" && line != "GET" && line != "DELETE")
+	{
+		std::cout << "Error: bad request" << std::endl;
+		exit(0);
+	}
 	_http_method = line;
 }
 
 void    parse_request::set_http_version(std::string &line)
 {
-	// if (line != "HTTP/1.1")
-	// {
-	// 	std::cout << "Error: bad version" << std::endl;
-	// 	exit(0);
-	// }
+	if (line != "HTTP/1.1")
+	{
+		std::cout << "Error: bad version" << std::endl;
+		exit(0);
+	}
 	_http_version = line;
 }
 
@@ -125,12 +128,6 @@ void	parse_request::set_http_body(std::string &line)
 		std::cout << "Error: bad body" << std::endl;
 		exit(0);
 	}
-	// while (_lines.size() > i)
-	// {
-	// 	std::cout << _lines[i] << std::endl;
-	// 	i++;
-	// }
-	// exit (0);
 }
 
 void    parse_request::start_parsing(char *buffer)
@@ -140,16 +137,16 @@ void    parse_request::start_parsing(char *buffer)
     headers = this->set_http_vmp(_headers_part);
 	this->set_http_headers(headers);
 	set_http_body(_body_part);
-	// std::cout << "Method: " << _http_method << std::endl;
-	// std::cout << "Version: " << _http_version << std::endl;
-	// std::cout << "Path: " << _http_path["path"] << std::endl;
-	// std::cout << "Query: " << _http_path["query"] << std::endl;
-	// std::cout << "Fragment: " << _http_path["fragment"] << std::endl;
-	// std::cout << "Headers: " << std::endl;
-	// for(std::map <std::string, std::string>::iterator it =_http_headers.begin(); it!=_http_headers.end(); ++it)
-   	// {
-    //    std::cout << it->first << " => " << it->second << '\n';
-   	// }
+	std::cout << "Method: " << _http_method << std::endl;
+	std::cout << "Version: " << _http_version << std::endl;
+	std::cout << "Path: " << _http_path["path"] << std::endl;
+	std::cout << "Query: " << _http_path["query"] << std::endl;
+	std::cout << "Fragment: " << _http_path["fragment"] << std::endl;
+	std::cout << "Headers: " << std::endl;
+	for(std::map <std::string, std::string>::iterator it =_http_headers.begin(); it!=_http_headers.end(); ++it)
+   	{
+       std::cout << it->first << " => " << it->second << '\n';
+   	}
 	std::cout << "body: \n"<< _http_body;
 }
 
