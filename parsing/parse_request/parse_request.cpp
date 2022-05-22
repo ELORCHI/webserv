@@ -17,76 +17,57 @@ parse_request::~parse_request()
 void    parse_request::set_lines(char *buffer)
 {
 	std::string line = buffer;
-	std::size_t found = 0;
-	int k = 0;
-	int i = 0;
-	while (1)
+	size_t found;
+
+	found = line.find("\r\n");
+	if (found != std::string::npos)
 	{
-		found = line.find("\r\n", found + 2);//replace "\n" by "\r\n"
-		if (found == std::string::npos)
-		{
-			std::string tmp = line.substr(k, line.size());
-			// tmp.assign(line, k , line.size() - k);
-			_lines.push_back(tmp);
-			break ;
-		}
-		else if (found != std::string::npos)
-		{
-			std::string tmp;
-			tmp.assign(line, k ,(found - k));
-			if (k == found)
-			{
-				if (i == 0)
-				{
-					// i = 1;
-					_lines.push_back("\n");
-				}
-				else
-				{
-					k = found + 2;
-					continue;
-				}
-			}
-			else
-			{
-				_lines.push_back(tmp);
-			}
-			k = found + 2;
-		}
+		_http_headers = line.substr(0, found);
+		_http_body = line.substr(found + 2);
 	}
-	// i = 0;
-	// while (_lines.size() > i)
-	// {
-	// 	std::cout << _lines[i] << std::endl;
-	// 	i++;
-	// }
-	// exit(0);
+	else
+	{
+		std::cout << "Error: bad request" << std::endl;
+		exit(0);
+	}
 }
 
-// HTTP/1.1
 void    parse_request::set_http_method(std::string &line)
 {
 	if (line != "POST" && line != "GET" && line != "DELETE")
-		throw std::runtime_error("Error: BAD METHOD");
+	{
+		std::cout << "Error: bad request" << std::endl;
+		exit(0);
+	}
 	_http_method = token;
 }
 
 void    parse_request::set_http_version(std::string &line)
 {
 	if (line != "HTTP/1.1")
-		throw std::runtime_error("Error: BAD VERSION");
+	{
+		std::cout << "Error: bad version" << std::endl;
+		exit(0);
+	}
 	_http_version = token;
 }
 
-void    parse_request::set_http_vmp(std::string line)
+std::string    parse_request::set_http_vmp(std::string line)
 {
-    int i = 0;
-    std::stringstream ss(line);
+	size_t found;
+	std::string tmp, tmp2;
+	found = line.find("\r\n");
+	if (found != std::string::npos)
+	{
+		tmp = line.substr(0, found);
+		tmp2 = line.substr(found + 2);
+	}
+    std::stringstream ss(tmp);
     std::string token;
     while (std::getline(ss, token, ' '))
     {
         if (i == 0)
-			set_method(token);
+			set_http_method(token);
         else if (i == 1)
         {
 			size_t found;
@@ -113,75 +94,64 @@ void    parse_request::set_http_vmp(std::string line)
 				_http_path["path"] = token;
         }
         else if (i == 2)
-			set_version(token);
+			set_http_version(token);
         i++;
     }
+	return (tmp2);
 }
 
-void    parse_request::set_http_headers(std::string line)
+void    parse_request::set_http_headers(std::string &line)
 {
-	int i = 0;
+	size_t found;
+	line.erase(remove(line.begin(), line.end(), '\r'), line.end());
 	std::stringstream ss(line);
 	std::string token;
 	std::string key;
 	std::string value;
-	if (line.find(":") == std::string::npos)
-		throw std::runtime_error("Error: BAD REQUEST");
-	while (std::getline(ss, token, ':'))
+	// if (line.find(":") == std::string::npos)
+	// 	throw std::runtime_error("Error: BAD REQUEST");
+	while (std::getline(ss, token, '\n'))
 	{
-		if (i == 0)
-			key = token;
-		else if (i == 1)
+		found = token.find(":");
+		if (found != std::string::npos)
 		{
-			value = token;
-			value.erase(remove_if(value.begin(), value.end(), isspace), value.end());
+			key = token.substr(0, found);
+			value = token.substr(found + 2);
+			key.erase(remove(key.begin(), key.end(), ' '), key.end());
+			value.erase(remove(value.begin(), value.end(), ' '), value.end());
+			_http_headers[key] = value;
 		}
-		if (key == "Host" && i == 2)
+		else
 		{
-			value += ":";
-			value += token;
+			std::cout << "Error: bad headers" << std::endl;
+			exit(0);
 		}
-		i++;
 	}
 	_http_headers[key] = value;
 }
 
-void	parse_request::set_http_body(std::vector<std::string> line, int i)
-{
-	if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers["Transfer-Encoding"] == "chunked")
-		set_chunked_http_body(line, i);
-	else
-		set_unchunked_http_body(line, i);
-	// while (_lines.size() > i)
-	// {
-	// 	std::cout << _lines[i] << std::endl;
-	// 	i++;
-	// }
-	// exit (0);
-}
+// void	parse_request::set_http_body(std::vector<std::string> line, int i)
+// {
+// 	if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers["Transfer-Encoding"] == "chunked")
+// 		set_chunked_http_body(line, i);
+// 	else
+// 		set_unchunked_http_body(line, i);
+// 	// while (_lines.size() > i)
+// 	// {
+// 	// 	std::cout << _lines[i] << std::endl;
+// 	// 	i++;
+// 	// }
+// 	// exit (0);
+// }
 
 void    parse_request::start_parsing(char *buffer)
 {
-    int i = 1;
+	std::string headers;
     this->set_lines(buffer);
-    this->set_http_vmp(_lines[0]);
-    while (_lines.size() > i && _lines[i][0] != '\n')
-    {
-		this->set_http_headers(_lines[i]);
-		i++;
-	}
-	i++;
-	set_http_body(_lines, i);
-    std::cout << _http_method << std::endl;
-    std::cout << _http_version << std::endl;
-	std::cout << "fragment: " << _http_path["fragment"] << std::endl;
-	std::cout << "path: " << _http_path["path"] << std::endl;
-	std::cout << "query: " <<_http_path["query"] << std::endl;
-	for(std::map <std::string, std::string>::iterator it =_http_headers.begin(); it!=_http_headers.end(); ++it)
-   	{
-       std::cout << it->first << " => " << it->second << '\n';
-   	}
-	std::cout << " \n body: \n"<< _http_body;
+    headers = this->set_http_vmp(_http_headers);
+	this->set_http_headers(headers);
+	// set_http_body(_lines, i);
+	// std::cout << " \n body: \n"<< _http_body;
 }
 
 size_t parse_request::hex_to_dec(std::string num)
