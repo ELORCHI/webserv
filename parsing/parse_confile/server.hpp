@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yhebbat <yhebbat@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/05/01 02:38:52 by yhebbat           #+#    #+#             */
+/*   Updated: 2022/05/01 02:38:53 by yhebbat          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef SERVER_HPP
 #define SERVER_HPP
 #include "parse_confile.hpp"
@@ -53,7 +65,6 @@ public:
     std::string                  get_root() const;
     std::string                  get_upload_path() const;
     location                     get_location(int i) const;
-	std::vector<location>		 get_locations(void);
     unsigned int                 get_location_size() const;
     unsigned int                 get_cgi_size() const;
     cgi                          get_cgi(int i) const;

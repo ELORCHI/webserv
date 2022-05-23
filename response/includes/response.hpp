@@ -13,6 +13,7 @@ class response
 		int	 status;
 		int isFinished;
 		client _cl;
+		location searchLocation;
 	public:
 		response(client cl);
 		void buildGetResponse();
@@ -20,6 +21,7 @@ class response
 		void buildDelteResponse();
 		void buildNotAllowedResponse();
 		unsigned int send();
+		location getSearchLocation(sts::vector<location> locations);
 		~response();
 };
 

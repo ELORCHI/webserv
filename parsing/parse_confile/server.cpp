@@ -21,7 +21,7 @@
 //-------------constructor--------------
 server::server():
     _name(),
-    _listen_port(),
+    _listen_port(-1),
     _listen_host(),
     _allowed_methods(),
     _index(),
@@ -53,33 +53,46 @@ void    server::set_upload_path(std::string upload_path)
     _upload_path = upload_path;
 }
 
+void    server::set_to_default()
+{
+    if (_listen_host.empty() || _listen_port == -1)
+    {
+        _listen_host = "0.0.0.0" ;
+        _listen_port = 80;
+    }
+}
+
 void    server::set_listen(std::string listen)
 {
-    if (!_listen_host.empty() || !_listen_port.empty())
+    if (!_listen_host.empty() || _listen_port != -1)
         throw std::runtime_error("Error: listen already set");
     std::size_t found=listen.find(':');
     if (found!=std::string::npos)
     {
         if (found == 0 && (listen.size() - found != 1))
         {
+            std::string tmp;
             _listen_host = "0.0.0.0";
-            _listen_port = listen.substr(1, listen.size());
+            tmp = listen.substr(1, listen.size());
+            _listen_port = std::stoi(tmp);
         }
         else if (found == 0 && (listen.size() - found == 0))
         {
             _listen_host = "0.0.0.0" ;
-            _listen_port = "80";
+            _listen_port = 80;
         }
         else
         {
+            std::string tmp;
             _listen_host = listen.substr(0, found);
-            _listen_port = listen.substr(found+1, listen.size());
+            tmp = listen.substr(found+1, listen.size());
+            _listen_port = std::stoi(tmp);
         }
     }
     else
     {
         _listen_host = "0.0.0.0" ;
-        _listen_port = "80";
+        _listen_port = 80;
     }
 }
 
@@ -151,7 +164,7 @@ std::string   server::get_listen_host() const
     return _listen_host;
 }
 
-std::string   server::get_listen_port() const
+int   server::get_listen_port() const
 {
     return _listen_port;
 }
@@ -200,10 +213,6 @@ unsigned int    server::get_client_max_body_size() const
 location   server::get_location(int i) const
 {
     return _location[i];
-}
-std::vector<location> server::get_locations(void)
-{
-	return _location;
 }
 
 cgi     server::get_cgi(int i) const
@@ -352,4 +361,25 @@ unsigned int server::fill_cgi(std::vector<std::string> words, unsigned int i, bo
     cgi_flag = false;
     set_cgi(c);
     return i;
+}
+
+/*
+    operator
+*/
+
+server    &server::operator=(server const &rhs)
+{
+    if (this != &rhs)
+    {
+        _name = rhs._name;
+        _index = rhs._index;
+        _autoindex = rhs._autoindex;
+        _client_max_body_size = rhs._client_max_body_size;
+        _allowed_methods = rhs._allowed_methods;
+        _location = rhs._location;
+        _cgi = rhs._cgi;
+        _redirections = rhs._redirections;
+        _root = rhs._root;
+    }
+    return *this;
 }

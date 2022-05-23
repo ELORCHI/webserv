@@ -17,5 +17,18 @@ response::response(client cl)
 
 void response::buildGetResponse()
 {
-	
+	// build the response
+}
+
+location server::getSearchLocation(std::vector<location> locations)
+{
+	// get the location from the request
+	// return the location
+	std::vector<location>::iterator it = locations.begin();
+	while (it != locations.end())
+	{
+		
+			it++;
+	}
+
 }

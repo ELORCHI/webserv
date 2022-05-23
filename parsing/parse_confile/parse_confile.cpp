@@ -12,18 +12,6 @@
 
 #include "parse_confile.hpp"
 
-//--------constructor--------
-
-// parse_config::parse_config(): _lines()
-// {
-// }
-
-// //--------destructor--------
-
-// parse_config::~parse_config()
-// {
-// }
-
 //--------methods--------
 
 size_t parse_config::get_lines_size() const
@@ -51,13 +39,6 @@ void    parse_config::accolade_error()
             --accolade;
         ++i;
     }
-    // i = 0;
-    // while (i < _words.size())
-    // {
-    //     std::cout << _words[i] << std::endl;
-    //     ++i;
-    // }
-    // std::cout << accolade << std::endl;
     if (accolade != 0)
         throw std::runtime_error("Error: File Not Well Formated(accolade error)");
 }
@@ -81,7 +62,6 @@ void       parse_config::split_by_space()
 
 unsigned int   parse_config::server_parsing(unsigned int &i)
 {
-    // server *s = new server();
     server s;
     bool location_flag = false;
     bool cgi_flag = false;
@@ -115,6 +95,7 @@ unsigned int   parse_config::server_parsing(unsigned int &i)
            i = s.fill_cgi(_words, i, cgi_flag);
         i++;
     }
+    s.set_to_default();
     this->_servers.push_back(s);
     return i;
 }
@@ -161,7 +142,7 @@ void    parse_config::check_host_server_names_error()
         size_t k = i + 1;
         while (k < _servers.size())
         {
-            if ((_servers[i].get_listen_port().compare(_servers[k].get_listen_port()) == 0))
+            if ((_servers[i].get_listen_port() == _servers[k].get_listen_port()))
             {
                 size_t t = 0;
                 while (t < _servers[i].get_name_size())
@@ -206,6 +187,7 @@ void    parse_config::start_parsing()
 void    parse_config::read_server()
 {
     size_t i = 0;
+
     while (i < _servers.size())
     {
         std::cout << "--------------SERVER" << i << "---------------" <<std::endl;
@@ -338,6 +320,42 @@ void    parse_config::read_server()
         }
         i++;
     }
+}
+
+int parse_config::basic_error(std::string error_message, char const *av, std::string error_message2)
+{
+    if (av && error_message2 != "" && error_message != "")
+        std::cout << error_message << av << error_message2 << std::endl;
+    else if (av && error_message != "")
+        std::cout << error_message << av << std::endl;
+    else if (error_message != "")
+        std::cout << error_message << std::endl;    
+    return (0);
+}
+
+int parse_config::parsing_conf(int ac, char const **av)
+{
+	if (ac != 2)
+        return (basic_error("Usage: ./parse_confile <path_to_config_file>", NULL, ""));
+	std::ifstream file(av[1]);
+	if (!file.is_open())
+        return (basic_error("Error: file " , av[1] , " not found"));
+	std::string line;
+	std::vector<std::string> lines;
+	while (std::getline(file, line))
+		lines.push_back(line);
+	file.close();
+	set_lines(lines);
+	try
+	{
+		start_parsing();
+	}
+	catch (std::runtime_error &e)
+	{
+		std::cout << e.what() << std::endl;
+		return (0);
+	}
+	return (1);
 }
 //--------getters-------------
 
