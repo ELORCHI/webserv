@@ -41,6 +41,10 @@ response::response(client cl)
 // because searchlocation and other variables need to be set in the procces of responseTypeDecider
 
 
+// look at this for more notes on the responseTypeDecider
+// of course we will not imlement all of this. its just an inspiration
+//https://camo.githubusercontent.com/c26df6d372790e9f24d7e16d2cfa16a142985109b237bbc0f482c47a717019fe/68747470733a2f2f7261776769746875622e636f6d2f666f722d4745542f687474702d6465636973696f6e2d6469616772616d2f6d61737465722f6874747064642e66736d2e706e67
+
 int responseTypeDecider(client cl)
 {
 	std::string method = cl.getReadyRequest()->get_request_parsing_data().get_http_method();
