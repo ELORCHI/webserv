@@ -30,6 +30,9 @@
 #define RESPONSE_NOT_MODIFIED 304
 #define RESPONSE_BAD_REQUEST 400
 
+#define GET_RESPONSE 0
+#define POST_RESPONSE 1
+#define DELETE_RESPONSE 2
 
 class response
 {
@@ -45,6 +48,7 @@ class response
 		void buildPOSTRespone();
 		void buildDelteResponse();
 		void buildNotAllowedResponse();
+		int	 setResponseType(int type);
 		unsigned int send();
 		location getSearchLocation(sts::vector<location> locations);
 		~response();
@@ -52,3 +56,4 @@ class response
 
 
 response buildHttpResponse(client cl);
+int		responseTypeDecider(client cl);
