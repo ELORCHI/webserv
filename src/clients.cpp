@@ -24,6 +24,7 @@ void client::appendToReadBuffer(char *buffer)
 client::~client() {
 	if (ready_request)
 		delete ready_request;
+	
 }
 
 request *client::getReadyRequest()

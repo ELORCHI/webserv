@@ -1,11 +1,21 @@
 #include "../includes/response.hpp"
 
 
-const server& response::serverIdentify(const std::vector<server>& Servers, const parse_request request)
+response::response(client cl)
 {
-	std::vector<server> mathces;
-	for (std::vector<server>::iterator it, it < Servers.end(), it++)
-	{
-		if ((it->get_listen_port().c_str) == )
-	}
+	this->_cl = cl;
+	std::string method = cl.getReadyRequest()->get_request_parsing_data().get_http_method();
+	if (method == GET)
+		buildGetResponse();
+	else if (method == POST)
+		buildPOSTRespone();
+	else if (method == DELETE)
+		buildDelteResponse();
+	else
+		buildNotAllowedResponse();
+}
+
+void response::buildGetResponse()
+{
+	
 }

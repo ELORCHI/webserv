@@ -321,9 +321,20 @@ void httpServer::run()
                 {
                     if (cl->isThereARequestReady() == true)
                     {
-                        response *res = new response(cl)
-                        
-                    }
+                        //response *res = new response(cl)
+						if (cl->resp) // if we already geneerated a response and we didn't finish sending it
+						{
+							if ((cl->resp.send()) == 0) // if we done  sending
+								disconnectClient(cl, true);
+						}
+						else {
+							cl->resp = new response(cl);
+							if ((cl->resp.send()) == 0) // if we done  sending
+								disconnectClient(cl, true);
+						}
+
+                    
+					}
                     // have kqueue disable tracking write events and enable read events after data sending is done
                     // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
                     // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);

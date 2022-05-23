@@ -1,37 +1,28 @@
 #pragma once
 #include "../../includes/webserv.hpp"
 
-// #ADD DEFINES FOR STATUX CODE
 
-
-// i dont know what ot do about chuncked responses
+#define GET std::string("GET")
+#define POST std::string("POST")
+#define DELETE std::string("DELETE")
 
 class response
 {
-	public:
-		response(client client);
-		~response();
-		send();
-		void setSearchLocation(server server);
-		location getSearchLocation();
+	private:
 		char *buffer;
-    private:
-		int			statusCode;
-		location	searchLocatin;
+		int	 status;
+		int isFinished;
+		client _cl;
+	public:
+		response(client cl);
+		void buildGetResponse();
+		void buildPOSTRespone();
+		void buildDelteResponse();
+		void buildNotAllowedResponse();
+		unsigned int send();
+		~response();
 };
 
 
-response::response(client client)
-{
 
-}
 
-void	response::searchLocatin(server server)
-{
-	std::vector<location> locations = server.get_locations();
-	std::vector<location>::iterator it = locations.begin();
-	for (it , it < locations.end, it++)
-	{
-		
-	}
-}
