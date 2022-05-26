@@ -78,22 +78,18 @@ void parse_request::eraseAllSubStr(std::string & mainStr, const std::string & to
         mainStr.erase(pos, toErase.length());
 }
 
-void	parse_request::set_chunked_http_body(std::string& file)
+void	parse_request::set_chunked_http_body(std::ifstream fin, std::ofstream fout)
 {
-
-	std::ifstream fin(file);
-	std::ofstream fout("/tmp/body.txt");
+	// extention in content_type 
 	std::string line;
 	size_t found, size;
 	std::string tmp;
 
-	if (!fout)
-	{
-		std::cout << "Error: file not found" << std::endl;
-		exit(0);
-	}
+	
 	while (getline(fin, line))
 	{
+		if (fin.eof())
+			break ;
 		line += "\n";
 		found = line.find("\r\n");
 		if (found != std::string::npos)
@@ -107,6 +103,7 @@ void	parse_request::set_chunked_http_body(std::string& file)
 				while (size > 0)
 				{
 					getline(fin, line);
+					line += "\n";
 					if (line.length() > size)
 					{
 						fout << line.substr(0, size);
@@ -144,7 +141,7 @@ void	parse_request::set_chunked_http_body(std::string& file)
 	// }
 }
 
-void	parse_request::set_unchunked_http_body(std::string& lines)
+void	parse_request::set_unchunked_http_body(std::ifstream fin, std::ofstream fout)
 {
 	size_t content_length;
 	if (is_number(_http_headers["Content-Length"]))
@@ -154,21 +151,57 @@ void	parse_request::set_unchunked_http_body(std::string& lines)
 		std::cout << "Error: bad content length" << std::endl;
 		exit(0);
 	}
-	eraseAllSubStr(lines, "\r\n");
-	_http_body = lines.substr(0, content_length);
+	// extention in content_type 
+	std::string line;
+	size_t found;
+	std::string tmp;
+	while (getline(fin, line))
+	{
+		if (fin.eof())
+			break ;
+		line += "\n";
+		eraseAllSubStr(lines, "\r\n");
+		if (line.length() > content_length)
+		{
+			std::cout << "Error: bad request" << std::endl;
+			exit (0);
+		}
+		else if (line.length() =< content_length)
+		{
+			fout << line;
+			content_length -= line.length();
+		}
+	}
+	if (content_length != 0)
+	{
+		std::cout << "Error: bad request" << std::endl;
+		exit (0);
+	}
+	// eraseAllSubStr(lines, "\r\n");
+	// _http_body = lines.substr(0, content_length);
 }
 
-void	parse_request::set_http_body(std::string &line)
+void	parse_request::set_http_body(std::string &filename)
 {
+	std::ifstream fin(filename);
+	std::ofstream fout("/tmp/body.txt", std::ios::binary); //os::bin::ios
+	
+	if (!fout || !fin)
+	{
+		std::cout << "Error: file not found" << std::endl;
+		exit(0);
+	}
 	if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers["Transfer-Encoding"] == "chunked")
-		set_chunked_http_body(line);
+		set_chunked_http_body(fin, fout);
 	else if (_http_headers.find("Content-Length") != _http_headers.end())
-		set_unchunked_http_body(line);
+		set_unchunked_http_body(fin, fout);
 	else
 	{
 		std::cout << "Error: bad body" << std::endl;
 		exit(0);
 	}
+	fin.close();
+	fout.close();
 }
 
 void    parse_request::set_http_headers(std::string &line)
@@ -252,13 +285,13 @@ void    parse_request::set_lines(char *buffer)
 	}
 }
 
-void    parse_request::start_parsing(char *buffer)
+void    parse_request::start_parsing(std::string &header, std::string &filename)
 {
 	std::string headers;
-    this->set_lines(buffer);
-    headers = this->set_http_vmp(_headers_part);
+    // this->set_lines(buffer);
+    headers = this->set_http_vmp(header);
 	this->set_http_headers(headers);
-	set_http_body(_body_part);
+	set_http_body(filename);
 	std::cout << "Method: " << get_http_method() << std::endl;
 	std::cout << "Version: " << get_http_version() << std::endl;
 	std::cout << "Path: " << get_http_path() << std::endl;

@@ -16,7 +16,7 @@ class parse_request
         std::string							_body_part;
         std::string							_http_version;
         std::string							_http_method;
-        std::string							_http_body;
+        std::string							_path_body;
         unsigned int						_port_request;
         std::map<std::string, std::string>	_http_path;
         std::map<std::string, std::string>	_http_headers;
@@ -30,8 +30,8 @@ class parse_request
         void set_http_path(std::string http_path);
         void set_http_headers(std::string&);
         void set_http_body(std::string&);
-        void set_chunked_http_body(std::string&);
-        void set_unchunked_http_body(std::string&);
+        void set_chunked_http_body(std::ifstream , std::ofstream );
+        void set_unchunked_http_body(std::ifstream , std::ofstream );
         void eraseAllSubStr(std::string&, const std::string&);
         size_t hex_to_dec(std::string num);
 
@@ -46,7 +46,7 @@ class parse_request
         //methods
         bool	is_number(const std::string&);
         bool	is_hexnumber(const std::string&);
-        void	start_parsing(char *buffer);
+        void	start_parsing(std::string &, std::string &);
 };
 
 
