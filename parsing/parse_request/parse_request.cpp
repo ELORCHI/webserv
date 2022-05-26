@@ -78,32 +78,70 @@ void parse_request::eraseAllSubStr(std::string & mainStr, const std::string & to
         mainStr.erase(pos, toErase.length());
 }
 
-void	parse_request::set_chunked_http_body(std::string& lines)
+void	parse_request::set_chunked_http_body(std::string& file)
 {
-	// std::cout << lines;
-	// exit(0);
-	size_t begin = 0, end;
-	while ((end = lines.find("\r\n", begin)) != std::string::npos)
+
+	std::ifstream fin(file);
+	std::ofstream fout("/tmp/body.txt");
+	std::string line;
+	size_t found, size;
+	std::string tmp;
+
+	if (!fout)
 	{
-		std::string tmp = lines.substr(begin, end - begin);
-		// std::cout << tmp << std::endl;
-		if (is_hexnumber(tmp))
+		std::cout << "Error: file not found" << std::endl;
+		exit(0);
+	}
+	while (getline(fin, line))
+	{
+		line += "\n";
+		found = line.find("\r\n");
+		if (found != std::string::npos)
 		{
-			size_t size = hex_to_dec(tmp);
-			if (size == 0)
-				break ;
-			begin = end + 2;
-			end = begin + size;
-			tmp = lines.substr(begin, end - begin);
-			_http_body += tmp;
-			begin = end + 2;
-		}
-		else
-		{
-			std::cout << "Error: bad chunked body" << std::endl;
-			exit(0);
+			tmp = line.substr(0, found);
+			if (is_hexnumber(tmp))
+			{
+				size = hex_to_dec(tmp);
+				if (size == 0)
+					break;
+				while (size > 0)
+				{
+					getline(fin, line);
+					if (line.length() > size)
+					{
+						fout << line.substr(0, size);
+						size = 0;
+					}
+					else if (line.length() =< size)
+					{
+						fout << line;
+						size -= line.length();
+					}
+				}
+			}
 		}
 	}
+	// size_t begin = 0, end;
+	// while ((end = lines.find("\r\n", begin)) != std::string::npos)
+	// {
+	// 	std::string tmp = lines.substr(begin, end - begin);
+	// 	if (is_hexnumber(tmp))
+	// 	{
+	// 		size_t size = hex_to_dec(tmp);
+	// 		if (size == 0)
+	// 			break ;
+	// 		begin = end + 2;
+	// 		end = begin + size;
+	// 		tmp = lines.substr(begin, end - begin);
+	// 		_http_body += tmp;
+	// 		begin = end + 2;
+	// 	}
+	// 	else
+	// 	{
+	// 		std::cout << "Error: bad chunked body" << std::endl;
+	// 		exit(0);
+	// 	}
+	// }
 }
 
 void	parse_request::set_unchunked_http_body(std::string& lines)
