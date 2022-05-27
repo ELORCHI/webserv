@@ -33,8 +33,8 @@ class parse_request
         void set_http_path(std::string http_path);
         void set_http_headers(std::string&);
         void set_http_body(std::string&);
-        void set_chunked_http_body(std::ifstream , std::ofstream );
-        void set_unchunked_http_body(std::ifstream , std::ofstream );
+        void set_chunked_http_body(std::string &filename);
+        void set_unchunked_http_body(std::string &filename);
         void set_extention();
         void eraseAllSubStr(std::string&, const std::string&);
         size_t hex_to_dec(std::string num);
