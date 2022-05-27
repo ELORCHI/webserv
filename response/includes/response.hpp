@@ -34,26 +34,26 @@
 #define POST_RESPONSE 1
 #define DELETE_RESPONSE 2
 
-class response
+
+class response 
 {
 	private:
+		int status;
 		char *buffer;
-		int	 status;
-		int isFinished;
-		client _cl;
-		location searchLocation;
-		int		resposeType;
+		int buffer_size;
+		int buffer_offset;
+		int responseType;
 	public:
-		response(client cl);
-		void buildPOSTRespone();
-		void buildDelteResponse();
-		void buildNotAllowedResponse();
-		int	 setResponseType(int type);
-		unsigned int send();
-		location getSearchLocation(sts::vector<location> locations);
+		response();
 		~response();
+		void set_status(int status);
+		int get_status();
+		void set_buffer(char *buffer, int buffer_size);
+		char *get_buffer();
+		int get_buffer_size();
+		int get_buffer_offset();
+		void set_buffer_offset(int buffer_offset);
+		void set_responseType(int responseType);
+		int get_responseType();
+		
 };
-
-
-response buildHttpResponse(client cl);
-int		responseTypeDecider(client cl);
