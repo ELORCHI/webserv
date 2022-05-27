@@ -8,6 +8,8 @@
 #include <vector>
 #include <map>
 #include <sstream>
+#include <ctime>
+#include <unistd.h>
 
 class parse_request
 {
@@ -17,6 +19,7 @@ class parse_request
         std::string							_http_version;
         std::string							_http_method;
         std::string							_path_body;
+        std::string                         _extention;
         unsigned int						_port_request;
         std::map<std::string, std::string>	_http_path;
         std::map<std::string, std::string>	_http_headers;
@@ -32,6 +35,7 @@ class parse_request
         void set_http_body(std::string&);
         void set_chunked_http_body(std::ifstream , std::ofstream );
         void set_unchunked_http_body(std::ifstream , std::ofstream );
+        void set_extention();
         void eraseAllSubStr(std::string&, const std::string&);
         size_t hex_to_dec(std::string num);
 
@@ -40,13 +44,15 @@ class parse_request
         std::string get_http_version() const {return _http_version;};  
         std::string get_http_path() {return _http_path["path"];};
         std::string get_http_query() {return _http_path["query"];};
+        std::string get_extention() {return _extention;};
         std::map<std::string, std::string> get_http_headers() const {return _http_headers;};
         std::string get_http_body() const {return _http_body;};
 
         //methods
-        bool	is_number(const std::string&);
-        bool	is_hexnumber(const std::string&);
-        void	start_parsing(std::string &, std::string &);
+        bool	    is_number(const std::string&);
+        bool	    is_hexnumber(const std::string&);
+        void	    start_parsing(std::string &, std::string &);
+        std::string gen_random(const int len);
 };
 
 

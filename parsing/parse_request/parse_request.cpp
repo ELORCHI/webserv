@@ -8,7 +8,8 @@ parse_request::parse_request():
     _http_body(),
 	_headers_part(),
 	_body_part(),
-	_port_request(0)
+	_port_request(0),
+	_extention()
 {
 }
 
@@ -184,8 +185,8 @@ void	parse_request::set_unchunked_http_body(std::ifstream fin, std::ofstream fou
 void	parse_request::set_http_body(std::string &filename)
 {
 	std::ifstream fin(filename);
-	std::ofstream fout("/tmp/body.txt", std::ios::binary); //os::bin::ios
-	
+	_path_body = gen_random(10);
+	std::ofstream fout(_path_body.append(_extention), std::ios::binary); //os::bin::ios
 	if (!fout || !fin)
 	{
 		std::cout << "Error: file not found" << std::endl;
@@ -288,19 +289,32 @@ void    parse_request::set_lines(char *buffer)
 void    parse_request::start_parsing(std::string &header, std::string &filename)
 {
 	std::string headers;
-    // this->set_lines(buffer);
     headers = this->set_http_vmp(header);
 	this->set_http_headers(headers);
+	set_extention();
 	set_http_body(filename);
-	std::cout << "Method: " << get_http_method() << std::endl;
-	std::cout << "Version: " << get_http_version() << std::endl;
-	std::cout << "Path: " << get_http_path() << std::endl;
-	std::cout << "Query: " << get_http_query() << std::endl;
+	// std::cout << "Method: " << get_http_method() << std::endl;
+	// std::cout << "Version: " << get_http_version() << std::endl;
+	// std::cout << "Path: " << get_http_path() << std::endl;
+	// std::cout << "Query: " << get_http_query() << std::endl;
 	// std::cout << "Fragment: " << _http_path["fragment"] << std::endl;
-	std::cout << "Headers: " << std::endl;
-	for(std::map <std::string, std::string>::iterator it =_http_headers.begin(); it!=_http_headers.end(); ++it)
-   	{
-       std::cout << it->first << " => " << it->second << '\n';
-   	}
-	std::cout << "body: \n"<< get_http_body();
+	// std::cout << "Headers: " << std::endl;
+	// for(std::map <std::string, std::string>::iterator it =_http_headers.begin(); it!=_http_headers.end(); ++it)
+   	// {
+    //    std::cout << it->first << " => " << it->second << '\n';
+   	// }
+	// std::cout << "body: \n"<< get_http_body();
+}
+
+std::string parse_request::gen_random(const int len) {
+	srand((unsigned)time(NULL) * getpid());     
+    static const char alphanum[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    std::string tmp_s;
+    tmp_s.reserve(len);
+    for (int i = 0; i < len; ++i) {
+        tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+    return tmp_s;
 }
