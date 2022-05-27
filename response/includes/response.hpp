@@ -1,5 +1,7 @@
 #pragma once
 #include "../../includes/webserv.hpp"
+#include <stdlib.h>
+#include <string.h>
 
 
 #define GET std::string("GET")
@@ -37,23 +39,83 @@
 
 class response 
 {
-	private:
+	protected:
 		int status;
+		char *body;
 		char *buffer;
-		int buffer_size;
-		int buffer_offset;
+		int bufferSize;
+		int bufferOffset;
 		int responseType;
+		int bodySize;
+		client *client;
 	public:
 		response();
 		~response();
-		void set_status(int status);
-		int get_status();
-		void set_buffer(char *buffer, int buffer_size);
-		char *get_buffer();
-		int get_buffer_size();
-		int get_buffer_offset();
-		void set_buffer_offset(int buffer_offset);
-		void set_responseType(int responseType);
-		int get_responseType();
-		
+		void setBufferOffset(int buffer_offset);
+		void setResponseType(int responseType);
+		void setBuffer(char *buffer, int buffer_size);
+		void setBodySize(int bodySize);
+		char *getBuffer(void);
+		char *getBody(void);
+		int getStatus(void);
+		int getBufferSize(void);
+		int getBufferOffset(void);
+		int getResponseType(void);
+		int getBodySize(void);
+		virtual void setStatus(int status) = 0;
+		virtual void setBody(char *body) = 0;
+};
+
+class systemResponse : public response
+{
+	public:
+		systemResponse();
+		~systemResponse();
+		void setBody(char *body);
+};
+
+
+class requestErrorResponse : public response
+{
+	public:
+		requestErrorResponse();
+		~requestErrorResponse();
+		void setStatus(int status);
+		void setBody(char *body);
+};
+
+class acceptedRequestResponse : public response
+{
+	public:
+		acceptedRequestResponse();
+		~acceptedRequestResponse();
+		void setStatus(int status);
+		void setBody(char *body);
+};
+
+class getResponse : public acceptedRequestResponse
+{
+	public:
+		getResponse();
+		~getResponse();
+		void setStatus(int status);
+		void setBody(char *body);
+};
+
+class postResponse : public acceptedRequestResponse
+{
+	public:
+		postResponse();
+		~postResponse();
+		void setStatus(int status);
+		void setBody(char *body);
+};
+
+class deleteResponse : public acceptedRequestResponse
+{
+	public:
+		deleteResponse();
+		~deleteResponse();
+		void setStatus(int status);
+		void setBody(char *body);
 };
