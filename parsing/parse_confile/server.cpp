@@ -55,6 +55,8 @@ void    server::set_upload_path(std::string upload_path)
 
 void    server::set_to_default()
 {
+    if (_allowed_methods.empty() && _root.empty())
+        throw std::runtime_error("Error: server need more info!!");
     if (_listen_host.empty() || _listen_port == -1)
     {
         _listen_host = "0.0.0.0" ;

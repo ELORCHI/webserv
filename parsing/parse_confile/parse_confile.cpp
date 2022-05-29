@@ -172,7 +172,7 @@ void    parse_config::start_parsing()
     syntax_error();
     for (unsigned int i = 0; i < _words.size(); i++)
     {
-		if (_words[i] == "server")
+		if (_words[i] == "server" && ((i + 1) < _words.size()))
         {
 			i++;
 			if (_words[i] == "{")
