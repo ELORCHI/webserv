@@ -68,8 +68,9 @@
 		// the rousource file is not found return 404
 		//	Forbidden. The requester does not have permission to access the specified resource.
 // 6. is method post?
+		
+// 7. cgi?
 
-// 7. 
 
 
 class response //interface
