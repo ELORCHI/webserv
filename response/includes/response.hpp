@@ -75,6 +75,7 @@
 	// 6. is method post?
 
 
+// if the response is chuncked. do not add a content length header
 // chunked or transfer encoding ====NEED TO READ MORE ABOUT IT====
 	// if the response is chunked, the response body is sent in chunks.
 	// if the response is not chunked, the response body is sent in a single chunk.
@@ -85,26 +86,30 @@
 
 // building a chain of responsability for the response
 
-class response //interface
+
+
+class response // the handler interface
 {
 	public:
 		response();
 		~response();
-		virtual void handle(client cl) = 0;
+		virtual void handle(client cl) = 0; //the signature of amethod for handling requests
 };
 
-class resonseHandler : public response// abstract class
+
+//This class should have a field for storing a reference to the next handler in the chain
+class responseHandler : public response// abstract class
 {
 	public:
-		resonseHandler();
-		~resonseHandler();
+		responseHandler();
+		virtual ~responseHandler();
 		virtual void handle(clinet cl) = 0;
 		virtual void buildresponse(client cl) = 0;
-		virtual void 
 		void appendTobuffer(int buffer_size, int buffer_offset, char *msg);
-
-	private:
+		void setNext(responseHandler *next);
+	protected:
 		char *buffer;
 		int bufferSize;
 		int bufferOffset;
+		std::vector<responseHandler*> nextHandler;
 };
