@@ -39,7 +39,7 @@ void location::set_methods(std::string &methods)
     if (methods == "POST" || methods == "GET" || methods == "DELETE")
         _allow_methods.push_back(methods);
     else
-        throw std::runtime_error("Error: allowed methods not well defined");
+        throw std::runtime_error("Error: allowed methods in location not well defined");
 }
 void location::set_root(std::string &root) {
     if (not_predefined(root))
@@ -131,6 +131,7 @@ std::string                 location::get_methods(unsigned int i) const
 {
     return  (this->_allow_methods[i]);
 }
+
 unsigned int location::fill_cgi(std::vector<std::string> words, unsigned int i, bool &cgi_flag)
 {
     cgi_flag = true;
@@ -145,11 +146,13 @@ unsigned int location::fill_cgi(std::vector<std::string> words, unsigned int i, 
         else if (words[i] == "allow_methods")
         {
             i++;
-            while (i < words.size() && words[i] != "}" && (words[i] == "POST" || words[i] == "GET" || words[i] == "DELETE"))
+            while (i < words.size() && not_predefined(words[i]))
             {
                 c.set_cgi_methods(words[i]);
                 i++;
             }
+            if (c.get_cgi_methods_size() == 0)
+                throw std::runtime_error("Error: cgi_allow_methods is empty");
             i--;
         }
         i++;
@@ -197,7 +200,7 @@ bool location::not_predefined(std::string &word) const
             && word != "upload_path" && word != "index"
             && word != "error_page" && word != "autoindex"
             && word != "redirection" && word != "client_max_body_size"
-            && word != "location" && word != "cgi")
+            && word != "location" && word != "cgi" && word != "cgi_path")
             return (1);
     return (0);
 }

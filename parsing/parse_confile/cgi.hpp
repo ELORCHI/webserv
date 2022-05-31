@@ -35,6 +35,7 @@ public:
     void                        set_cgi_methods(std::string &methods);
     void                        set_cgi_name(std::string &name);
     unsigned int                get_cgi_methods_size();
+    bool                        not_predefined(std::string &word) const;
     cgi                         &operator=(cgi const & rhs);
 };
 
