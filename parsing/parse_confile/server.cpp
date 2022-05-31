@@ -271,6 +271,8 @@ unsigned int server::fill_allowed_methods(std::vector<std::string> words, unsign
         set_allowed_methods(words[i]);
         i++;
     }
+    if (get_allowed_methods_size() == 0)
+            throw std::runtime_error("Error: server allow_method is empty");
     i--;
     return i;
 }
@@ -288,6 +290,8 @@ unsigned int server::fill_name(std::vector<std::string> words, unsigned int i)
         set_name(words[i]);
         i++;
     }
+    if (get_name_size() == 0)
+            throw std::runtime_error("Error: server name is empty");
     i--;
     return i;
 }
@@ -305,6 +309,8 @@ unsigned int server::fill_index(std::vector<std::string> words, unsigned int i)
         set_index(words[i]);
         i++;
     }
+    if (get_index_size() == 0)
+            throw std::runtime_error("Error: server index is empty");
     i--;
     return i;
 }
@@ -387,7 +393,7 @@ unsigned int server::fill_cgi(std::vector<std::string> words, unsigned int i, bo
         else if (words[i] == "allow_methods")
         {
             i++;
-            while (i < words.size() && words[i] != "}" && (words[i] == "POST" || words[i] == "GET" || words[i] == "DELETE"))
+            while (i < words.size() && not_predefined(words[i]))
             {
                 c.set_cgi_methods(words[i]);
                 i++;

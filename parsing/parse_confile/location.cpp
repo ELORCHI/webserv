@@ -80,6 +80,8 @@ unsigned int location::fill_allowed_methods(std::vector<std::string> words, unsi
         set_methods(words[i]);
         i++;
     }
+    if (get_methods_size() == 0)
+            throw std::runtime_error("Error: location allow_method is empty");
     i--;
     return i;
 }
@@ -97,6 +99,8 @@ unsigned int location::fill_index(std::vector<std::string> words, unsigned int i
         set_index(words[i]);
         i++;
     }
+    if (get_index_size() == 0)
+            throw std::runtime_error("Error: location index is empty");
     i--;
     return i;
 }
