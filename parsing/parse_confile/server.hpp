@@ -33,7 +33,7 @@ protected:
     std::string                             _root;
     std::vector<location>                   _location;
     std::vector<cgi>                        _cgi;
-    unsigned int                            _client_max_body_size;
+    long long int                           _client_max_body_size;
     bool                                    _autoindex;
 
     // int                                     _accolade;
@@ -51,7 +51,7 @@ public:
     void                         set_upload_path(std::string upload_path);
     void                         set_location(location location);
     void                         set_cgi(cgi cgi);
-    void                         set_client_max_body_size(unsigned int client_max_body_size);
+    void                         set_client_max_body_size(std::string client_max_body_size);
     void                         set_autoindex(bool autoindex);
     std::string                  get_name(int) const;
     std::string                  get_listen_host() const;
@@ -68,7 +68,7 @@ public:
     unsigned int                 get_location_size() const;
     unsigned int                 get_cgi_size() const;
     cgi                          get_cgi(int i) const;
-    unsigned int                 get_client_max_body_size() const;
+    long long int                 get_client_max_body_size() const;
     unsigned int                 get_allowed_methods_size() const;
     bool                         get_autoindex() const;
     unsigned int                 get_index_size() const;
@@ -79,6 +79,8 @@ public:
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
     unsigned int                 fill_location(std::vector<std::string>, unsigned int, bool&);
     unsigned int                 fill_cgi(std::vector<std::string>, unsigned int, bool&);
+    bool                         not_predefined(std::string &) const;
+    bool                         is_number(const std::string& str);
     server                         &operator=(server const & rhs);
 };
 #endif

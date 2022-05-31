@@ -25,7 +25,7 @@ protected:
     std::string                 _locations_path;
     std::vector<std::string>    _allow_methods;
     std::string                 _root;
-    std::string                 _client_max_body_size;
+    long long int                 _client_max_body_size;
     std::vector<std::string>    _index;
     std::vector<cgi>            _cgi;
     bool                        _autoindex;
@@ -37,7 +37,7 @@ public:
     std::vector<std::string>    &get_methods();
     std::string                 &get_root();
     bool                        &get_autoindex();
-    std::string                 &get_client_max_body_size();
+    long long int                 &get_client_max_body_size();
     std::string                 get_index(unsigned int i) const;
     unsigned int                get_index_size() const;
     std::string                 get_methods(unsigned int i) const;
@@ -55,6 +55,8 @@ public:
     unsigned int                 fill_index(std::vector<std::string>, unsigned int);
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
     unsigned int                 fill_cgi(std::vector<std::string>, unsigned int, bool&);
+    bool                         is_number(const std::string& str);
+    bool                         not_predefined(std::string &) const;
     location                    &operator=(location const & rhs);
 };
 

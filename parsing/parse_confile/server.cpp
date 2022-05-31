@@ -28,7 +28,7 @@ server::server():
     _error_pages(),
     _redirections(),
     _root(""),
-    _client_max_body_size(0),
+    _client_max_body_size(-1),
     _autoindex(false)
 {
 }
@@ -50,12 +50,15 @@ void    server::set_name(std::string name)
 
 void    server::set_upload_path(std::string upload_path)
 {
-    _upload_path = upload_path;
+    if (not_predefined(upload_path))
+        _upload_path = upload_path;
+    else
+        throw std::runtime_error("Error: upload_path is empty");
 }
 
 void    server::set_to_default()
 {
-    if (_allowed_methods.empty() && _root.empty())
+    if (_allowed_methods.empty() || _root.empty())
         throw std::runtime_error("Error: server need more info!!");
     if (_listen_host.empty() || _listen_port == -1)
     {
@@ -100,7 +103,10 @@ void    server::set_listen(std::string listen)
 
 void    server::set_allowed_methods(std::string allowed_methods)
 {
-    _allowed_methods.push_back(allowed_methods);
+    if (allowed_methods == "POST" || allowed_methods == "GET" || allowed_methods == "DELETE")
+        _allowed_methods.push_back(allowed_methods);
+    else
+        throw std::runtime_error("Error: allowed methods not well defined");
 }
 
 void    server::set_index(std::string index)
@@ -110,28 +116,56 @@ void    server::set_index(std::string index)
 
 void    server::set_error_pages(std::string error_pages, std::string number_error)
 {
-    std::vector<std::string>    tmp;
-    tmp.push_back(number_error);
-    tmp.push_back(error_pages);
-    _error_pages.push_back(tmp);
+    if (!not_predefined(error_pages) || !not_predefined(number_error))
+        throw std::runtime_error("Error: error_pages or number_of_error not well defined");
+    else
+    {
+        std::vector<std::string>    tmp;
+        tmp.push_back(number_error);
+        tmp.push_back(error_pages);
+        _error_pages.push_back(tmp);
+    }
 }
 
 void    server::set_redirections(std::string redirection_from, std::string redirection_to)
 {
-    std::vector<std::string>    tmp;
-    tmp.push_back(redirection_from);
-    tmp.push_back(redirection_to);
-    _redirections.push_back(tmp);
+    if (!not_predefined(redirection_from) || !not_predefined(redirection_to))
+        throw std::runtime_error("Error: redirections not well defined");
+    else
+    {
+        std::vector<std::string>    tmp;
+        tmp.push_back(redirection_from);
+        tmp.push_back(redirection_to);
+        _redirections.push_back(tmp);
+    }
 }
 
 void    server::set_root(std::string root)
 {
-    _root = root;
+    if (not_predefined(root))
+        _root = root;
+    else
+        throw std::runtime_error("Error: root not well defined");
 }
 
-void    server::set_client_max_body_size(unsigned int client_max_body_size)
+bool server::is_number(const std::string& str)
 {
-    _client_max_body_size = client_max_body_size;
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		char current = str[i];
+		if (current >= '0' && current <= '9')
+			continue;
+		return false;
+	}
+	return true;
+}
+
+void    server::set_client_max_body_size(std::string client_max_body_size)
+{
+    if (not_predefined(client_max_body_size) && is_number(client_max_body_size))
+        _client_max_body_size =std::stoi(client_max_body_size);
+    else
+        throw std::runtime_error("Error: client max body size should be number");
 }
 
 void    server::set_autoindex(bool autoindex)
@@ -207,7 +241,7 @@ bool   server::get_autoindex() const
 }
 
 
-unsigned int    server::get_client_max_body_size() const
+long long int    server::get_client_max_body_size() const
 {
     return _client_max_body_size;
 }
@@ -232,7 +266,7 @@ unsigned int    server::get_allowed_methods_size() const
 unsigned int server::fill_allowed_methods(std::vector<std::string> words, unsigned int i)
 {
     i++;
-    while (i < words.size() && (words[i] == "POST" || words[i] == "GET" || words[i] == "DELETE"))
+    while (i < words.size() && not_predefined(words[i]))
     {
         set_allowed_methods(words[i]);
         i++;
@@ -308,6 +342,8 @@ unsigned int server::fill_location(std::vector<std::string> words, unsigned int 
     }
     location_flag = false;
     set_location(l);
+    if (l.get_methods().empty() || l.get_root().empty())
+        throw std::runtime_error("Error: location need more info!!");
     return i;
 }
 
@@ -384,4 +420,16 @@ server    &server::operator=(server const &rhs)
         _root = rhs._root;
     }
     return *this;
+}
+
+bool server::not_predefined(std::string &word) const
+{
+    if (word != "}" && word != "server" && word != "{" && word != "listen" 
+            && word != "root" && word != "allow_methods" && word != "server_names"
+            && word != "upload_path" && word != "index"
+            && word != "error_page" && word != "autoindex"
+            && word != "redirection" && word != "client_max_body_size"
+            && word != "location" && word != "cgi")
+            return (1);
+    return (0);
 }

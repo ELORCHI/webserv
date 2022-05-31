@@ -88,7 +88,7 @@ unsigned int   parse_config::server_parsing(unsigned int &i)
         else if (_words[i] == "redirection")
             s.set_redirections(_words[i + 1], _words[i + 2]);
         else if (_words[i] == "client_max_body_size")
-            s.set_client_max_body_size(std::stoi(_words[i + 1]));
+            s.set_client_max_body_size(_words[i + 1]);
         else if (_words[i] == "location")
             i = s.fill_location(_words, i, location_flag);
         else if (_words[i] == "cgi")
@@ -252,6 +252,7 @@ void    parse_config::read_server()
         {
             location t = this->_servers[i].get_location(j);
             std::cout << "location_path: "<< t.get_locations_path() << std::endl;
+            std::cout << "max_body_size: "<< t.get_client_max_body_size() << std::endl;
             unsigned int k = 0;
             std::cout << "root: "<< t.get_root() << std::endl;
             if (t.get_autoindex())
