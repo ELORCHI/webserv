@@ -36,6 +36,19 @@
 #define POST_RESPONSE 1
 #define DELETE_RESPONSE 2
 
+
+#define NOT_FOUND_RESPONSE_MSG "<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>"
+#define FORBIDDEN_RESPONSE_MSG "<html><head><title>403 Forbidden</title></head><body><h1>403 Forbidden</h1></body></html>"
+#define NOT_ALLOWED_RESPONSE_MSG "<html><head><title>405 Method Not Allowed</title></head><body><h1>405 Method Not Allowed</h1></body></html>"
+#define INTERNAL_SERVER_ERROR_RESPONSE_MSG "<html><head><title>500 Internal Server Error</title></head><body><h1>500 Internal Server Error</h1></body></html>"
+#define NOT_IMPLEMENTED_RESPONSE_MSG "<html><head><title>501 Not Implemented</title></head><body><h1>501 Not Implemented</h1></body></html>"
+#define BAD_GATEWAY_RESPONSE_MSG "<html><head><title>502 Bad Gateway</title></head><body><h1>502 Bad Gateway</h1></body></html>"
+#define SERVICE_UNAVAILABLE_RESPONSE_MSG "<html><head><title>503 Service Unavailable</title></head><body><h1>503 Service Unavailable</h1></body></html>"
+#define GATEWAY_TIMEOUT_RESPONSE_MSG "<html><head><title>504 Gateway Timeout</title></head><body><h1>504 Gateway Timeout</h1></body></html>"
+#define HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG "<html><head><title>505 HTTP Version Not Supported</title></head><body><h1>505 HTTP Version Not Supported</h1></body></html>"
+#define HTTP_VERSION_NOT_SUPPORTED_BY_SERVER_RESPONSE_MSG "<html><head><title>505 HTTP Version Not Supported by Server</title></head><body><h1>505 HTTP Version Not Supported by Server</h1></body></html>"
+#define BAD_REQUEST_RESPONSE_MSG "<html><head><title>400 Bad Request</title></head><body><h1>400 Bad Request</h1></body></html>"
+
 // building response steps
 // 1. check the system and the request
 	//1.1 if the system is not available, return 503
@@ -84,11 +97,8 @@
 	// send method will handle the chunked encoding and the transfer encoding
 
 
-// building a chain of responsability for the response
 
-
-
-class response // the handler interface
+class response
 {
 	public:
 		response();
@@ -96,8 +106,6 @@ class response // the handler interface
 		virtual void handle(client cl) = 0; //the signature of amethod for handling requests
 };
 
-
-//This class should have a field for storing a reference to the next handler in the chain
 class responseHandler : public response// abstract class
 {
 	public:
@@ -109,7 +117,15 @@ class responseHandler : public response// abstract class
 		void setNext(responseHandler *next);
 	protected:
 		char *buffer;
-		int bufferSize;
+		int bufferSize;// it might be a response length cause we are sending the buffer
 		int bufferOffset;
-		std::vector<responseHandler*> nextHandler;
+};
+
+class system_block_response : public responseHandler
+{
+	public:
+		system_block_response();
+		~system_block_response();
+		void handle(client cl);
+		void buildresponse(client cl);
 };
