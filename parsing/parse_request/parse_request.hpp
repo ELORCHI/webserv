@@ -14,6 +14,7 @@
 class parse_request
 {
     private:
+        int                                _code_status;
         std::string							_headers_part;
         std::string							_body_part;
         std::string							_http_version;

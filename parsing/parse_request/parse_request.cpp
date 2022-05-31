@@ -9,7 +9,8 @@ parse_request::parse_request():
 	_headers_part(),
 	_body_part(),
 	_port_request(0),
-	_extention()
+	_extention(),
+	_code_status(0)
 {
 }
 
@@ -57,9 +58,10 @@ void    parse_request::set_http_method(std::string &line)
 	if (line != "POST" && line != "GET" && line != "DELETE")
 	{
 		std::cout << "Error: bad request" << std::endl;
-		exit(0);
+		_code_status = 405;
 	}
-	_http_method = line;
+	else
+		_http_method = line;
 }
 
 void    parse_request::set_http_version(std::string &line)
@@ -67,9 +69,10 @@ void    parse_request::set_http_version(std::string &line)
 	if (line != "HTTP/1.1")
 	{
 		std::cout << "Error: bad version" << std::endl;
-		exit(0);
+		_code_status = 505;
 	}
-	_http_version = line;
+	else
+		_http_version = line;
 }
 
 void parse_request::eraseAllSubStr(std::string & mainStr, const std::string & toErase)
@@ -92,7 +95,7 @@ void	parse_request::set_chunked_http_body(std::string &filename)
 	if (!fout || !fin)
 	{
 		std::cout << "Error: file not found" << std::endl;
-		exit(0);
+		_code_status = 500;
 	}
 	while (getline(fin, line))
 	{
@@ -161,14 +164,14 @@ void	parse_request::set_unchunked_http_body(std::string &filename)
 	if (!fout || !fin)
 	{
 		std::cout << "Error: file not found" << std::endl;
-		exit(0);
+		_code_status = 500;
 	}
 	if (is_number(_http_headers["Content-Length"]))
 		content_length = std::stoi(_http_headers["Content-Length"]);
 	else
 	{
 		std::cout << "Error: bad content length" << std::endl;
-		exit(0);
+		_code_status = 400;
 	}
 	// extention in content_type 
 	std::string line;
@@ -183,7 +186,7 @@ void	parse_request::set_unchunked_http_body(std::string &filename)
 		if (line.length() > content_length)
 		{
 			std::cout << "Error: bad request" << std::endl;
-			exit (0);
+			_code_status = 400;
 		}
 		else if (line.length() =< content_length)
 		{
@@ -194,7 +197,7 @@ void	parse_request::set_unchunked_http_body(std::string &filename)
 	if (content_length != 0)
 	{
 		std::cout << "Error: bad request" << std::endl;
-		exit (0);
+		_code_status = 411;
 	}
 	fin.close();
 	fout.close();
@@ -212,7 +215,7 @@ void	parse_request::set_http_body(std::string &filename)
 	else
 	{
 		std::cout << "Error: bad body" << std::endl;
-		exit(0);
+		_code_status = 500;
 	}
 }
 
@@ -238,7 +241,7 @@ void    parse_request::set_http_headers(std::string &line)
 		else
 		{
 			std::cout << "Error: bad headers" << std::endl;
-			exit(0);
+			_code_status = 500;
 		}
 	}
 }
@@ -293,7 +296,7 @@ void    parse_request::set_lines(char *buffer)
 	else
 	{
 		std::cout << "Error: bad request" << std::endl;
-		exit(0);
+		_code_status = 400;
 	}
 }
 
@@ -301,9 +304,14 @@ void    parse_request::start_parsing(std::string &header, std::string &filename)
 {
 	std::string headers;
     headers = this->set_http_vmp(header);
-	this->set_http_headers(headers);
-	set_extention();
-	set_http_body(filename);
+	if (_code_status != 0)
+		this->set_http_headers(headers);
+	if (_code_status != 0)
+		set_extention();
+	if (_code_status != 0)
+		set_http_body(filename);
+	if (_code_status != 0)
+		_code_status = 200;
 	// std::cout << "Method: " << get_http_method() << std::endl;
 	// std::cout << "Version: " << get_http_version() << std::endl;
 	// std::cout << "Path: " << get_http_path() << std::endl;
