@@ -27,7 +27,7 @@
 #define NOT_IMPLEMENTED_CODE 501
 #define BAD_GATEWAY_CODE 502
 #define SERVICE_UNAVAILABLE_CODE 503
-#define HTTP_VERSION_NOT_SUPPORTED_BY_SERVER_CODE 505
+#define HTTP_VERSION_NOT_SUPPORTED_CODE 505
 #define RESPONSE_OK 200
 #define RESPONSE_NOT_MODIFIED 304
 #define RESPONSE_BAD_REQUEST 400
@@ -113,12 +113,11 @@ class response
 class responseHandler : public response// abstract class
 {
 	public:
-		responseHandler();
+		responseHandler(client cl);
 		virtual ~responseHandler();
 		virtual int handle(clinet cl) = 0;
 		virtual void buildresponse(client cl) = 0;
 		void appendTobuffer(int buffer_size, int buffer_offset, char *msg);
-		void setNext(responseHandler *next);
 		void setResposeStatusLine(int status_code, char *status_msg);
 		void setResponseHeader(char *header_name, char *header_value);
 		void setResponseHeaders(char *headers);
@@ -129,9 +128,9 @@ class responseHandler : public response// abstract class
 		int bufferOffset;
 };
 
+
 // this class checks if the system is available
 // is the method implemented?
-// is the system blocked?
 // is the http version supported?
 
 class system_block_response : public responseHandler
@@ -143,4 +142,6 @@ class system_block_response : public responseHandler
 		void buildresponse(client cl);
 		int isMethodImplemented(std::string method);
 		int isHttpVersionSupported(std::string http_version);
+	private:
+		int error;
 };
