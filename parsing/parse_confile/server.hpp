@@ -81,6 +81,7 @@ public:
     unsigned int                 fill_cgi(std::vector<std::string>, unsigned int, bool&);
     bool                         not_predefined(std::string &) const;
     bool                         is_number(const std::string& str);
+    void                         check_host(std::string);
     server                         &operator=(server const & rhs);
 };
 #endif

@@ -67,36 +67,84 @@ void    server::set_to_default()
     }
 }
 
+void    server::check_host(std::string listen_host)
+{
+    if (listen_host != "localhost")
+    {
+        int i = 0;
+        int t = 0;
+        while (listen_host[i])
+        {
+            if (listen_host[i] == '.')
+                t++;
+            i++;
+        }
+        if (t != 3)
+            throw std::runtime_error("Error: host not valid");
+        i = 0;
+        char * cstr = new char [listen_host.length()+1];
+        std::strcpy (cstr, listen_host.c_str());
+        char *p = std::strtok (cstr,".");
+        while (p!=0)
+        {
+            if (!is_number(p))
+            {
+                delete[] cstr;
+                throw std::runtime_error("Error: host not valid");
+            }
+            int tmp = std::atoi(p);
+            if (tmp < 0 || tmp > 255)
+            {
+                delete[] cstr;
+                throw std::runtime_error("Error: host not valid");
+            }
+            i++;
+            p = std::strtok (NULL,".");
+        }
+        delete[] cstr;
+        if (i != 4)
+            throw std::runtime_error("Error: host not valid");
+    }
+}
 void    server::set_listen(std::string listen)
 {
     if (!_listen_host.empty() || _listen_port != -1)
         throw std::runtime_error("Error: listen already set");
     std::size_t found=listen.find(':');
-    if (found!=std::string::npos)
+    if (found != std::string::npos)
     {
         if (found == 0 && (listen.size() - found != 1))
         {
             std::string tmp;
             _listen_host = "0.0.0.0";
             tmp = listen.substr(1, listen.size());
-            _listen_port = std::stoi(tmp);
+            if (is_number(tmp))
+                _listen_port = std::stoi(tmp);
+            else
+                throw std::runtime_error("Error: port should be a number");
         }
-        else if (found == 0 && (listen.size() - found == 0))
+        else if (found == 0 && (listen.size() - found == 1))
         {
             _listen_host = "0.0.0.0" ;
             _listen_port = 80;
         }
         else
         {
+            check_host(listen.substr(0, found));
+            _listen_host = listen.substr(0, found);
             std::string tmp;
             _listen_host = listen.substr(0, found);
             tmp = listen.substr(found+1, listen.size());
-            _listen_port = std::stoi(tmp);
+            if (is_number(tmp))
+                _listen_port = std::stoi(tmp);
+            else
+                throw std::runtime_error("Error: port should be a number");
         }
     }
     else
     {
-        _listen_host = "0.0.0.0" ;
+        check_host(listen);
+        _listen_host = listen;
         _listen_port = 80;
     }
 }
