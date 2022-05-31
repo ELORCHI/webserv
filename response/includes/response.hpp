@@ -7,7 +7,7 @@
 #define GET std::string("GET")
 #define POST std::string("POST")
 #define DELETE std::string("DELETE")
-
+#define HTPP_VERSION_1_1 std::string("HTTP/1.1")
 #define HTTP_VERSION_MSG std::string("HTTP/1.1")
 #define FORBIDDEN_MSG std::string("403 Forbidden")
 #define NOT_FOUND_MSG std::string("404 Not Found")
@@ -98,12 +98,16 @@
 
 
 
+
+// if the hanlde method returns 1 the request will be passed to next hanle
+// if the handle method returns 0 the request will be handled by the calling object
+
 class response
 {
 	public:
 		response();
 		~response();
-		virtual void handle(client cl) = 0; //the signature of amethod for handling requests
+		virtual int handle(client cl) = 0; //the signature of amethod for handling requests
 };
 
 class responseHandler : public response// abstract class
@@ -111,21 +115,32 @@ class responseHandler : public response// abstract class
 	public:
 		responseHandler();
 		virtual ~responseHandler();
-		virtual void handle(clinet cl) = 0;
+		virtual int handle(clinet cl) = 0;
 		virtual void buildresponse(client cl) = 0;
 		void appendTobuffer(int buffer_size, int buffer_offset, char *msg);
 		void setNext(responseHandler *next);
+		void setResposeStatusLine(int status_code, char *status_msg);
+		void setResponseHeader(char *header_name, char *header_value);
+		void setResponseHeaders(char *headers);
+		void setResponseBody(char *body);
 	protected:
 		char *buffer;
 		int bufferSize;// it might be a response length cause we are sending the buffer
 		int bufferOffset;
 };
 
+// this class checks if the system is available
+// is the method implemented?
+// is the system blocked?
+// is the http version supported?
+
 class system_block_response : public responseHandler
 {
 	public:
 		system_block_response();
 		~system_block_response();
-		void handle(client cl);
+		int handle(client cl);
 		void buildresponse(client cl);
+		int isMethodImplemented(std::string method);
+		int isHttpVersionSupported(std::string http_version);
 };
