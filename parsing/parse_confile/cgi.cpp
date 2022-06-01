@@ -31,6 +31,7 @@ void cgi::set_cgi_path(std::string &cgi_path)
 
 void cgi::set_cgi_methods(std::string &methods)
 {
+    // std::cout << methods << std::endl;
     if (methods == "POST" || methods == "GET" || methods == "DELETE")
         this->_allow_methods.push_back(methods);
     else

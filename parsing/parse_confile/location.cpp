@@ -136,56 +136,56 @@ std::string                 location::get_methods(unsigned int i) const
     return  (this->_allow_methods[i]);
 }
 
-unsigned int location::fill_cgi(std::vector<std::string> words, unsigned int i, bool &cgi_flag)
-{
-    cgi_flag = true;
-    cgi c;
-    c.set_cgi_name(words[i + 1]);
-    while (1)
-    {
-        if (i >= words.size() || (words[i] == "}" && cgi_flag))
-            break ;
-        if (words[i] == "cgi_path")
-            c.set_cgi_path(words[i + 1]);
-        else if (words[i] == "allow_methods")
-        {
-            i++;
-            while (i < words.size() && not_predefined(words[i]))
-            {
-                c.set_cgi_methods(words[i]);
-                i++;
-            }
-            if (c.get_cgi_methods_size() == 0)
-                throw std::runtime_error("Error: cgi_allow_methods is empty");
-            i--;
-        }
-        i++;
-    }
-    cgi_flag = false;
-    set_cgi(c);
-    return i;
-}
+// unsigned int location::fill_cgi(std::vector<std::string> words, unsigned int i, bool &cgi_flag)
+// {
+//     cgi_flag = true;
+//     cgi c;
+//     c.set_cgi_name(words[i + 1]);
+//     while (1)
+//     {
+//         if (i >= words.size() || (words[i] == "}" && cgi_flag))
+//             break ;
+//         if (words[i] == "cgi_path")
+//             c.set_cgi_path(words[i + 1]);
+//         else if (words[i] == "allow_methods")
+//         {
+//             i++;
+//             while (i < words.size() && not_predefined(words[i]))
+//             {
+//                 c.set_cgi_methods(words[i]);
+//                 i++;
+//             }
+//             if (c.get_cgi_methods_size() == 0)
+//                 throw std::runtime_error("Error: cgi_allow_methods is empty");
+//             i--;
+//         }
+//         i++;
+//     }
+//     cgi_flag = false;
+//     set_cgi(c);
+//     return i;
+// }
 
-void    location::set_cgi(cgi cgi)
-{
-    _cgi.push_back(cgi);
-}
+// void    location::set_cgi(cgi cgi)
+// {
+//     _cgi.push_back(cgi);
+// }
 
-unsigned int location::get_cgi_size() const
-{
-    return _cgi.size();
-}
+// unsigned int location::get_cgi_size() const
+// {
+//     return _cgi.size();
+// }
 
 
-cgi     location::get_cgi(int i) const
-{
-    return _cgi[i];
-}
+// cgi     location::get_cgi(int i) const
+// {
+//     return _cgi[i];
+// }
 
-std::vector<cgi>    &location::get_cgi()
-{
-    return _cgi;
-}
+// std::vector<cgi>    &location::get_cgi()
+// {
+//     return _cgi;
+// }
 
 /*
     operator
