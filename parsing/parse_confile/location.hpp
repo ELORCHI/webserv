@@ -37,6 +37,7 @@ public:
     std::vector<std::string>    &get_methods();
     std::string                 &get_root();
     bool                        &get_autoindex();
+    std::vector<cgi>            &get_cgi();
     long long int                 &get_client_max_body_size();
     std::string                 get_index(unsigned int i) const;
     unsigned int                get_index_size() const;

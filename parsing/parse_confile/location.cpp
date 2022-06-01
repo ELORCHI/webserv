@@ -176,11 +176,16 @@ unsigned int location::get_cgi_size() const
     return _cgi.size();
 }
 
+
 cgi     location::get_cgi(int i) const
 {
     return _cgi[i];
 }
 
+std::vector<cgi>    &location::get_cgi()
+{
+    return _cgi;
+}
 
 /*
     operator

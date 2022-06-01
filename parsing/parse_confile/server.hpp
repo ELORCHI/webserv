@@ -36,7 +36,6 @@ protected:
     long long int                           _client_max_body_size;
     bool                                    _autoindex;
 
-    // int                                     _accolade;
 public:
     server();
     ~server();
@@ -82,6 +81,8 @@ public:
     bool                         not_predefined(std::string &) const;
     bool                         is_number(const std::string& str);
     void                         check_host(std::string);
+    std::vector<location>        &get_location();
+    std::vector<cgi>             &get_cgi();
     server                         &operator=(server const & rhs);
 };
 #endif
