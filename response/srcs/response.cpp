@@ -29,9 +29,21 @@ int system_block_response::isHttpVersionSupported(std::string http_version)
 	return 1;
 }
 
-void buildresponse(client cl)
+void request_block_response::buildresponse(client cl)
 {
-
+	switch (error)
+	{
+		case HTTP_VERSION_NOT_SUPPORTED_CODE:
+			setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
+			setResponseHeader(CONTENT_TYPE, CONTENT_TYPE_TEXT_HTML);
+			setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
+			break;
+		case NOT_IMPLEMENTED_CODE:
+			setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
+			setResponseheader(CONTENT_TYPE, CONTENT_TYPE_TEXT_HTML);
+			setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
+			break;
+		default:
+			return;
+	}
 }
-
-

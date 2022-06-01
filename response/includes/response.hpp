@@ -115,8 +115,8 @@ class responseHandler : public response// abstract class
 	public:
 		responseHandler(client cl);
 		virtual ~responseHandler();
-		virtual int handle(clinet cl) = 0;
-		virtual void buildresponse(client cl) = 0;
+		virtual int handle(clinet &cl) = 0;
+		virtual void buildresponse(client &cl) = 0;
 		void appendTobuffer(int buffer_size, int buffer_offset, char *msg);
 		void setResposeStatusLine(int status_code, char *status_msg);
 		void setResponseHeader(char *header_name, char *header_value);
@@ -124,8 +124,13 @@ class responseHandler : public response// abstract class
 		void setResponseBody(char *body);
 	protected:
 		char *buffer;
+		std::string response_status_line;
+		std::string	response_headers;
+		std::string response_body;
 		int bufferSize;// it might be a response length cause we are sending the buffer
 		int bufferOffset;
+		int contentLength;
+		int isChunked;
 };
 
 
@@ -138,10 +143,27 @@ class system_block_response : public responseHandler
 	public:
 		system_block_response();
 		~system_block_response();
-		int handle(client cl);
-		void buildresponse(client cl);
+		int handle(client &cl);
+		void buildresponse(client &cl);
 		int isMethodImplemented(std::string method);
 		int isHttpVersionSupported(std::string http_version);
-	private:
+	protected:
 		int error;
+};
+
+class request_block_response : public responseHandler
+{
+	public:
+		request_block_response();
+		~request_block_response();
+		void buildresponse(client &cl);
+		int handle(client &cl);
+		int isMethodAllowed(std::string method);
+		int isForbidden(std::string method, std::string resource);
+		int isRequestBlockOk(std::string method, std::string resource);
+		int setSearchLocation(client &client);
+		location getSearchLocation(void) const;
+	protected:
+		int error;
+		location searchLoaction;
 };
