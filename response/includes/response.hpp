@@ -117,11 +117,11 @@ class responseHandler : public response// abstract class
 		virtual ~responseHandler();
 		virtual int handle(clinet &cl) = 0;
 		virtual void buildresponse(client &cl) = 0;
-		void appendTobuffer(int buffer_size, int buffer_offset, char *msg);
-		void setResposeStatusLine(int status_code, char *status_msg);
-		void setResponseHeader(char *header_name, char *header_value);
-		void setResponseHeaders(char *headers);
-		void setResponseBody(char *body);
+		void appendTobuffer(int buffer_size, int buffer_offset, char *msg);// need implementation
+		void setResposeStatusLine(int status_code, char *status_msg);// need implementation
+		void setResponseHeader(char *header_name, char *header_value);// need implementation
+		void setResponseHeaders(char *headers);// need implementation
+		void setResponseBody(char *body);// need implementation
 	protected:
 		char *buffer;
 		std::string response_status_line;
@@ -151,19 +151,15 @@ class system_block_response : public responseHandler
 		int error;
 };
 
-class request_block_response : public responseHandler
+// this class selects a location from the server locations to search fo the resource
+class Locator : public responseHandler
 {
 	public:
-		request_block_response();
-		~request_block_response();
-		void buildresponse(client &cl);
-		int handle(client &cl);
-		int isMethodAllowed(std::string method);
-		int isForbidden(std::string method, std::string resource);
-		int isRequestBlockOk(std::string method, std::string resource);
-		int setSearchLocation(client &client);
-		location getSearchLocation(void) const;
+		Locator(client cl);
+		~Locator();
+		virtual int handle(client &cl) = 0;
+		virtual void buildresponse(client &cl) = 0;
 	protected:
+		location *searchLocation();
 		int error;
-		location searchLoaction;
 };

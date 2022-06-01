@@ -5,11 +5,11 @@
 // if the handle method returns 0 the request will be handled by the calling object
 int system_block_response::handle(client cl)
 {
-	if (isMethodImplemented(cl.request->get_http_method()) == 0)
+	if (this->isMethodImplemented(cl.request->get_http_method()) == 0)
 		return 0;
-	if (isHttpVersionSupported(cl.request->get_http_version()) == 0)
+	if (this->isHttpVersionSupported(cl.request->get_http_version()) == 0)
 		return 0;
-	buildresponse(cl);
+	this->buildresponse(cl);
 	return 1;
 }
 
@@ -34,16 +34,21 @@ void request_block_response::buildresponse(client cl)
 	switch (error)
 	{
 		case HTTP_VERSION_NOT_SUPPORTED_CODE:
-			setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
-			setResponseHeader(CONTENT_TYPE, CONTENT_TYPE_TEXT_HTML);
-			setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
+			this->setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
+			this->setResponseHeader(CONTENT_TYPE, CONTENT_TYPE_TEXT_HTML);
+			this->setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
 			break;
 		case NOT_IMPLEMENTED_CODE:
-			setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
-			setResponseheader(CONTENT_TYPE, CONTENT_TYPE_TEXT_HTML);
-			setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
+			this->setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
+			this->setResponseheader(CONTENT_TYPE, CONTENT_TYPE_TEXT_HTML);
+			this->setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
 			break;
 		default:
 			return;
 	}
 }
+
+
+
+
+location 
