@@ -160,6 +160,6 @@ class Locator : public responseHandler
 		virtual int handle(client &cl) = 0;
 		virtual void buildresponse(client &cl) = 0;
 	protected:
-		location *searchLocation();
+		location *searchLocation(std::vector<location> &locations, parse_request &req);
 		int error;
 };

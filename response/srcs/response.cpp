@@ -50,5 +50,19 @@ void request_block_response::buildresponse(client cl)
 
 
 
-
-location 
+// each location in the server block has its own path
+// we will match the path of the request with the path of each location and chose the location with the longest match
+//Nginx begins by checking all prefix-based location matches.
+//It checks each location against the complete request URI.
+location locator::*searchLocation(std::vector<location> &locations, parse_request &req)
+{
+	int max_match_length = 0;
+	location loc = new location();
+	int	match;
+	for (int i = 0; i < locations.size(); i++)
+	{
+		match = 0;
+		for (int j = 0; j <)
+	}
+	return loc;
+}
