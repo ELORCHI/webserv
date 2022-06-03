@@ -273,29 +273,29 @@ void    parse_config::read_server()
                 std::cout << t.get_methods(k) << " ";
                 k++;
             }
-            if (t.get_cgi_size() != 0)
-            {
-                size_t m = 0;
-                std::cout << std::endl;
-                std::cout << "********CGI_LOCATION*********" << std::endl;
-                while (m < t.get_cgi_size())
-                {
-                    cgi p = t.get_cgi(m);
-                    std::cout << "cgi name:" << p.get_cgi_name() << std::endl;
-                    std::cout << "cgi_path: "<< p.get_cgi_path() << std::endl;
-                    unsigned int k = 0;
-                    k = 0;
-                    std::cout << "cgi_methods: ";
-                    while (k < p.get_cgi_methods_size())
-                    {
-                        std::cout << p.get_cgi_methods(k) << " ";
-                        k++;
-                    }
-                    std::cout << std::endl;
-                    std::cout << "***********************" << std::endl;
-                    m++;
-                }
-            }
+            // if (t.get_cgi_size() != 0)
+            // {
+            //     size_t m = 0;
+                // std::cout << std::endl;
+                // std::cout << "********CGI_LOCATION*********" << std::endl;
+                // while (m < t.get_cgi_size())
+                // {
+                //     cgi p = t.get_cgi(m);
+                //     std::cout << "cgi name:" << p.get_cgi_name() << std::endl;
+                //     std::cout << "cgi_path: "<< p.get_cgi_path() << std::endl;
+                //     unsigned int k = 0;
+                //     k = 0;
+                //     std::cout << "cgi_methods: ";
+                //     while (k < p.get_cgi_methods_size())
+                //     {
+                //         std::cout << p.get_cgi_methods(k) << " ";
+                //         k++;
+                //     }
+                //     std::cout << std::endl;
+                //     std::cout << "***********************" << std::endl;
+                //     m++;
+                // }
+            // }
             std::cout << std::endl;
             std::cout << "***********************" << std::endl;
             j++;

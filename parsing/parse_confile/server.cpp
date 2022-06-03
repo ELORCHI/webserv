@@ -375,7 +375,7 @@ unsigned int server::fill_autoindex(std::vector<std::string> words, unsigned int
 unsigned int server::fill_location(std::vector<std::string> words, unsigned int i, bool &location_flag)
 {
     location_flag = true;
-    bool cgi_flag = false;
+    // bool cgi_flag = false;
     location l;
     l.set_locations_path(words[i + 1]);
     while (1)
@@ -391,7 +391,10 @@ unsigned int server::fill_location(std::vector<std::string> words, unsigned int 
         else if (words[i] == "autoindex")
             i = l.fill_autoindex(words, i);
         else if (words[i] == "cgi")
-            i = l.fill_cgi(words, i, cgi_flag);
+        {
+            throw std::runtime_error("Error: No cgi inside location");
+            // i = l.fill_cgi(words, i, cgi_flag);
+        }
         i++;
     }
     location_flag = false;
@@ -429,6 +432,8 @@ std::string                  server::get_index(int i) const
 
 unsigned int server::fill_cgi(std::vector<std::string> words, unsigned int i, bool &cgi_flag)
 {
+    if (_cgi.size())
+        throw std::runtime_error("Error : NO multiple cgi");
     cgi_flag = true;
     cgi c;
     c.set_cgi_name(words[i + 1]);
@@ -483,7 +488,17 @@ bool server::not_predefined(std::string &word) const
             && word != "upload_path" && word != "index"
             && word != "error_page" && word != "autoindex"
             && word != "redirection" && word != "client_max_body_size"
-            && word != "location" && word != "cgi")
+            && word != "location" && word != "cgi" && word != "cgi_path")
             return (1);
     return (0);
+}
+
+std::vector<location>    &server::get_location()
+{
+    return _location;
+}
+
+std::vector<cgi>    &server::get_cgi()
+{
+    return _cgi;
 }
