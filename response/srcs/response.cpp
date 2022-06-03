@@ -29,7 +29,7 @@ int system_block_response::isHttpVersionSupported(std::string http_version)
 	return 1;
 }
 
-void request_block_response::buildresponse(client cl)
+void request_block_response::buildresponse()
 {
 	switch (error)
 	{
@@ -54,15 +54,44 @@ void request_block_response::buildresponse(client cl)
 // we will match the path of the request with the path of each location and chose the location with the longest match
 //Nginx begins by checking all prefix-based location matches.
 //It checks each location against the complete request URI.
-location locator::*searchLocation(std::vector<location> &locations, parse_request &req)
+location* locator::searchLocation(std::vector<location> locations, parse_request &req)
 {
 	int max_match_length = 0;
-	location loc = new location();
+	location *loc = new location();
 	int	match;
-	for (int i = 0; i < locations.size(); i++)
+	int size = locations.size();
+	for (int i = 0; i < size; i++)
 	{
 		match = 0;
-		for (int j = 0; j <)
+		for (int j = 0; j < locations[i].get_path().lenght(); i++)
+		{
+			if (locations[i].get_path()[j] == req.get_path()[j])
+				match++;
+			else
+				break;
+		}
+		if (match > max_match_length)
+		{
+			max_match_length = match;
+			loc = locations[i];
+		}
 	}
+	if (max_match_length == 0)
+		return NULL;
+	return loc;
+}
+
+void locator::setLocation(std::vector<location> locations, parse_request &req)
+{
+	location *loc = this->searchLocation(locations, req);
+	if (loc == NULL)
+		loc = this->defaultLocation();
+	this->location = loc;
+}
+
+location *locator::defaultLocation()
+{
+	location *loc = new location();
+	loc->set_path(cl.request->server_parsed_data->);
 	return loc;
 }

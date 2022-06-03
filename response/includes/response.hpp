@@ -116,7 +116,7 @@ class responseHandler : public response// abstract class
 		responseHandler(client cl);
 		virtual ~responseHandler();
 		virtual int handle(clinet &cl) = 0;
-		virtual void buildresponse(client &cl) = 0;
+		virtual void buildresponse() = 0;
 		void appendTobuffer(int buffer_size, int buffer_offset, char *msg);// need implementation
 		void setResposeStatusLine(int status_code, char *status_msg);// need implementation
 		void setResponseHeader(char *header_name, char *header_value);// need implementation
@@ -131,6 +131,7 @@ class responseHandler : public response// abstract class
 		int bufferOffset;
 		int contentLength;
 		int isChunked;
+		client cl;
 };
 
 
@@ -144,7 +145,7 @@ class system_block_response : public responseHandler
 		system_block_response();
 		~system_block_response();
 		int handle(client &cl);
-		void buildresponse(client &cl);
+		void buildresponse();
 		int isMethodImplemented(std::string method);
 		int isHttpVersionSupported(std::string http_version);
 	protected:
@@ -157,9 +158,12 @@ class Locator : public responseHandler
 	public:
 		Locator(client cl);
 		~Locator();
-		virtual int handle(client &cl) = 0;
-		virtual void buildresponse(client &cl) = 0;
+		virtual int		handle(client &cl) = 0;
+		virtual void	buildresponse(client &cl) = 0;
+		location		*searchLocation(std::vector<location> locations, parse_request &req);
+		location		*defaultLocation(location loc);
+		void			setLocation(std::vector<location> locations, parse_request &req);
 	protected:
-		location *searchLocation(std::vector<location> &locations, parse_request &req);
 		int error;
+		location *workingLocation;//allocate memory on the constructor
 };
