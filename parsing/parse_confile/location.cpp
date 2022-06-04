@@ -34,21 +34,21 @@ long long int               location::get_client_max_body_size() const { return 
 /*
 * SETTERS
 */
-void location::set_locations_path(std::string &locations_path) { this->_locations_path = locations_path; }
-void location::set_methods(std::string &methods)
+void location::set_locations_path(std::string locations_path) { this->_locations_path = locations_path; }
+void location::set_methods(std::string methods)
 {
     if (methods == "POST" || methods == "GET" || methods == "DELETE")
         _allow_methods.push_back(methods);
     else
         throw std::runtime_error("Error: allowed methods in location not well defined");
 }
-void location::set_root(std::string &root) {
+void location::set_root(std::string root) {
     if (not_predefined(root))
         this->_root = root;
     else
         throw std::runtime_error("Error: root in location not well defined");}
 void location::set_autoindex(bool autoindex) { this->_autoindex = autoindex; }
-void location::set_index(std::string &index) { this->_index.push_back(index); }
+void location::set_index(std::string index) { this->_index.push_back(index); }
 bool location::is_number(const std::string& str)
 {
 	for (size_t i = 0; i < str.length(); i++)
@@ -61,7 +61,7 @@ bool location::is_number(const std::string& str)
 	return true;
 }
 
-void    location::set_client_max_body_size(std::string &client_max_body_size)
+void    location::set_client_max_body_size(std::string client_max_body_size)
 {
     if (not_predefined(client_max_body_size) && is_number(client_max_body_size))
        this->_client_max_body_size =std::stoi(client_max_body_size);
