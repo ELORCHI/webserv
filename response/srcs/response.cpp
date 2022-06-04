@@ -8,7 +8,7 @@ int system_block_response::handle()
 	int err = 0;
 	if (this->isMethodImplemented(cl.getReadyRequest()->get_request_parsing_data().get_http_method()) == 1)
 		err = 1;
-	else if (this->isHttpVersionSupported(cl.getReadyRequest()->get_r~equest_parsing_data().get_http_version()) == 1)
+	else if (this->isHttpVersionSupported(cl.getReadyRequest()->get_request_parsing_data().get_http_version()) == 1)
 		err = 1;
 	else if (cl.getReadyRequest()->get_request_parsing_data().get_code_status() == 500)
 	{
@@ -107,10 +107,10 @@ location *Locator::defaultLocation(server *server)
 {
 	location *loc = new location();
 	loc->set_root(server->get_root());
-	//loc->set_client_max_body_size(server->get_client_max_body_size());
-	//loc->set_index(server->get_index());
-	//loc->set_autoindex(server->get_autoindex());
-	//loc->fill_allowed_methods(server->get_allowed_methods());
+	loc->set_client_max_body_size(server->get_client_max_body_size());
+	loc->set_index(server->get_index());
+	loc->set_autoindex(server->get_autoindex());
+	loc->fill_allowed_methods(server->get_allowed_methods());
 	return loc;
 }
 
