@@ -364,5 +364,5 @@ void parse_request::set_extention()
         }
     }
     if (_extention == "")
-        _extention = ".txt"
+        _extention = ".txt";
 }
