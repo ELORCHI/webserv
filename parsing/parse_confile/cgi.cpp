@@ -47,17 +47,22 @@ void    cgi::set_cgi_name(std::string &name)
     
 }
 
-std::string &cgi::get_cgi_methods(int i)
+std::string cgi::get_cgi_methods(int i) const
 {
     return this->_allow_methods[i];
 }
 
-std::string &cgi::get_cgi_name()
+std::vector<std::string> cgi::get_cgi_methods() const
+{
+    return this->_allow_methods;
+}
+
+std::string cgi::get_cgi_name() const
 {
     return this->_name;
 }
 
-std::string &cgi::get_cgi_path()
+std::string cgi::get_cgi_path() const
 {
     return this->_cgi_path;
 }

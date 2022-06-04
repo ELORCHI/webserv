@@ -493,12 +493,17 @@ bool server::not_predefined(std::string &word) const
     return (0);
 }
 
-std::vector<location>    &server::get_location()
+std::vector<location>    server::get_location() const
 {
     return _location;
 }
 
-std::vector<cgi>    &server::get_cgi()
+std::vector<std::string>     server::get_index() const
+{
+    return _index;
+}
+
+std::vector<cgi>    server::get_cgi() const
 {
     return _cgi;
 }

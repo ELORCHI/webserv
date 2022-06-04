@@ -28,8 +28,8 @@ protected:
     std::vector<std::string>                _allowed_methods;
     std::vector<std::string>                _index;
     std::string                             _upload_path;
-    std::vector<std::vector<std::string> >   _error_pages;
-    std::vector<std::vector<std::string> >   _redirections;
+    std::vector<std::vector<std::string> >  _error_pages;
+    std::vector<std::vector<std::string> >  _redirections;
     std::string                             _root;
     std::vector<location>                   _location;
     std::vector<cgi>                        _cgi;
@@ -57,6 +57,7 @@ public:
     int                          get_listen_port() const;
     std::string                  get_allowed_methods(int i) const;
     std::string                  get_index(int i) const;
+    std::vector<std::string>     get_index() const;
     std::vector<std::string>     get_error_pages(int i) const;
     unsigned int                 get_error_pages_size() const;
     unsigned int                 get_redirections_size() const;
@@ -67,7 +68,7 @@ public:
     unsigned int                 get_location_size() const;
     unsigned int                 get_cgi_size() const;
     cgi                          get_cgi(int i) const;
-    long long int                 get_client_max_body_size() const;
+    long long int                get_client_max_body_size() const;
     unsigned int                 get_allowed_methods_size() const;
     bool                         get_autoindex() const;
     unsigned int                 get_index_size() const;
@@ -81,8 +82,8 @@ public:
     bool                         not_predefined(std::string &) const;
     bool                         is_number(const std::string& str);
     void                         check_host(std::string);
-    std::vector<location>        &get_location();
-    std::vector<cgi>             &get_cgi();
-    server                         &operator=(server const & rhs);
+    std::vector<location>        get_location() const;
+    std::vector<cgi>             get_cgi() const;
+    server                       &operator=(server const & rhs);
 };
 #endif

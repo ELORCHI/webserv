@@ -1,4 +1,4 @@
-GET https://greenbytes.de/tech/webdav/?draft-ietf-httpbis-http2-09.html HTTP/1.1\r\n
+GET https://greenbytes.de/tech/webdav/?draft-ietf-httpbis-http2-09.php HTTP/1.1\r\n
 gdndfgn: dfgndfgn
 User-Agent: PostmanRuntime/7.29.0
 Accept: */*

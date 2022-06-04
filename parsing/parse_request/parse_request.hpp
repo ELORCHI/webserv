@@ -31,7 +31,6 @@ class parse_request
         std::string set_http_vmp(std::string);    
         void set_http_method(std::string&);  
         void set_http_version(std::string&);  
-        void set_http_path(std::string http_path);
         void set_http_headers(std::string&);
         void set_http_body(std::string&);
         void set_chunked_http_body(std::string &filename);
@@ -47,7 +46,8 @@ class parse_request
         std::string get_http_query() {return _http_path["query"];};
         std::string get_extention() {return _extention;};
         std::map<std::string, std::string> get_http_headers() const {return _http_headers;};
-        std::string get_http_body() const {return _http_body;};
+        std::string get_path_body() const {return _path_body;};
+        int get_code_status() const {return _code_status;};
 
         //methods
         bool	    is_number(const std::string&);
