@@ -23,6 +23,10 @@ class request {
         int getPort();
         // int get_req_port();
         std::string getReqHost();
+        server *get_server(void)
+        {
+            return this->server_parsed_data;
+        }
 
     // static int get_content_length(std::string astring);
     public:

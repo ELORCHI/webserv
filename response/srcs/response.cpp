@@ -103,16 +103,16 @@ void Locator::setLocation(void)
 
 // talk with yassine about this
 // NEEDS MORE DETAILS UPLOAD PATH ECT MAYBE ADD CGI TO A LOCATION
-location *Locator::defaultLocation(server *server)
-{
-	location *loc = new location();
-	loc->set_root(server->get_root());
-	loc->set_client_max_body_size(server->get_client_max_body_size());
-	loc->set_index(server->get_index());
-	loc->set_autoindex(server->get_autoindex());
-	loc->fill_allowed_methods(server->get_allowed_methods());
-	return loc;
-}
+// location *Locator::defaultLocation(server *server)
+// {
+// 	location *loc = new location();
+// 	loc->set_root(server->get_root());
+// 	loc->set_client_max_body_size(server->get_client_max_body_size());
+// 	loc->set_index(server->get_index());
+// 	loc->set_autoindex(server->get_autoindex());
+// 	loc->fill_allowed_methods(server->get_allowed_methods());
+// 	return loc;
+// }
 
 // sets isAllowed to true if found in the location methods
 // needs getters for allowed methods
