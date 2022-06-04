@@ -20,7 +20,7 @@ cgi::~cgi()
 {
 }
 
-void cgi::set_cgi_path(std::string &cgi_path)
+void cgi::set_cgi_path(std::string cgi_path)
 {
     if (not_predefined(cgi_path))
        this->_cgi_path = cgi_path;
@@ -29,7 +29,7 @@ void cgi::set_cgi_path(std::string &cgi_path)
     
 }
 
-void cgi::set_cgi_methods(std::string &methods)
+void cgi::set_cgi_methods(std::string methods)
 {
     // std::cout << methods << std::endl;
     if (methods == "POST" || methods == "GET" || methods == "DELETE")
@@ -38,7 +38,7 @@ void cgi::set_cgi_methods(std::string &methods)
         throw std::runtime_error("Error: allowed methods in cgi not well defined");
 }
 
-void    cgi::set_cgi_name(std::string &name)
+void    cgi::set_cgi_name(std::string name)
 {
     if (not_predefined(name))
        this->_name = name;
@@ -47,17 +47,22 @@ void    cgi::set_cgi_name(std::string &name)
     
 }
 
-std::string &cgi::get_cgi_methods(int i)
+std::string cgi::get_cgi_methods(int i) const
 {
     return this->_allow_methods[i];
 }
 
-std::string &cgi::get_cgi_name()
+std::vector<std::string> cgi::get_cgi_methods() const
+{
+    return this->_allow_methods;
+}
+
+std::string cgi::get_cgi_name() const
 {
     return this->_name;
 }
 
-std::string &cgi::get_cgi_path()
+std::string cgi::get_cgi_path() const
 {
     return this->_cgi_path;
 }
