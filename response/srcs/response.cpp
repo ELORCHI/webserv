@@ -1,7 +1,7 @@
 #include "../includes/response.hpp"
 
 
-// if the hanlde method returns 1 the request will be passed to next hanle
+// if the hanlde method returns 1 the request will be passed to next handler
 // if the handle method returns 0 the request will be handled by the calling object
 int system_block_response::handle()
 {
@@ -29,24 +29,24 @@ int system_block_response::isHttpVersionSupported(std::string http_version)
 	return 1;
 }
 
-// void request_block_response::buildresponse(client &cl)
-// {
-	// switch (error)
-	// {
-		// case HTTP_VERSION_NOT_SUPPORTED_CODE:
-			// this->setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
-			// this->setResponseHeader(CONTENT_TYPE, CONTENT_TYPE_TEXT_HTML);
-			// this->setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
-			// break;
-		// case NOT_IMPLEMENTED_CODE:
-			// this->setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
-			// this->setResponseheader(CONTENT_TYPE, CONTENT_TYPE_TEXT_HTML);
-			// this->setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
-			// break;
-		// default:
-			// return;
-	// }
-// }
+void system_block_response::buildresponse(client &cl)
+{
+	switch (error)
+	{
+		case HTTP_VERSION_NOT_SUPPORTED_CODE:
+			this->setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
+			responseHandler::setResponseHeaders();//no header so just default ones
+			this->setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
+			break;
+		case NOT_IMPLEMENTED_CODE:
+			this->setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
+			responseHandler::setResponseHeaders();
+			this->setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
+			break;
+		default:
+			return;
+	}
+}
 
 
 
@@ -89,6 +89,8 @@ void Locator::setLocation(void)
 	this->workingLocation = loc;
 }
 
+
+// talk with yassine about this
 location *Locator::defaultLocation(server *server)
 {
 	location *loc = new location();
