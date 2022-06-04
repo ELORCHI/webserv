@@ -5,11 +5,18 @@
 // if the handle method returns 0 the request will be handled by the calling object
 int system_block_response::handle()
 {
-	if (this->isMethodImplemented(cl.getReadyRequest()->get_request_parsing_data().get_http_method()) == 0)
-		return 0;
-	if (this->isHttpVersionSupported(cl.getReadyRequest()->get_request_parsing_data().get_http_version()) == 0)
-		return 0;
-	this->buildresponse(cl);
+	int err = 0;
+	if (this->isMethodImplemented(cl.getReadyRequest()->get_request_parsing_data().get_http_method()) == 1)
+		err = 1;
+	else if (this->isHttpVersionSupported(cl.getReadyRequest()->get_r~equest_parsing_data().get_http_version()) == 1)
+		err = 1;
+	else if (cl.getReadyRequest()->get_request_parsing_data().get_code_status() == 500)
+	{
+		err = 1;
+		error = INTERNAL_SERVER_ERROR_CODE;
+	}
+	if (err = 1)
+		this->buildresponse(cl);
 	return 1;
 }
 
@@ -40,8 +47,12 @@ void system_block_response::buildresponse(client &cl)
 			break;
 		case NOT_IMPLEMENTED_CODE:
 			this->setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
-			responseHandler::setResponseHeaders();
+			responseHandler::setResponseHeaders();// no header just default ones
 			this->setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
+		case INTERNAL_SERVER_ERROR_CODE:
+			this->setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+			responseHandler::setResponseHeaders();//no header so just default ones
+			this->setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
 			break;
 		default:
 			return;
@@ -91,6 +102,7 @@ void Locator::setLocation(void)
 
 
 // talk with yassine about this
+// NEEDS MORE DETAILS UPLOAD PATH ECT MAYBE ADD CGI TO A LOCATION
 location *Locator::defaultLocation(server *server)
 {
 	location *loc = new location();
@@ -112,3 +124,7 @@ location *Locator::defaultLocation(server *server)
 // 	}
 // }
 
+int Locator::handle()
+{
+	
+}

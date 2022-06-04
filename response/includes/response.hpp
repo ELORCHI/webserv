@@ -156,16 +156,15 @@ class system_block_response : public responseHandler
 class Locator : public responseHandler
 {
 	public:
-		Locator();
+		Locator(client &cl);
 		~Locator();
-		virtual int		handle() = 0;
-		virtual void	buildresponse(client &cl) = 0;
+		int		handle();
+		virtual	int		buildresponse(client &cl);
 		location		*searchLocation(std::vector<location> &locations, std::string source);
 		location		*defaultLocation(server *server);
 		void			setLocation(void);
-		void			setMethodAllowance(std::string method);
+		bool			isMethodAllowd(std::string method);
 	protected:
-		int error;
+		int		error;
 		location *workingLocation;//allocate memory on the constructor maybe not
-		bool isAllowed;
 };
