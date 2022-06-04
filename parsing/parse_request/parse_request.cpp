@@ -208,14 +208,19 @@ void	parse_request::set_unchunked_http_body(std::string &filename)
 void	parse_request::set_http_body(std::string &filename)
 {
 
-	if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers["Transfer-Encoding"] == "chunked")
+	if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers.find("Content-Length") != _http_headers.end())
+	{
+		std::cout << "Error: bad request" << std::endl;
+		_code_status = 400;
+	}
+	else if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers["Transfer-Encoding"] == "chunked")
 		set_chunked_http_body(filename);
 	else if (_http_headers.find("Content-Length") != _http_headers.end())
 		set_unchunked_http_body(filename);
 	else
 	{
-		std::cout << "Error: bad body" << std::endl;
-		_code_status = 500;
+		std::cout << "Error: bad request" << std::endl;
+		_code_status = 400;
 	}
 }
 
