@@ -163,7 +163,9 @@ class Locator : public responseHandler
 		location		*searchLocation(std::vector<location> &locations, std::string source);
 		location		*defaultLocation(server *server);
 		void			setLocation(void);
+		void			setMethodAllowance(std::string method);
 	protected:
 		int error;
 		location *workingLocation;//allocate memory on the constructor maybe not
+		bool isAllowed;
 };

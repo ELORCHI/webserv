@@ -83,7 +83,7 @@ location* Locator::searchLocation(std::vector<location> &locations, std::string 
 
 void Locator::setLocation(void)
 {
-	location *loc = this->searchLocation(cl.getReadyRequest()->get_server()->get_location(), cl.getReadyRequest()->get_request_parsing_data()->get_http_path());
+	location *loc = this->searchLocation(cl.getReadyRequest()->get_server()->get_location(), cl.getReadyRequest()->get_request_parsing_data().get_http_path());
 	if (loc == NULL)
 		loc = this->defaultLocation(cl.getReadyRequest()->get_server());
 	this->workingLocation = loc;
@@ -101,4 +101,14 @@ location *Locator::defaultLocation(server *server)
 	//loc->fill_allowed_methods(server->get_allowed_methods());
 	return loc;
 }
+
+// sets isAllowed to true if found in the location methods
+// needs getters for allowed methods
+// void Locator::setMethodAllowance(std::string method)
+// {
+// 	for (int i; i < workingLocation->get_allowd_methods().size; i++)
+// 	{
+
+// 	}
+// }
 
