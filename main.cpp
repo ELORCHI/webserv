@@ -1,21 +1,23 @@
-#include "src/server.hpp"
 #include <string>
 #include <iostream>
-#include "src/request.hpp"
+#include "src/servers.hpp"
+// #include "src/request.hpp"
 #include <iostream>
 #include <fstream>
 #include <ostream>
 #include <sstream>
 #include <string>
 #include <streambuf>
+// #include "servers.hpp"
 
 
 int main(int argc, char *argv[])
 {
-
-    server s(4200);
-    s.start();
-    s.run();
+	httpServers srvrs(argc, argv);
+	srvrs.httpServers_repl();
+    // server s(4200);
+    // s.start();
+    // s.run();
     // std::stringstream ss;
     // std::string s;
     // std::ifstream file;

@@ -5,7 +5,8 @@
 #include <queue>
 #include "../parsing/parse_request/parse_request.hpp"
 #include "request.hpp"
-
+#include <fstream>
+#include <sstream>
 
 
 class client {
@@ -13,7 +14,15 @@ class client {
     struct sockaddr_in clientAddr;
     bool is_done_reading_from;
     std::string read_buffer;
+
+	bool isHeadersReadingComplete;
+	std::fstream readTmpFile;
+	std::string headersBuffer;
+	bool isHeadersBufferResidue;
+	std::string bodyFileName;
+	std::fstream bodyFile;
 	request* ready_request;
+
      public:
         client(int fd, struct sockaddr_in addr);
         ~client();
@@ -30,12 +39,13 @@ class client {
 
         bool is_reading_complete() { return is_done_reading_from; }
         void set_reading_status (bool status) { is_done_reading_from = status; }
-        void appendToReadBuffer(char *buffer);
-        
-        std::string getReadBuffer() {return read_buffer;}
+        void appendToHeadersBuffer(char *buffer);
+		void appendToReadBodyFile(const char *buffer);
+		std::fstream &getBodyFile() { return bodyFile; }
+        std::string getHeadersBuffer() {return headersBuffer;}
         request *getReadyRequest();
         bool isRequestsQueueEmpty();
         bool isThereARequestReady();
 		void setRequest(request *rq);
-
+		std::fstream &getReadTmpFile();
 };
