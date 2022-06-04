@@ -88,7 +88,7 @@ unsigned int   parse_config::server_parsing(unsigned int &i)
         else if (_words[i] == "redirection")
             s.set_redirections(_words[i + 1], _words[i + 2]);
         else if (_words[i] == "client_max_body_size")
-            s.set_client_max_body_size(std::stoi(_words[i + 1]));
+            s.set_client_max_body_size(_words[i + 1]);
         else if (_words[i] == "location")
             i = s.fill_location(_words, i, location_flag);
         else if (_words[i] == "cgi")
@@ -172,7 +172,7 @@ void    parse_config::start_parsing()
     syntax_error();
     for (unsigned int i = 0; i < _words.size(); i++)
     {
-		if (_words[i] == "server")
+		if (_words[i] == "server" && ((i + 1) < _words.size()))
         {
 			i++;
 			if (_words[i] == "{")
@@ -252,6 +252,7 @@ void    parse_config::read_server()
         {
             location t = this->_servers[i].get_location(j);
             std::cout << "location_path: "<< t.get_locations_path() << std::endl;
+            std::cout << "max_body_size: "<< t.get_client_max_body_size() << std::endl;
             unsigned int k = 0;
             std::cout << "root: "<< t.get_root() << std::endl;
             if (t.get_autoindex())
@@ -272,29 +273,29 @@ void    parse_config::read_server()
                 std::cout << t.get_methods(k) << " ";
                 k++;
             }
-            if (t.get_cgi_size() != 0)
-            {
-                size_t m = 0;
-                std::cout << std::endl;
-                std::cout << "********CGI_LOCATION*********" << std::endl;
-                while (m < t.get_cgi_size())
-                {
-                    cgi p = t.get_cgi(m);
-                    std::cout << "cgi name:" << p.get_cgi_name() << std::endl;
-                    std::cout << "cgi_path: "<< p.get_cgi_path() << std::endl;
-                    unsigned int k = 0;
-                    k = 0;
-                    std::cout << "cgi_methods: ";
-                    while (k < p.get_cgi_methods_size())
-                    {
-                        std::cout << p.get_cgi_methods(k) << " ";
-                        k++;
-                    }
-                    std::cout << std::endl;
-                    std::cout << "***********************" << std::endl;
-                    m++;
-                }
-            }
+            // if (t.get_cgi_size() != 0)
+            // {
+            //     size_t m = 0;
+                // std::cout << std::endl;
+                // std::cout << "********CGI_LOCATION*********" << std::endl;
+                // while (m < t.get_cgi_size())
+                // {
+                //     cgi p = t.get_cgi(m);
+                //     std::cout << "cgi name:" << p.get_cgi_name() << std::endl;
+                //     std::cout << "cgi_path: "<< p.get_cgi_path() << std::endl;
+                //     unsigned int k = 0;
+                //     k = 0;
+                //     std::cout << "cgi_methods: ";
+                //     while (k < p.get_cgi_methods_size())
+                //     {
+                //         std::cout << p.get_cgi_methods(k) << " ";
+                //         k++;
+                //     }
+                //     std::cout << std::endl;
+                //     std::cout << "***********************" << std::endl;
+                //     m++;
+                // }
+            // }
             std::cout << std::endl;
             std::cout << "***********************" << std::endl;
             j++;

@@ -178,43 +178,111 @@
 // 	}
 // 	return 0;
 // }
-#include <iostream>
-#include <iomanip>
-#include <sstream>
+// #include <iostream>
+// #include <iomanip>
+// #include <sstream>
 
-bool is_hexnumber(const std::string& str)
+// bool is_hexnumber(const std::string& str)
+// {
+// 	for (size_t i = 0; i < str.length(); i++)
+// 	{
+// 		char current = str[i];
+// 		if (current >= '0' && current <= '9')
+// 			continue;
+// 		if (current >= 'A' && current <= 'F')
+// 			continue;
+// 		if (current >= 'a' && current <= 'f')
+// 			continue;
+// 		return false;
+// 	}
+// 	return true;
+// }
+
+// int main()
+// {
+//     int x, y;
+//     std::stringstream stream;
+
+//     if (is_hexnumber("1C"))
+//         std::cout << "1"; 
+//     exit(0);
+//     // std::cin >> x;
+//     stream << "22";
+//     stream >> std::hex >> y;
+// 	stream >> y;
+//     std::cout << y;
+
+//     return 0;
+// }
+
+// std::string gen_random(const int len) {
+// 	srand((unsigned)time(NULL) * getpid());     
+//     static const char alphanum[] =
+//         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+//         "abcdefghijklmnopqrstuvwxyz";
+//     std::string tmp_s;
+//     tmp_s.reserve(len);
+//     for (int i = 0; i < len; ++i) {
+//         tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+//     }
+//     return tmp_s;
+// }
+
+// int main(int argc, char *argv[]) {
+//     // srand((unsigned)time(NULL) * getpid());     
+//     std::cout << gen_random(10) << "\n";        
+//     return 0;
+// }
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <map>
+#include <sstream>
+#include <ctime>
+#include <unistd.h>
+
+std::string gen_random(const int len) {
+	srand((unsigned)time(NULL) * getpid());     
+    static const char alphanum[] =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    std::string tmp_s;
+    tmp_s.reserve(len);
+    for (int i = 0; i < len; ++i) {
+        tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+    return tmp_s;
+}
+
+void	set_unchunked_http_body()
 {
-	for (size_t i = 0; i < str.length(); i++)
+	std::string line;
+	size_t found;
+	std::string tmp;
+    std::ifstream fin("./request_file");
+	std::string _path_body = gen_random(10);
+	std::ofstream fout(_path_body.append(".txt"), std::ios::binary);
+    if (!fout || !fin)
 	{
-		char current = str[i];
-		if (current >= '0' && current <= '9')
-			continue;
-		if (current >= 'A' && current <= 'F')
-			continue;
-		if (current >= 'a' && current <= 'f')
-			continue;
-		return false;
+		std::cout << "Error: file not found" << std::endl;
+		exit(0);
 	}
-	return true;
+	while (getline(fin, line))
+	{
+        line += "\n";
+		if (fin.eof())
+			break ;
+        fout << line;
+	}
+    fin.close();
+	fout.close();
+	// eraseAllSubStr(lines, "\r\n");
+	// _http_body = lines.substr(0, content_length);
 }
 
 int main()
 {
-    int x, y;
-    std::stringstream stream;
-
-    if (is_hexnumber("1C"))
-        std::cout << "1"; 
-    exit(0);
-    // std::cin >> x;
-    stream << "22";
-    stream >> std::hex >> y;
-	stream >> y;
-    std::cout << y;
-
-    return 0;
+	 //os::bin::ios
+	set_unchunked_http_body();
 }
-
-
-
-// 4\r\nWiki\r\n6\r\npedia \r\nE\r\nin\r\n\r\nchunks.\r\n0\r\n\r\n

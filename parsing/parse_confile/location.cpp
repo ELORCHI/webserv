@@ -15,7 +15,7 @@
 location::location() : _locations_path(""),
                         _allow_methods(std::vector<std::string>()),
                         _root(""),
-                        _client_max_body_size(""),  
+                        _client_max_body_size(-1),  
                         _index(std::vector<std::string>()),
                         _autoindex(false)
                         {}
@@ -28,18 +28,45 @@ std::string                 &location::get_locations_path() { return this->_loca
 std::vector<std::string>    &location::get_methods() { return this->_allow_methods; }
 std::string                 &location::get_root() { return this->_root; }
 bool                        &location::get_autoindex() { return this->_autoindex; }
-std::string                 &location::get_client_max_body_size() { return this->_client_max_body_size; }
+long long int                 &location::get_client_max_body_size() { return this->_client_max_body_size; }
 
 /*
 * SETTERS
 */
 void location::set_locations_path(std::string &locations_path) { this->_locations_path = locations_path; }
-void location::set_methods(std::string &methods){ this->_allow_methods.push_back(methods);}
-void location::set_root(std::string &root) { this->_root = root; }
+void location::set_methods(std::string &methods)
+{
+    if (methods == "POST" || methods == "GET" || methods == "DELETE")
+        _allow_methods.push_back(methods);
+    else
+        throw std::runtime_error("Error: allowed methods in location not well defined");
+}
+void location::set_root(std::string &root) {
+    if (not_predefined(root))
+        this->_root = root;
+    else
+        throw std::runtime_error("Error: root in location not well defined");}
 void location::set_autoindex(bool autoindex) { this->_autoindex = autoindex; }
-void location::set_client_max_body_size(std::string &client_max_body_size) { this->_client_max_body_size = client_max_body_size; }
 void location::set_index(std::string &index) { this->_index.push_back(index); }
+bool location::is_number(const std::string& str)
+{
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		char current = str[i];
+		if (current >= '0' && current <= '9')
+			continue;
+		return false;
+	}
+	return true;
+}
 
+void    location::set_client_max_body_size(std::string &client_max_body_size)
+{
+    if (not_predefined(client_max_body_size) && is_number(client_max_body_size))
+       this->_client_max_body_size =std::stoi(client_max_body_size);
+    else
+        throw std::runtime_error("Error: client max body size should be number");
+}
 /*
 * methods
 */
@@ -48,11 +75,13 @@ void location::set_index(std::string &index) { this->_index.push_back(index); }
 unsigned int location::fill_allowed_methods(std::vector<std::string> words, unsigned int i)
 {
     i++;
-    while (i < words.size() && (words[i] == "POST" || words[i] == "GET" || words[i] == "DELETE"))
+    while (i < words.size() && not_predefined(words[i]))
     {
         set_methods(words[i]);
         i++;
     }
+    if (get_methods_size() == 0)
+            throw std::runtime_error("Error: location allow_method is empty");
     i--;
     return i;
 }
@@ -70,6 +99,8 @@ unsigned int location::fill_index(std::vector<std::string> words, unsigned int i
         set_index(words[i]);
         i++;
     }
+    if (get_index_size() == 0)
+            throw std::runtime_error("Error: location index is empty");
     i--;
     return i;
 }
@@ -104,49 +135,57 @@ std::string                 location::get_methods(unsigned int i) const
 {
     return  (this->_allow_methods[i]);
 }
-unsigned int location::fill_cgi(std::vector<std::string> words, unsigned int i, bool &cgi_flag)
-{
-    cgi_flag = true;
-    cgi c;
-    c.set_cgi_name(words[i + 1]);
-    while (1)
-    {
-        if (i >= words.size() || (words[i] == "}" && cgi_flag))
-            break ;
-        if (words[i] == "cgi_path")
-            c.set_cgi_path(words[i + 1]);
-        else if (words[i] == "allow_methods")
-        {
-            i++;
-            while (i < words.size() && words[i] != "}" && (words[i] == "POST" || words[i] == "GET" || words[i] == "DELETE"))
-            {
-                c.set_cgi_methods(words[i]);
-                i++;
-            }
-            i--;
-        }
-        i++;
-    }
-    cgi_flag = false;
-    set_cgi(c);
-    return i;
-}
 
-void    location::set_cgi(cgi cgi)
-{
-    _cgi.push_back(cgi);
-}
+// unsigned int location::fill_cgi(std::vector<std::string> words, unsigned int i, bool &cgi_flag)
+// {
+//     cgi_flag = true;
+//     cgi c;
+//     c.set_cgi_name(words[i + 1]);
+//     while (1)
+//     {
+//         if (i >= words.size() || (words[i] == "}" && cgi_flag))
+//             break ;
+//         if (words[i] == "cgi_path")
+//             c.set_cgi_path(words[i + 1]);
+//         else if (words[i] == "allow_methods")
+//         {
+//             i++;
+//             while (i < words.size() && not_predefined(words[i]))
+//             {
+//                 c.set_cgi_methods(words[i]);
+//                 i++;
+//             }
+//             if (c.get_cgi_methods_size() == 0)
+//                 throw std::runtime_error("Error: cgi_allow_methods is empty");
+//             i--;
+//         }
+//         i++;
+//     }
+//     cgi_flag = false;
+//     set_cgi(c);
+//     return i;
+// }
 
-unsigned int location::get_cgi_size() const
-{
-    return _cgi.size();
-}
+// void    location::set_cgi(cgi cgi)
+// {
+//     _cgi.push_back(cgi);
+// }
 
-cgi     location::get_cgi(int i) const
-{
-    return _cgi[i];
-}
+// unsigned int location::get_cgi_size() const
+// {
+//     return _cgi.size();
+// }
 
+
+// cgi     location::get_cgi(int i) const
+// {
+//     return _cgi[i];
+// }
+
+// std::vector<cgi>    &location::get_cgi()
+// {
+//     return _cgi;
+// }
 
 /*
     operator
@@ -161,4 +200,16 @@ location    &location::operator=(location const &rhs)
     this->_client_max_body_size = rhs._client_max_body_size;
     this->_index = rhs._index;
     return *this;
+}
+
+bool location::not_predefined(std::string &word) const
+{
+    if (word != "}" && word != "server" && word != "{" && word != "listen" 
+            && word != "root" && word != "allow_methods" && word != "server_names"
+            && word != "upload_path" && word != "index"
+            && word != "error_page" && word != "autoindex"
+            && word != "redirection" && word != "client_max_body_size"
+            && word != "location" && word != "cgi" && word != "cgi_path")
+            return (1);
+    return (0);
 }
