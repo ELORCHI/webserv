@@ -9,7 +9,7 @@ execute_cgi::~execute_cgi()
 }
 
 
-std::string GetPortFromHeaders()
+std::string execute_cgi::GetPortFromHeaders()
 {
     std::string port;
     std::string tmp = get_http_headers().find("Host")->second;
@@ -21,34 +21,34 @@ std::string GetPortFromHeaders()
         port = "80";
 }
 
-void set_environement(parse_request request)
+void execute_cgi::set_environement(parse_request request)
 {
-    setenv( "GATEWAY_INTERFACE", "CGI/1.1",0);
-    setenv( "SERVER_PROTOCOL", "HTTP/1.1",0);
-    setenv( "SERVER_PORT", GetPortFromHeaders().c_str(),0);
-    setenv( "REMOTE_ADDR", "0.0.0.0",0);
-    setenv( "PATH_INFO", get_http_path().c_str(),0);
-    // setenv( "SCRIPT_FILENAME" , get_http_path()); //need full path
-    setenv( "QUERY_STRING" , get_http_query().c_str(), 0);
-    setenv( "REQUEST_METHOD" ,get_http_method().c_str(), 0);
-    setenv( "REDIRECT_STATUS" , "true", 0);
-    setenv( "FCGI_ROLE" , "RESPONDER", 0);
-    setenv( "REQUEST_SCHEME" , "http", 0);
-    setenv( "REMOTE_PORT" ,"0", 0);
+    setenv( "GATEWAY_INTERFACE", "CGI/1.1",1);
+    setenv( "SERVER_PROTOCOL", "HTTP/1.1",1);
+    setenv( "SERVER_PORT", GetPortFromHeaders().c_str(),1);
+    setenv( "REMOTE_ADDR", "0.0.0.0",1);
+    setenv( "PATH_INFO", get_http_path().c_str(),1);
+    // setenv( "SCRIPT_FILENAME" , get_http_path(),1); //need full path
+    setenv( "QUERY_STRING" , get_http_query().c_str(),1);
+    setenv( "REQUEST_METHOD" ,get_http_method().c_str(),1);
+    setenv( "REDIRECT_STATUS" , "true",1);
+    setenv( "FCGI_ROLE" , "RESPONDER",1);
+    setenv( "REQUEST_SCHEME" , "http",1);
+    setenv( "REMOTE_PORT" ,"0",1);
     if (get_http_headers().find("Content-Lenght") != get_http_headers().end()) 
     {
-        setenv( "CONTENT_TYPE", get_http_headers().find("Content-Type")->second.c_str(),0);
-        setenv( "CONTENT_LENGTH", get_http_headers().find("Content-Lenght")->second.c_str(),0);
+        setenv( "CONTENT_TYPE", get_http_headers().find("Content-Type")->second.c_str(),1);
+        setenv( "CONTENT_LENGTH", get_http_headers().find("Content-Lenght")->second.c_str(),1);
     }
     else 
     {
-        setenv( "CONTENT_TYPE","text/html; charset=UTF-8" ,0);
-        setenv( "CONTENT_LENGTH", "0" ,0);
+        setenv( "CONTENT_TYPE","text/html; charset=UTF-8" ,1);
+        setenv( "CONTENT_LENGTH", "0" ,1);
     }
 }
 
 
-int start_execute_cgi(request request)
+int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_path, request request)
 {
     pid_t   pid;
     int fd[2] = {-1};
@@ -69,8 +69,6 @@ int start_execute_cgi(request request)
     }
     if (pid == 0)
     {
-        int cgi_response_fd = 0;
-        int body_fd = 0;
         set_environement(request);
         if (fd[0] > 0)
         {
@@ -80,8 +78,8 @@ int start_execute_cgi(request request)
         dup2(fd[1], 1);
         close(fd[1]);
         char *tmp[3];
-        // tmp[0] = ; cgi_path
-        // tmp[1] = ; file_full_path
+        tmp[0] = cgi_path.c_str; //cgi_path
+        tmp[1] = file_full_path.c_str();// file_full_path
         tmp[2] = NULL;
         int ret = execvp(tmp[0], tmp);
         remove("bodybuilding.html");
@@ -113,6 +111,6 @@ int start_execute_cgi(request request)
             kill(pid, SIGKILL);
             return 408;
         }
-        
+    
     }
 }
