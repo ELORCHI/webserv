@@ -19,6 +19,7 @@
 #define GATEWAY_TIMEOUT_MSG std::string("504 Gateway Timeout")
 #define HTTP_VERSION_NOT_SUPPORTED_MSG std::string("505 HTTP Version Not Supported")
 #define HTTP_VERSION_NOT_SUPPORTED_BY_SERVER_MSG std::string("505 HTTP Version Not Supported by Server")
+#define BAD_REQUEST_MSG std::string("400 Bad Request")
 
 #define FORBIDDEN_CODE 403
 #define NOT_FOUND_CODE 404
@@ -118,10 +119,10 @@ class responseHandler : public response// abstract class
 		virtual int handle() = 0;
 		virtual void buildresponse() = 0;
 		void appendTobuffer(int buffer_size, int buffer_offset, char *msg);// need implementation
-		void setResposeStatusLine(int status, std::string status_line);// need implementation
+		virtual void setResposeStatusLine(int status, std::string status_line);// need implementation
 		virtual void setResponseHeaders(void);// need implementation set up general headers subclasses which need more header
 		// could implement their own and they might call the parent method and then append an other headers to the response buffer
-		void setResponseBody(std::string body);// need implementation
+		virtual void setResponseBody(std::string body);// need implementation
 	protected:
 		char *buffer;
 		std::string response_status_line;
@@ -145,26 +146,45 @@ class system_block_response : public responseHandler
 		system_block_response();
 		~system_block_response();
 		int handle();
-		void buildresponse(client &cl);
+		void buildresponse();
 		int isMethodImplemented(std::string method);
 		int isHttpVersionSupported(std::string http_version);
 	protected:
 		int error;
 };
 
+
+class workingLocation
+{
+	public:
+		workingLocation();
+		location		*searchLocation(std::vector<location> locations, std::string source);
+		location		*defaultLocation(server *server);
+		void			setRedirections(server *server);
+		void			setDefaultError(server *server);
+		void			setlocation(request *request);
+		void			setUpload(std::string path);
+		location		*getLocation(void);
+		~workingLocation();
+	private:
+		location *serverlocation;
+		std::string upload;
+		std::vector<std::vector<std::string> >  redirections;
+		std::vector<std::vector<std::string> >  defaultError;
+};
+
+
 // this class selects a location from the server locations to search fo the resource
 class Locator : public responseHandler
 {
 	public:
-		Locator(client &cl);
+		Locator();
 		~Locator();
-		int		handle();
-		virtual	int		buildresponse(client &cl);
-		location		*searchLocation(std::vector<location> &locations, std::string source);
-		location		*defaultLocation(server *server);
-		void			setLocation(void);
+		int				handle();
+		virtual	void	buildresponse();
+		void			setworkingLocation(void);
 		bool			isMethodAllowd(std::string method);
 	protected:
-		int		error;
-		location *workingLocation;//allocate memory on the constructor maybe not
+		int				error;
+		workingLocation *Locate;
 };

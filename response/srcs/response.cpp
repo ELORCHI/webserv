@@ -15,8 +15,10 @@ int system_block_response::handle()
 		err = 1;
 		error = INTERNAL_SERVER_ERROR_CODE;
 	}
-	if (err = 1)
-		this->buildresponse(cl);
+	else
+		return (0);
+	if (err == 1)
+		this->buildresponse();
 	return 1;
 }
 
@@ -36,14 +38,14 @@ int system_block_response::isHttpVersionSupported(std::string http_version)
 	return 1;
 }
 
-void system_block_response::buildresponse(client &cl)
+void system_block_response::buildresponse()
 {
 	switch (error)
 	{
 		case HTTP_VERSION_NOT_SUPPORTED_CODE:
-			this->setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
+			responseHandler::setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
 			responseHandler::setResponseHeaders();//no header so just default ones
-			this->setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
+			responseHandler::setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
 			break;
 		case NOT_IMPLEMENTED_CODE:
 			this->setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
@@ -65,7 +67,7 @@ void system_block_response::buildresponse(client &cl)
 // we will match the path of the request with the path of each location and chose the location with the longest match
 //Nginx begins by checking all prefix-based location matches.
 //It checks each location against the complete request URI.
-location* Locator::searchLocation(std::vector<location> &locations, std::string source)
+location* workingLocation::searchLocation(std::vector<location> locations, std::string source)
 {
 	int max_match_length = 0;
 	location *loc = new location();
@@ -92,27 +94,40 @@ location* Locator::searchLocation(std::vector<location> &locations, std::string 
 	return loc;
 }
 
-void Locator::setLocation(void)
+void workingLocation::setlocation(request *request)
 {
-	location *loc = this->searchLocation(cl.getReadyRequest()->get_server()->get_location(), cl.getReadyRequest()->get_request_parsing_data().get_http_path());
+	location *loc = this->searchLocation(request->get_server()->get_location(), request->get_request_parsing_data().get_http_path());
 	if (loc == NULL)
-		loc = this->defaultLocation(cl.getReadyRequest()->get_server());
-	this->workingLocation = loc;
+		loc = this->defaultLocation(request->get_server());
+	serverlocation = loc;
+	setUpload(request->get_server()->get_upload_path());
+	setRedirections(request->get_server());
+	setDefaultError(request->get_server()); 
+}
+
+void workingLocation::setDefaultError(server *server)
+{
+	defaultError = server->get_error_pages();
+}
+
+void workingLocation::setRedirections(server *server)
+{
+	redirections = server->get_redirections();
 }
 
 
-// talk with yassine about this
 // NEEDS MORE DETAILS UPLOAD PATH ECT MAYBE ADD CGI TO A LOCATION
-// location *Locator::defaultLocation(server *server)
-// {
-// 	location *loc = new location();
-// 	loc->set_root(server->get_root());
-// 	loc->set_client_max_body_size(server->get_client_max_body_size());
-// 	loc->set_index(server->get_index());
-// 	loc->set_autoindex(server->get_autoindex());
-// 	loc->fill_allowed_methods(server->get_allowed_methods());
-// 	return loc;
-// }
+	// think about an other way than this location to store default data
+location *workingLocation::defaultLocation(server *server)
+{
+	location *loc = new location();
+	loc->set_root(server->get_root());
+	loc->set_client_max_body_size(server->get_client_max_body_size());
+	loc->set_index(server->get_index());
+	loc->set_autoindex(server->get_autoindex());
+	loc->set_allowed_methods(server->get_allowed_methods());
+	return loc;
+}
 
 // sets isAllowed to true if found in the location methods
 // needs getters for allowed methods
@@ -124,7 +139,52 @@ void Locator::setLocation(void)
 // 	}
 // }
 
+
+void Locator::setworkingLocation(void)
+{
+	this->Locate->setlocation(cl.getReadyRequest());
+}
+
+
+bool Locator::isMethodAllowd(std::string method)
+{
+	std::vector<std::string> it = Locate->getLocation()->get_methods();
+	for (int i = 0; i < it.size(); i++)
+	{
+		if (method == it[i])
+			return (true);
+	}
+	return (false);
+}
+
 int Locator::handle()
 {
-	
+	error = 0;
+	if (!isMethodAllowd(cl.getReadyRequest()->get_request_parsing_data().get_http_method()))
+		error = NOT_ALLOWED_CODE;
+	else if (cl.getReadyRequest()->get_request_parsing_data().get_code_status() == 400)
+		error = RESPONSE_BAD_REQUEST;
+	else
+		return (0);
+	if (error != 0)
+		buildresponse();
+	return (1);
+}
+
+
+void Locator::buildresponse()
+{
+	switch (error)
+	{
+	case RESPONSE_BAD_REQUEST:
+		responseHandler::setResposeStatusLine(RESPONSE_BAD_REQUEST, BAD_REQUEST_MSG);
+		responseHandler::setResponseHeaders();//no header so just default ones
+		responseHandler::setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
+	case NOT_ALLOWED_CODE:
+		responseHandler::setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
+		responseHandler::setResponseHeaders();//no header so just default ones
+		responseHandler::setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
+	default:
+		break;
+	}
 }
