@@ -362,6 +362,7 @@ int DeleteHandler::handleFiles(void)
 		// delete file
 		error = NO_CONTENT;
 	}
+	return (1);
 }
 
 int DeleteHandler::HandleDir(void)
@@ -369,8 +370,34 @@ int DeleteHandler::HandleDir(void)
 	if (!godFather->gedEnd())
 		error = CONFLICT;
 	else if (godFather->isCgi(godFather->getResourceFullPath()))
-		HandleCGI();
+	{
+		if (godFather->getIndex())
+			HandleCGI();
+		else
+			error = FORBIDDEN_CODE;
+	}
 	else
+	{
+		//DELETE ALL DIR FILE
+		//IF SUCCES ==> NO_CONTENT
+		//IF NOT
+		//	PERMITION ERROR ==> FORBIDEN
+		// ELSE INTERNAL SERVER ERROR
 		error = 200;
+	}
 	return (1);
+}
+
+
+void DeleteHandler::buildresponse(void)
+{
+	switch (error)
+	{
+	case NO_CONTENT:
+		responseHandler::setResposeStatusLine(NO_CONTENT, NO_CONTENT_MSG);
+	case FORBIDDEN_CODE:
+		
+	default:
+		break;
+	}
 }
