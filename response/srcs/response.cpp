@@ -313,7 +313,7 @@ void GetHandler::buildresponse()
 	case AUTOINDEX_CODE:
 		responseHandler::setResposeStatusLine(AUTOINDEX_CODE, OK_MSG);
 		responseHandler::setResponseHeaders();//
-		setResponseBody(setAutoindexResponse().c_str());
+		this->setResponseBody(setAutoindexResponse().c_str());
 	case MOVED_PERMANENTLY:
 		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
 		responseHandler::setResponseHeaders();// set location header feild
@@ -321,8 +321,17 @@ void GetHandler::buildresponse()
 	case 200:
 		responseHandler::setResposeStatusLine(200, OK_MSG);
 		responseHandler::setResponseHeaders();//
-		setResponseBody(godFather->readBody(godFather->getResourceFullPath()));
+		this->setResponseBody(godFather->readBody(godFather->getResourceFullPath()));
+	case FORBIDDEN_CODE:
+		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
+		responseHandler::setResponseHeaders();//
+		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
+	case NOT_FOUND_CODE:
+		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
+		responseHandler::setResponseHeaders();//
+		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
 	default:
+
 		break;
 	}
 }
@@ -359,7 +368,7 @@ int DeleteHandler::handleFiles(void)
 		HandleCGI();
 	else
 	{
-		// delete file
+		deleter(godFather->getResourceFullPath());
 		error = NO_CONTENT;
 	}
 	return (1);
@@ -379,10 +388,12 @@ int DeleteHandler::HandleDir(void)
 	else
 	{
 		//DELETE ALL DIR FILE
-		//IF SUCCES ==> NO_CONTENT
-		//IF NOT
-		//	PERMITION ERROR ==> FORBIDEN
-		// ELSE INTERNAL SERVER ERROR
+		if (deleter(godFather->getResourceFullPath()) == 0)
+			error = NO_CONTENT;//IF SUCCES ==> NO_CONTENT
+		else if (error = 2) 
+			error = FORBIDDEN_CODE;//	PERMITION ERROR ==> FORBIDEN
+		else
+			error = INTERNAL_SERVER_ERROR_CODE;
 		error = 200;
 	}
 	return (1);
@@ -395,8 +406,23 @@ void DeleteHandler::buildresponse(void)
 	{
 	case NO_CONTENT:
 		responseHandler::setResposeStatusLine(NO_CONTENT, NO_CONTENT_MSG);
+		this->setResponseHeaders();// no content-length
 	case FORBIDDEN_CODE:
-		
+		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
+		responseHandler::setResponseHeaders();//
+		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
+	case INTERNAL_SERVER_ERROR_CODE:
+		responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+		responseHandler::setResponseHeaders();//no header so just default ones
+		responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
+	case CONFLICT:
+		responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+		responseHandler::setResponseHeaders();
+		this->setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);// describe why
+	case NOT_FOUND_CODE:
+		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
+		responseHandler::setResponseHeaders();//
+		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
 	default:
 		break;
 	}

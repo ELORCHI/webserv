@@ -256,6 +256,7 @@ class DeleteHandler : public responseHandler
 		int handleFiles(void);
 		int HandleDir(void);
 		int HandleCGI(void);
+		int deleter(std::string path);
 	private:
 		Locator *godFather;
 };
