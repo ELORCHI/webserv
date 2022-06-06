@@ -18,7 +18,7 @@ class parse_request
 {
     private:
         bool                                _is_request_complete;
-        bool                                _is_request_valid;
+        bool                                _is_file_created;
         bool                                _is_header_complete; 
         int                                 _code_status;
         int                                 _chunk_size;

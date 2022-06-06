@@ -38,7 +38,6 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".cgm", "image/cgm"));
     extentions.push_back(std::make_pair(".class", "application/java-vm"));
     extentions.push_back(std::make_pair(".coffee", "text/coffeescript"));
-    extentions.push_back(std::make_pair(".conf", "text/plain"));
     extentions.push_back(std::make_pair(".cpt", "application/mac-compactpro"));
     extentions.push_back(std::make_pair(".crl", "application/pkix-crl"));
     extentions.push_back(std::make_pair(".css", "text/css"));
@@ -47,7 +46,6 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".davmount", "application/davmount+xml"));
     extentions.push_back(std::make_pair(".dbk", "application/docbook+xml"));
     extentions.push_back(std::make_pair(".deb", "application/octet-stream"));
-    extentions.push_back(std::make_pair(".def", "text/plain"));
     extentions.push_back(std::make_pair(".deploy", "application/octet-stream"));
     extentions.push_back(std::make_pair(".disposition-notification", "message/disposition-notification"));
     extentions.push_back(std::make_pair(".dist", "application/octet-stream"));
@@ -105,8 +103,6 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".iges", "model/iges"));
     extentions.push_back(std::make_pair(".igs", "model/iges"));
     extentions.push_back(std::make_pair(".img", "application/octet-stream"));
-    extentions.push_back(std::make_pair(".in", "text/plain"));
-    extentions.push_back(std::make_pair(".ini", "text/plain"));
     extentions.push_back(std::make_pair(".ink", "application/inkml+xml"));
     extentions.push_back(std::make_pair(".inkml", "application/inkml+xml"));
     extentions.push_back(std::make_pair(".ipfix", "application/ipfix"));
@@ -115,7 +111,6 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".jar", "application/java-archive"));
     extentions.push_back(std::make_pair(".jls", "image/jls"));
     extentions.push_back(std::make_pair(".jp2", "image/jp2"));
-    extentions.push_back(std::make_pair(".jpe", "image/jpeg"));
     extentions.push_back(std::make_pair(".jpeg", "image/jpeg"));
     extentions.push_back(std::make_pair(".jpf", "image/jpx"));
     extentions.push_back(std::make_pair(".jpg", "image/jpeg"));
@@ -133,9 +128,7 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".kar", "audio/midi"));
     extentions.push_back(std::make_pair(".ktx", "image/ktx"));
     extentions.push_back(std::make_pair(".less", "text/less"));
-    extentions.push_back(std::make_pair(".list", "text/plain"));
     extentions.push_back(std::make_pair(".litcoffee", "text/coffeescript"));
-    extentions.push_back(std::make_pair(".log", "text/plain"));
     extentions.push_back(std::make_pair(".lostxml", "application/lost+xml"));
     extentions.push_back(std::make_pair(".lrf", "application/octet-stream"));
     extentions.push_back(std::make_pair(".m1v", "video/mpeg"));
@@ -283,7 +276,6 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".t38", "image/t38"));
     extentions.push_back(std::make_pair(".tei", "application/tei+xml"));
     extentions.push_back(std::make_pair(".teicorpus", "application/tei+xml"));
-    extentions.push_back(std::make_pair(".text", "text/plain"));
     extentions.push_back(std::make_pair(".tfi", "application/thraud+xml"));
     extentions.push_back(std::make_pair(".tfx", "image/tiff-fx"));
     extentions.push_back(std::make_pair(".tif", "image/tiff"));

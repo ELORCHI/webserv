@@ -87,7 +87,8 @@ void tokenize(std::string s, std::string del = "$%")
     int i = 0;
     while (i < tokens.size())
     {
-        std::cout << tokens[i].size() << std::endl;
+        // std::cout << tokens[i].size() << std::endl;
+        std::cout << tokens[i] << std::endl;
         i++;
     }
    
@@ -95,7 +96,7 @@ void tokenize(std::string s, std::string del = "$%")
 int main(int argc, char const* argv[])
 {
 	// Takes C++ std::string with any separator
-	std::string a = "Hi$%do$%you$%$%do$%!";
+	std::string a = "$%Hi$%do$%you$%$%do$%!$%";
 	tokenize(a, "$%");
 
 	return 0;
