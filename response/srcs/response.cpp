@@ -139,11 +139,40 @@ location *workingLocation::defaultLocation(server *server)
 // 	}
 // }
 
-
-void Locator::checker()
+void Locator::setResourceFullPath()
 {
-	
+	resourceFullPath = Locate->getLocation()->get_root() + cl.getReadyRequest()->get_request_parsing_data().get_http_path();
 }
+
+std::string Locator::getResourceFullPath(void)
+{
+	return resourceFullPath;
+}
+
+void Locator::checker(void)
+{
+	struct stat s;
+	std::string path = cl.getReadyRequest()->get_request_parsing_data().get_http_path();
+	if (isCgi(path))
+		resourceType = CG;
+	else if (stat(path.c_str(), &s))
+	{
+		if (s.st_mode & S_IFDIR)
+		{
+			resourceType = DIR;
+			setIndex();
+		}
+		else
+			resourceType = FI;
+	}
+	else
+		resourceType = NO;
+	if (*(path.rbegin()) == 92)
+		endwithslash = true;
+	else
+		endwithslash = false;
+}
+
 
 void Locator::setworkingLocation(void)
 {
@@ -160,6 +189,11 @@ bool Locator::isMethodAllowd(std::string method)
 			return (true);
 	}
 	return (false);
+}
+
+int Locator::getResourceType(void)
+{
+	return (resourceType);
 }
 
 int Locator::handle()
@@ -200,12 +234,71 @@ void Locator::buildresponse()
 	}
 }
 
-GetHandler::GetHandler(responseHandler *_godFather): responseHandler()
+bool Locator::gedEnd(void)
+{
+	return endwithslash;
+}
+
+void Locator::setAutoIndex(void)
+{
+	autoindex = Locate->getLocation()->get_autoindex();
+}
+
+bool Locator::getAutoIndex(void)
+{
+	return autoindex;
+}
+
+GetHandler::GetHandler(Locator *_godFather): responseHandler()
 {
 	godFather = _godFather;
 }
 
-void GetHandler::setGodFather(responseHandler *_godFather)
+void	Locator::setIndex(void)
+{
+	if (Locate->getLocation()->get_indexs().size() > 0)
+		hasIndex = true;
+	else
+		hasIndex = false;
+}
+
+void GetHandler::setGodFather(Locator *_godFather)
 {
 	this->godFather = _godFather;
+}
+
+int GetHandler::handle()
+{
+	if (godFather->getResourceType() == NO)
+		error = NOT_FOUND_CODE;
+	else if (godFather->getResourceType() == FI)
+			handleFiles();
+	else
+		HandleDir();
+	buildresponse();
+	return (1);
+};
+
+int GetHandler::HandleDir(void)
+{
+	if (!godFather->gedEnd())
+		error = MOVED_PERMANENTLY;
+	else if (!godFather->getIndex())
+	{
+		if (godFather->getAutoIndex())
+			error = AUTOINDEX_CODE;
+		else
+			error = FORBIDDEN_CODE;
+	}
+	else
+		HandleCGI();
+	return (1);
+}
+
+int GetHandler::handleFiles()
+{
+	if (godFather->isCgi(godFather->getResourceFullPath()))
+		HandleCGI();
+	else
+		error = 200;
 }

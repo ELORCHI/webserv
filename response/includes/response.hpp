@@ -2,6 +2,8 @@
 #include "../../includes/webserv.hpp"
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 
 #define GET std::string("GET")
@@ -32,12 +34,18 @@
 #define RESPONSE_OK 200
 #define RESPONSE_NOT_MODIFIED 304
 #define RESPONSE_BAD_REQUEST 400
+#define MOVED_PERMANENTLY 301
 
 #define GET_RESPONSE 0
 #define POST_RESPONSE 1
 #define DELETE_RESPONSE 2
 
+#define AUTOINDEX_CODE 100
 
+#define DIR 1
+#define FI  0
+#define NO -1
+#define CG  2
 
 #define NOT_FOUND_RESPONSE_MSG std::string("<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>")
 #define FORBIDDEN_RESPONSE_MSG std::string("<html><head><title>403 Forbidden</title></head><body><h1>403 Forbidden</h1></body></html>")
@@ -133,6 +141,7 @@ class responseHandler : public response// abstract class
 		int bufferOffset;
 		int contentLength;
 		int isChunked;
+		int error;
 		client cl;
 };
 
@@ -151,7 +160,6 @@ class system_block_response : public responseHandler
 		int isMethodImplemented(std::string method);
 		int isHttpVersionSupported(std::string http_version);
 	protected:
-		int error;
 };
 
 
@@ -182,26 +190,43 @@ class Locator : public responseHandler
 		Locator();
 		~Locator();
 		int				handle();
-		virtual	void	buildresponse();
-		void			setworkingLocation(void);
+		int				getResourceType(void);
+		bool			gedEnd(void);
 		bool			isMethodAllowd(std::string method);
 		bool			isCgi(std::string path);
+		bool			getIndex();
+		bool			getAutoIndex();
+		void			buildresponse();
+		void			setworkingLocation(void);
+		void			setResourceType(void);
+		void			setResourceFullPath(void);
 		void			checker(void);
+		void			setIndex(void);
+		void			setAutoIndex(void);
+		std::string		getResourceFullPath(void);
 	protected:
-		int				error;
 		workingLocation *Locate;
 		responseHandler *methodHandler;
+		std::string		resourceFullPath;
+		int				resourceType;
+		bool			endwithslash;
+		bool			hasIndex;
+		bool			autoindex;
 };
 
 class GetHandler : public responseHandler
 {
 	public:
-		GetHandler(responseHandler *_godFather);
+		GetHandler(Locator *_godFather);
 		GetHandler();
 		~GetHandler();
 		int handle();
-		void setGodFather(responseHandler *_godFather);
-		std::string getResourceFullParth();
+		int handleFiles();
+		int HandleDir();
+		int HandleCGI();
+		void buildresponse();
+		void setGodFather(Locator *_godFather);
 	private:
-		responseHandler *godFather;
+	Locator *godFather;
+
 };
