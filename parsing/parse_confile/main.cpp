@@ -12,14 +12,14 @@
 
 #include "parse_confile.hpp"
 
-int main(int ac, char const **av)
-{
-	parse_config conf;
-	std::vector<server> test;
+// int main(int ac, char const **av)
+// {
+// 	parse_config conf;
+// 	std::vector<server> test;
 
-	if(!conf.parsing_conf(ac, av))
-		return (0);
-	conf.read_server();
-	test = conf.get_server_vect();
-	return (0);
-}
+// 	if(!conf.parsing_conf(ac, av))
+// 		return (0);
+// 	conf.read_server();
+// 	test = conf.get_server_vect();
+// 	return (0);
+// }

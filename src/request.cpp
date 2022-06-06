@@ -166,10 +166,8 @@ bool request::is_requestHeaderComplete(std::string buffer)
 // }
 request::request(std::string request_text, int port, server *server_parsed_data)
 {
-    parse_request pr;
     char *_request_text = (char *)request_text.c_str();
-    pr.start_parsing(_request_text);
-    request_parsing_data = pr;
+    // request_parsing_data = pr;
     std::string Host = request_parsing_data.get_http_headers()["Host"];
     if (Host.find(":") != std::string::npos) {
         std::vector<std::string> sv = splitString(request_parsing_data.get_http_headers()["Host"], ':');

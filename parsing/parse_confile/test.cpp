@@ -70,35 +70,35 @@ using namespace std;
 // }
 
 
-std::string names[] = {"robotomy request","shrubbery creation","presidential pardon"};
-	Form* (Intern::*fct[])(std::string) = 
-	{
-		&Intern::RobotomyRequest, &Intern::ShrubberyCreation, &Intern::PresidentialPardon, &Intern::nothing
-	};
+// std::string names[] = {"robotomy request","shrubbery creation","presidential pardon"};
+// 	Form* (Intern::*fct[])(std::string) = 
+// 	{
+// 		&Intern::RobotomyRequest, &Intern::ShrubberyCreation, &Intern::PresidentialPardon, &Intern::nothing
+// 	};
     
-size_t		Config::parseServer(configFile con, unsigned int &index){
-	serverConfig *server = new serverConfig();
-	bool isLocation = 0;
-	Ptr values[7] = {&serverConfig::serverName, &serverConfig::root,
-	&serverConfig::listen, &serverConfig::parseLocation, &serverConfig::allowMethods,
-	&serverConfig::index, &serverConfig::errorPages};
-	while (true)
-	{
-		index++;
-		for (size_t i = 0; i < 7; i++)
-		{
-			if (i == 3)
-				isLocation = 1;
-			if (index >= con.size())
-				break; 
-			if (con[index] == keys[i])
-				index = (server->*values[i])(*server, con, index);
-		}
-		if (index >= con.size() || (con[index] == "}" && !isLocation) || !con[index].compare("server"))
-			break;
-	}
-	// ? check if two servers have the same server_name and the same port
-	this->servers.push_back(server);
-	index--;
-	return index; //! return index to the last colla 
-}
+// size_t		Config::parseServer(configFile con, unsigned int &index){
+// 	serverConfig *server = new serverConfig();
+// 	bool isLocation = 0;
+// 	Ptr values[7] = {&serverConfig::serverName, &serverConfig::root,
+// 	&serverConfig::listen, &serverConfig::parseLocation, &serverConfig::allowMethods,
+// 	&serverConfig::index, &serverConfig::errorPages};
+// 	while (true)
+// 	{
+// 		index++;
+// 		for (size_t i = 0; i < 7; i++)
+// 		{
+// 			if (i == 3)
+// 				isLocation = 1;
+// 			if (index >= con.size())
+// 				break; 
+// 			if (con[index] == keys[i])
+// 				index = (server->*values[i])(*server, con, index);
+// 		}
+// 		if (index >= con.size() || (con[index] == "}" && !isLocation) || !con[index].compare("server"))
+// 			break;
+// 	}
+// 	// ? check if two servers have the same server_name and the same port
+// 	this->servers.push_back(server);
+// 	index--;
+// 	return index; //! return index to the last colla 
+// }
