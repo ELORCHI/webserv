@@ -140,6 +140,11 @@ location *workingLocation::defaultLocation(server *server)
 // }
 
 
+void Locator::checker()
+{
+	
+}
+
 void Locator::setworkingLocation(void)
 {
 	this->Locate->setlocation(cl.getReadyRequest());
@@ -171,6 +176,12 @@ int Locator::handle()
 	return (1);
 }
 
+bool Locator::isCgi(std::string path)
+{
+	if (cl.getReadyRequest()->get_request_parsing_data().get_http_path().find_last_of(".php"))
+		return true;
+	return false;
+}
 
 void Locator::buildresponse()
 {
@@ -187,4 +198,14 @@ void Locator::buildresponse()
 	default:
 		break;
 	}
+}
+
+GetHandler::GetHandler(responseHandler *_godFather): responseHandler()
+{
+	godFather = _godFather;
+}
+
+void GetHandler::setGodFather(responseHandler *_godFather)
+{
+	this->godFather = _godFather;
 }

@@ -115,6 +115,7 @@ class responseHandler : public response// abstract class
 {
 	public:
 		responseHandler(client cl);
+		responseHandler();
 		virtual ~responseHandler();
 		virtual int handle() = 0;
 		virtual void buildresponse() = 0;
@@ -184,7 +185,23 @@ class Locator : public responseHandler
 		virtual	void	buildresponse();
 		void			setworkingLocation(void);
 		bool			isMethodAllowd(std::string method);
+		bool			isCgi(std::string path);
+		void			checker(void);
 	protected:
 		int				error;
 		workingLocation *Locate;
+		responseHandler *methodHandler;
+};
+
+class GetHandler : public responseHandler
+{
+	public:
+		GetHandler(responseHandler *_godFather);
+		GetHandler();
+		~GetHandler();
+		int handle();
+		void setGodFather(responseHandler *_godFather);
+		std::string getResourceFullParth();
+	private:
+		responseHandler *godFather;
 };
