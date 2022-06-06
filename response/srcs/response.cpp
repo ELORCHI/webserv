@@ -290,8 +290,10 @@ int GetHandler::HandleDir(void)
 		else
 			error = FORBIDDEN_CODE;
 	}
-	else
+	else if (godFather->isCgi(godFather->getResourceFullPath()))
 		HandleCGI();
+	else
+		error = 200;
 	return (1);
 }
 
@@ -301,6 +303,7 @@ int GetHandler::handleFiles()
 		HandleCGI();
 	else
 		error = 200;
+	return (1);
 }
 
 void GetHandler::buildresponse()
@@ -309,13 +312,65 @@ void GetHandler::buildresponse()
 	{
 	case AUTOINDEX_CODE:
 		responseHandler::setResposeStatusLine(AUTOINDEX_CODE, OK_MSG);
-		responseHandler::setResponseHeaders();
+		responseHandler::setResponseHeaders();//
 		setResponseBody(setAutoindexResponse().c_str());
 	case MOVED_PERMANENTLY:
-	
+		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
+		responseHandler::setResponseHeaders();// set location header feild
+		setResponseBody(MOVED_PERMANENTLY_RESPONSE_MSG);
 	case 200:
-
+		responseHandler::setResposeStatusLine(200, OK_MSG);
+		responseHandler::setResponseHeaders();//
+		setResponseBody(godFather->readBody(godFather->getResourceFullPath()));
 	default:
 		break;
 	}
+}
+
+DeleteHandler::DeleteHandler(Locator *_godFather): responseHandler()
+{
+	godFather = _godFather;
+}
+
+void DeleteHandler::setGodFather(Locator *_godFather)
+{
+	godFather = _godFather;
+}
+
+DeleteHandler::~DeleteHandler()
+{
+}
+
+int DeleteHandler::handle()
+{
+	if (godFather->getResourceType() == NO)
+		error = NOT_FOUND_CODE;
+	else if (godFather->getResourceType() == FI)
+			handleFiles();
+	else
+		HandleDir();
+	buildresponse();
+	return (1);
+};
+
+int DeleteHandler::handleFiles(void)
+{
+	if (godFather->isCgi(godFather->getResourceFullPath()))
+		HandleCGI();
+	else
+	{
+		// delete file
+		error = NO_CONTENT;
+	}
+}
+
+int DeleteHandler::HandleDir(void)
+{
+	if (!godFather->gedEnd())
+		error = CONFLICT;
+	else if (godFather->isCgi(godFather->getResourceFullPath()))
+		HandleCGI();
+	else
+		error = 200;
+	return (1);
 }

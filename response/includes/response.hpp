@@ -23,6 +23,9 @@
 #define HTTP_VERSION_NOT_SUPPORTED_BY_SERVER_MSG std::string("505 HTTP Version Not Supported by Server")
 #define BAD_REQUEST_MSG std::string("400 Bad Request")
 #define OK_MSG std::string("200 OK")
+#define MOVED_PERMANENTLY_MSG std::string("301 Moved Permanently")
+#define NO_CONTENT_MSG std::string("204 No Content")
+#define CONFLICT_MSG std::string("409 Conflict");
 
 #define FORBIDDEN_CODE 403
 #define NOT_FOUND_CODE 404
@@ -36,6 +39,8 @@
 #define RESPONSE_NOT_MODIFIED 304
 #define RESPONSE_BAD_REQUEST 400
 #define MOVED_PERMANENTLY 301
+#define NO_CONTENT 204
+#define CONFLICT 409
 
 #define GET_RESPONSE 0
 #define POST_RESPONSE 1
@@ -49,6 +54,7 @@
 #define CG  2
 
 #define NOT_FOUND_RESPONSE_MSG std::string("<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>")
+#define CONFLICT_RESPONSE_MSG std::string("<html><head><title>CONFLICT</title></head><body><h1>CONFLICT</h1></body></html>")
 #define FORBIDDEN_RESPONSE_MSG std::string("<html><head><title>403 Forbidden</title></head><body><h1>403 Forbidden</h1></body></html>")
 #define NOT_ALLOWED_RESPONSE_MSG std::string("<html><head><title>405 Method Not Allowed</title></head><body><h1>405 Method Not Allowed</h1></body></html>")
 #define INTERNAL_SERVER_ERROR_RESPONSE_MSG std::string("<html><head><title>500 Internal Server Error</title></head><body><h1>500 Internal Server Error</h1></body></html>")
@@ -58,6 +64,8 @@
 #define GATEWAY_TIMEOUT_RESPONSE_MSG std::string("<html><head><title>504 Gateway Timeout</title></head><body><h1>504 Gateway Timeout</h1></body></html>")
 #define HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG std::string("<html><head><title>505 HTTP Version Not Supported</title></head><body><h1>505 HTTP Version Not Supported</h1></body></html>")
 #define BAD_REQUEST_RESPONSE_MSG std::string("<html><head><title>400 Bad Request</title></head><body><h1>400 Bad Request</h1></body></html>")
+#define MOVED_PERMANENTLY_RESPONSE_MSG std::string("<html><head><title>Moved Permanently</title></head><body><h1>Moved Permanently</h1></body></html>")
+#define NO_CONTENT_RESPONSE_MSG std::string("<html><head><title>No Content</title></head><body><h1>Moved Permanently</h1></body></html>")
 
 // building response steps
 // 1. check the system and the request
@@ -205,6 +213,7 @@ class Locator : public responseHandler
 		void			setIndex(void);
 		void			setAutoIndex(void);
 		std::string		getResourceFullPath(void);
+		std::string		readBody(std::string path);// need implementation
 	protected:
 		workingLocation *Locate;
 		responseHandler *methodHandler;
@@ -219,18 +228,34 @@ class GetHandler : public responseHandler
 {
 	public:
 		GetHandler(Locator *_godFather);
-		GetHandler();
-		~GetHandler();
-		int handle();
-		int handleFiles();
-		int HandleDir();
-		int HandleCGI();
-		void buildresponse();
+		GetHandler(void);
+		~GetHandler(void);
+		int handle(void);
+		int handleFiles(void);
+		int HandleDir(void);
+		int HandleCGI(void);
+		void buildresponse(void);
 		void setResponseBody(std::string body);// need implementation
-		virtual void setResponseHeaders(void);// need implementation set up general headers subclasses which need more header
+		void setResponseHeaders(void);// need implementation set up general headers subclasses which need more headers
 		void setGodFather(Locator *_godFather);
 		std::string setAutoindexResponse(void);//needs implemantation
 	private:
-	Locator *godFather;
+		Locator *godFather;
+};
 
+class DeleteHandler : public responseHandler
+{
+	public:
+		DeleteHandler(Locator *_godFather);
+		~DeleteHandler();
+		int handle();
+		void buildresponse();
+		void setResponseBody(std::string body);// need implementation
+		void setResponseHeaders(void);// need implementation set up general headers subclasses which need more headers
+		void setGodFather(Locator *_godFather);
+		int handleFiles(void);
+		int HandleDir(void);
+		int HandleCGI(void);
+	private:
+		Locator *godFather;
 };
