@@ -368,7 +368,7 @@ int DeleteHandler::handleFiles(void)
 		HandleCGI();
 	else
 	{
-		deleter(godFather->getResourceFullPath());
+		deleter(godFather->getResourceFullPath()); // you maight need to check deleter return 
 		error = NO_CONTENT;
 	}
 	return (1);
@@ -390,7 +390,7 @@ int DeleteHandler::HandleDir(void)
 		//DELETE ALL DIR FILE
 		if (deleter(godFather->getResourceFullPath()) == 0)
 			error = NO_CONTENT;//IF SUCCES ==> NO_CONTENT
-		else if (error = 2) 
+		else if (error = 2) // this variable may cause a problem if it got changed by deleter method
 			error = FORBIDDEN_CODE;//	PERMITION ERROR ==> FORBIDEN
 		else
 			error = INTERNAL_SERVER_ERROR_CODE;
@@ -426,4 +426,20 @@ void DeleteHandler::buildresponse(void)
 	default:
 		break;
 	}
+}
+
+
+PostHandler::PostHandler(Locator *_godFather): responseHandler()
+{
+	godFather = _godFather;
+}
+
+void PostHandler::setGodFather(Locator *_godFather)
+{
+	godFather = _godFather;
+}
+
+int PostHandler::handle()
+{
+	
 }

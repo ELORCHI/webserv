@@ -260,3 +260,22 @@ class DeleteHandler : public responseHandler
 	private:
 		Locator *godFather;
 };
+
+
+class PostHandler : public responseHandler
+{
+	public:
+		PostHandler(Locator *_godFather);
+		~PostHandler();
+		int handle();
+		void buildresponse();
+		void setResponseBody(std::string body);// need implementation
+		void setResponseHeaders(void);// need implementation set up general headers subclasses which need more headers
+		void setGodFather(Locator *_godFather);
+		int handleFiles(void);
+		int HandleDir(void);
+		int HandleCGI(void);
+		int creator(std::string path);
+	private:
+		Locator *godFather;
+};
