@@ -22,6 +22,7 @@
 #define HTTP_VERSION_NOT_SUPPORTED_MSG std::string("505 HTTP Version Not Supported")
 #define HTTP_VERSION_NOT_SUPPORTED_BY_SERVER_MSG std::string("505 HTTP Version Not Supported by Server")
 #define BAD_REQUEST_MSG std::string("400 Bad Request")
+#define OK_MSG std::string("200 OK")
 
 #define FORBIDDEN_CODE 403
 #define NOT_FOUND_CODE 404
@@ -225,7 +226,10 @@ class GetHandler : public responseHandler
 		int HandleDir();
 		int HandleCGI();
 		void buildresponse();
+		void setResponseBody(std::string body);// need implementation
+		virtual void setResponseHeaders(void);// need implementation set up general headers subclasses which need more header
 		void setGodFather(Locator *_godFather);
+		std::string setAutoindexResponse(void);//needs implemantation
 	private:
 	Locator *godFather;
 

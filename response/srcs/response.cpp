@@ -302,3 +302,20 @@ int GetHandler::handleFiles()
 	else
 		error = 200;
 }
+
+void GetHandler::buildresponse()
+{
+	switch (error)
+	{
+	case AUTOINDEX_CODE:
+		responseHandler::setResposeStatusLine(AUTOINDEX_CODE, OK_MSG);
+		responseHandler::setResponseHeaders();
+		setResponseBody(setAutoindexResponse().c_str());
+	case MOVED_PERMANENTLY:
+	
+	case 200:
+
+	default:
+		break;
+	}
+}
