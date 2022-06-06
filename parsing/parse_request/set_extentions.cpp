@@ -97,8 +97,8 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".hjson", "application/hjson"));
     extentions.push_back(std::make_pair(".hlp", "application/winhlp"));
     extentions.push_back(std::make_pair(".hqx", "application/mac-binhex40"));
-    extentions.push_back(std::make_pair(".htm", "text/html"));
     extentions.push_back(std::make_pair(".html", "text/html"));
+    extentions.push_back(std::make_pair(".htm", "text/html"));
     extentions.push_back(std::make_pair(".ics", "text/calendar"));
     extentions.push_back(std::make_pair(".ief", "image/ief"));
     extentions.push_back(std::make_pair(".ifb", "text/calendar"));
@@ -356,7 +356,7 @@ void parse_request::set_extention()
         for (std::vector<std::pair<std::string, std::string> >::iterator it = extentions.begin();
             it < extentions.end(); it++)
         {
-            if (_http_headers["Transfer-Encoding"] == it->second)
+            if (_http_headers["Content-Type"] == it->second)
             {
                 _extention = it->first;
                 break ;
