@@ -180,6 +180,7 @@ void	parse_request::set_http_body()
 	{
 		std::cout << "Error: bad request" << std::endl;
 		_code_status = 400;
+		return ;
 	}
 	else if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers["Transfer-Encoding"] == "chunked")
 		set_chunked_http_body();
@@ -189,6 +190,7 @@ void	parse_request::set_http_body()
 	{
 		std::cout << "Error: bad request" << std::endl;
 		_code_status = 400;
+		return ;
 	}
 }
 
@@ -272,7 +274,8 @@ int    parse_request::start_parsing(char *buff, size_t size)
 				_is_header_complete = true;
 				std::string header = _data.substr(0, _data.find("\r\n\r\n"));
 				header = set_http_vmp(header);
-				set_http_headers(header);
+				// if (_code_status == 0)
+					set_http_headers(header);
 				_tmp = _data.substr(_data.find("\r\n\r\n") + 4);
 				_data.clear();
 				std::cout << _data << std::endl;
@@ -280,7 +283,7 @@ int    parse_request::start_parsing(char *buff, size_t size)
 				if (get_http_method() != "POST")
 				{
 					_is_request_complete = true;
-					return _is_header_complete;
+					return _is_request_complete;
 				}
 			}
 		}
@@ -294,12 +297,17 @@ int    parse_request::start_parsing(char *buff, size_t size)
 			{
 				std::cout << "Error: bad request" << std::endl;
 				_code_status = 500;
+				close(_file_descriptor);
+				remove(_path_body.c_str());
 				_is_request_complete = true;
-				return _is_header_complete;
+				return _is_request_complete;
 			}
-			set_http_body();
+			// if (_code_status == 0)
+				set_http_body();
 		}
 	}
+	if (_is_request_complete)
+		close(_file_descriptor);
 	return _is_request_complete;
 	// std::string headers;
     // headers = this->set_http_vmp(header);
