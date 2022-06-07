@@ -140,12 +140,13 @@ int	httpServer::parsing_conf(int ac, char **av,parse_config *conf)
 //     listeningServAddr.sin_addr.s_addr = htonl(INADDR_ANY); //accept all connections aka set address to 0.0.0.0
 // }
 
-httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd)
+httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd, int KqueueFd)
 {
     listenServerFd = INVALID_SOCKET;
     listenServerPort = server_parsed_data.get_listen_port(); 
     canRun = false;
     serverKqFd = -1;
+    this->KqueueFd = KqueueFd;
     canRun = false;
     // listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
     this->server_parsed_data = server_parsed_data;
