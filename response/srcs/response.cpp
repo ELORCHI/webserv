@@ -120,6 +120,8 @@ void workingLocation::setlocation(request *request)
 	setUpload(request->get_server()->get_upload_path());
 	setRedirections(request->get_server());
 	setDefaultError(request->get_server()); 
+	if (request->get_server()->get_cgi_size() != 0)
+		setCgi(request->get_server()->get_cgi(0));
 }
 
 void workingLocation::setDefaultError(server *server)
@@ -206,6 +208,11 @@ void Locator::checker(void)
 }
 
 
+// int Locator::HandleCGI()
+// {
+// 	error = 1;
+// }
+
 std::string Locator::getindexfile(void)
 {
 	std::string indexfile;
@@ -248,6 +255,17 @@ workingLocation *Locator::getWorkingLocation(void)
 	return Locate;
 }
 
+cgi *workingLocation::getCgi(void)
+{
+	return (cgiLocation);
+}
+
+void workingLocation::setCgi(cgi Cgi)
+{
+	cgiLocation = new cgi;
+	*cgiLocation = Cgi;
+}
+
 int Locator::getResourceType(void)
 {
 	return (resourceType);
@@ -267,8 +285,11 @@ int Locator::handle()
 	return (1);
 }
 
+
 bool Locator::isCgi(std::string path)
 {
+	if (Locate->getCgi() == NULL)
+		return (false);
 	if (cl.getReadyRequest()->get_request_parsing_data().get_http_path().find_last_of(".php"))
 		return true;
 	return false;
@@ -343,6 +364,8 @@ int GetHandler::handle()
 
 int GetHandler::HandleDir(void)
 {
+	std::string newpath;
+
 	if (!godFather->gedEnd())
 		error = MOVED_PERMANENTLY;
 	else if (!godFather->getIndex())
@@ -352,17 +375,19 @@ int GetHandler::HandleDir(void)
 		else
 			error = FORBIDDEN_CODE;
 	}
-	else if (godFather->isCgi(godFather->getResourceFullPath()))
-		HandleCGI();
 	else
-		error = 200;
+	{
+		newpath = godFather->getResourceFullPath() + godFather->getindexfile();
+		godFather->setResourceFullPath(newpath);
+		handleFiles();
+	}
 	return (1);
 }
 
 int GetHandler::handleFiles()
 {
 	if (godFather->isCgi(godFather->getResourceFullPath()))
-		HandleCGI();
+		godFather->HandleCGI();
 	else
 		error = 200;
 	return (1);
@@ -425,7 +450,7 @@ int DeleteHandler::handle()
 };
 
 int DeleteHandler::deleter(std::string path)
-{
+{	// add folders to be deleted too
 	// should i check for file permisions if yes return 2;
 	if (remove(path.c_str()) == 0)
 		return (0);
@@ -436,7 +461,7 @@ int DeleteHandler::deleter(std::string path)
 int DeleteHandler::handleFiles(void)
 {
 	if (godFather->isCgi(godFather->getResourceFullPath()))
-		HandleCGI();
+		godFather->HandleCGI();
 	else
 	{
 		if (deleter(godFather->getResourceFullPath()) == 0) // you maight need to check deleter return 
@@ -454,7 +479,7 @@ int DeleteHandler::HandleDir(void)
 	else if (godFather->isCgi(godFather->getResourceFullPath()))
 	{
 		if (godFather->getIndex())
-			HandleCGI();
+			godFather->HandleCGI();
 		else
 			error = FORBIDDEN_CODE;
 	}
@@ -553,7 +578,7 @@ int PostHandler::handle()
 int PostHandler::handleFiles(void)
 {
 	if (godFather->isCgi(godFather->getResourceFullPath()))
-		HandleCGI();
+		godFather->HandleCGI();
 	else
 		error = FORBIDDEN_CODE;
 	return (1);

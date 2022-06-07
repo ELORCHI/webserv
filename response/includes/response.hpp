@@ -186,16 +186,19 @@ class workingLocation
 		void			setDefaultError(server *server);
 		void			setlocation(request *request);
 		void			setUpload(std::string path);
+		void			setCgi(cgi cgi);
 		std::string		getUpload(void);
 		std::vector<std::vector<std::string> > getRedirections(void);
 		std::vector<std::vector<std::string> > getDefaultError(void);
 		location		*getLocation(void);
+		cgi				*getCgi(void);
 		~workingLocation();
 	private:
-		location *serverlocation;
+		location *serverlocation;//free
 		std::string upload;
 		std::vector<std::vector<std::string> >  redirections;
 		std::vector<std::vector<std::string> >  defaultError;
+		cgi *cgiLocation;// free 
 };
 
 
@@ -209,7 +212,7 @@ class Locator : public responseHandler
 		int				getResourceType(void);
 		bool			gedEnd(void);
 		bool			isMethodAllowd(std::string method);
-		bool			isCgi(std::string path);
+		bool				isCgi(std::string path);
 		bool			getIndex();
 		bool			getAutoIndex();
 		void			buildresponse();
@@ -224,9 +227,10 @@ class Locator : public responseHandler
 		std::string		readBody(std::string path);// need implementation
 		workingLocation *getWorkingLocation(void);
 		std::string		getindexfile(void);
+		int				HandleCGI();
 	protected:
-		workingLocation *Locate;
-		responseHandler *methodHandler;
+		workingLocation *Locate;//free
+		responseHandler *methodHandler;//free
 		std::string		resourceFullPath;
 		int				resourceType;
 		bool			endwithslash;
@@ -243,7 +247,6 @@ class GetHandler : public responseHandler
 		int handle(void);
 		int handleFiles(void);
 		int HandleDir(void);
-		int HandleCGI(void);
 		void buildresponse(void);
 		void setResponseBody(std::string body);// need implementation
 		void setResponseHeaders(void);// need implementation set up general headers subclasses which need more headers
@@ -265,7 +268,6 @@ class DeleteHandler : public responseHandler
 		void setGodFather(Locator *_godFather);
 		int handleFiles(void);
 		int HandleDir(void);
-		int HandleCGI(void);
 		int deleter(std::string path);
 	private:
 		Locator *godFather;
@@ -284,7 +286,6 @@ class PostHandler : public responseHandler
 		void setGodFather(Locator *_godFather);
 		int handleFiles(void);
 		int HandleDir(void);
-		int HandleCGI(void);
 		int creator(std::string path);
 		bool supportAppload();
 	private:
