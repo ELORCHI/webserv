@@ -258,6 +258,9 @@ int    parse_request::start_parsing(char *buff, size_t size)
 					set_http_headers(header);
 				if (get_http_method() != "POST" || _code_status)
 				{
+					if (!_code_status)
+						_code_status = 200;
+					//if !_code_status then _code_status = 200
 					_is_request_complete = true;
 					return _is_request_complete;
 				}
