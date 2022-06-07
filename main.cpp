@@ -13,6 +13,13 @@
 
 int main(int argc, char *argv[])
 {
+    struct stat buffer;
+    int i = stat(argv[1], &buffer);
+    if (i == -1)
+    {
+        std::cout << "Error : file not found" << std::endl;
+        return 0;
+    }
 	httpServers srvrs(argc, argv);
 	srvrs.httpServers_repl();
     // server s(4200);

@@ -22,6 +22,7 @@ class client {
 	std::string bodyFileName;
 	std::fstream bodyFile;
 	request* ready_request;
+    parse_request pr;
 
      public:
         client(int fd, struct sockaddr_in addr);
@@ -49,4 +50,5 @@ class client {
 		void setRequest(request *rq);
 		std::fstream &getReadTmpFile();
 		bool is_request_complete(long long recieved_data_size, char *buffer);
+        parse_request &get_pr() { return pr; }
 };

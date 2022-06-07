@@ -31,6 +31,7 @@
 #include <unordered_set>
 #include <set>
 #include <fstream>
+#include "servers.hpp"
 
 
 #define NUM_CLIENTS 10
@@ -69,6 +70,7 @@ class httpServer
         void disconnectClient(client *c, bool is_delete);
         void read_from_client(client *c, long data_length);
         bool doesHttpRequestBelongs(request *rq);
+        int getServerFd();
     //handeling multiple servers interface
     public:
         static std::vector<httpServer> servers;

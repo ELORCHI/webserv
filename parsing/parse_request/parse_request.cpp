@@ -87,71 +87,36 @@ void parse_request::eraseAllSubStr(std::string & mainStr, const std::string & to
         mainStr.erase(pos, toErase.length());
 }
 
-std::vector<std::string> parse_request::tokenize(std::string s, std::string del)
-{
-    std::vector<std::string> tokens;
-	int start = 0;
-	int end = s.find(del);
-	while (1)
-    {
-		tokens.push_back(s.substr(start, end - start));
-		start = end + del.size();
-		end = s.find(del, start);
-        if (end == std::string::npos)
-        {
-            tokens.push_back(s.substr(start, end - start));
-            break;
-        }
-	}
-	return tokens;
-}
-
 void	parse_request::set_chunked_http_body()
 {
-	std::vector<std::string> splited;
-	splited = tokenize(_data, "\r\n");
-	int i = 0;
-	while (i < splited.size())
-	{		
+	while (!_is_request_complete)
+	{
 		if (_chunk_size == -1)
 		{
-			// std::cout << splited[i] << std::endl;
-			if (splited[i].size() == 0)
+			size_t found = _data.find("\r\n");
+			if (found != std::string::npos)
 			{
-				write(_file_descriptor, "\r\n", 2);
-				_chunk_size -= 2;
-				i++;
+				std::string chunk_size = _data.substr(0, found);
+				_chunk_size = hex_to_dec(chunk_size);
+				_data.erase(0, found + 2);
 			}
-			if (is_hexnumber(splited[i]))
-				_chunk_size = hex_to_dec(splited[i]);
-			else
-			{
-				// std::cout << "Error: bad chunk size" << std::endl;
-				_code_status = 505;
-				return ;
-			}
-			if (_chunk_size == 0)
+			if (_chunk_size == 0 && (_data.size() < 3))
 			{
 				_is_request_complete = true;
-				return ;
+				close(_file_descriptor);
 			}
 		}
-		else
+		if (_chunk_size != -1)
 		{
-			if (splited[i].size() == 0)
+			if (_data.size() > _chunk_size + 2)
 			{
-				write(_file_descriptor, "\r\n", 2);
-				_chunk_size -= 2;
+				write(_file_descriptor, _data.c_str(), _chunk_size);
+				_data.erase(0, _chunk_size + 2);
+				_chunk_size = -1;
 			}
 			else
-			{
-				write(_file_descriptor, splited[i].c_str(), splited[i].size());
-				_chunk_size -= splited[i].size();
-			}
-			if (_chunk_size == 0)
-				_chunk_size = -1;
+				break ;
 		}
-		i++;
 	}
 }
 

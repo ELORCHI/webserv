@@ -278,6 +278,7 @@ void httpServer::disconnectClient(client *c, bool is_delete)
 // set the headers buffer then store the rest of the body in a file 
 void httpServer::read_from_client(client *c, long data_length)
 {
+    
 	// static long long size = 0;
     // if (!c || request::is_request_complete(c->getHeadersBuffer(), c->getBodyFile()))
 	// {
@@ -290,6 +291,9 @@ void httpServer::read_from_client(client *c, long data_length)
     char *c_buffer = new char[data_length];
 	// std::cerr << "DBG_00" << std::endl;
     int bytesRead = recv(c->getClientFd(), c_buffer, data_length, 0);
+    // std::cout << c_buffer << std::endl;
+    int k = c->get_pr().start_parsing(c_buffer, bytesRead);
+    std::cout << k << std::endl;
 	//size += bytesRead;
 
 	// std::cerr << "size : " << bytesRead <<  " total : " << size << std::endl;
@@ -373,11 +377,9 @@ void httpServer::run()
 		}
         for (int i = 0; i < num_events; i++)
         {
-			std::cerr << "A" << std::endl;
 			// std::cout << "hoooooo" << std::endl;
             if (_eventList[i].ident == listenServerFd) //a client is waiting to connect
 			{
-				std::cerr << "B" << std::endl;
                 acceptConnection();
 				// std::cout << "fuck" << std::endl;
 			}
@@ -385,17 +387,14 @@ void httpServer::run()
             {
                 if (clientmap.find(_eventList[i].ident) == clientmap.end())
 				{
-				std::cerr << "C" << std::endl;
                     cl = NULL;
 				}
                 else
 				{
-					std::cerr << "C_" << std::endl;
                     cl = clientmap[_eventList[i].ident];
 				}
                 if (cl == NULL)
                 {	
-					std::cerr << "D" << std::endl;
                     EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
                     kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
                     EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
@@ -406,7 +405,6 @@ void httpServer::run()
                 }
 
                 if (_eventList[i].flags & EV_EOF) {
-					std::cerr << "E" << std::endl;
 					// std::cout << "yo am i here" << std::endl;
                     //disconnectClient(cl, true);
                     continue;
@@ -420,9 +418,7 @@ void httpServer::run()
 					// if (cl->is_reading_complete() == false)
 					// std::cout << "dudude" << std::endl;
 					//if (request::is_request_complete(cl->getHeadersBuffer(), cl->getBodyFile()))
-					std::cerr << "START ====================" << std::endl;
 					read_from_client(cl, _eventList[i].data);
-					std::cerr << "END ======================"<< std::endl;
 					if (request::is_request_complete(cl->getHeadersBuffer(), cl->getBodyFile()))
 					{
 						std::cout << "reading complete" << std::endl;
@@ -510,3 +506,7 @@ void httpServer::run()
     }
 }
 
+int httpServer::getServerFd()
+{
+    return (this->listenServerFd);
+}

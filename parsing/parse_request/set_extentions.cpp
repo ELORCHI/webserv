@@ -4,13 +4,11 @@ void parse_request::set_extention()
 {
     std::vector <std::pair <std::string, std::string> > extentions;
     extentions.push_back(std::make_pair(".*3gpp", "audio/3gpp"));
-    extentions.push_back(std::make_pair(".*jpm", "video/jpm"));
     extentions.push_back(std::make_pair(".*mp3", "audio/mp3"));
     extentions.push_back(std::make_pair(".*rtf", "text/rtf"));
     extentions.push_back(std::make_pair(".*wav", "audio/wave"));
     extentions.push_back(std::make_pair(".*xml", "text/xml"));
     extentions.push_back(std::make_pair(".3g2", "video/3gpp2"));
-    extentions.push_back(std::make_pair(".3gp", "video/3gpp"));
     extentions.push_back(std::make_pair(".3gpp", "video/3gpp"));
     extentions.push_back(std::make_pair(".ac", "application/pkix-attr-cert"));
     extentions.push_back(std::make_pair(".adp", "audio/adpcm"));
@@ -171,12 +169,10 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".mp4", "video/mp4"));
     extentions.push_back(std::make_pair(".mp4a", "audio/mp4"));
     extentions.push_back(std::make_pair(".mp4s", "application/mp4"));
-    extentions.push_back(std::make_pair(".mp4v", "video/mp4"));
     extentions.push_back(std::make_pair(".mpd", "application/dash+xml"));
     extentions.push_back(std::make_pair(".mpe", "video/mpeg"));
     extentions.push_back(std::make_pair(".mpeg", "video/mpeg"));
     extentions.push_back(std::make_pair(".mpg", "video/mpeg"));
-    extentions.push_back(std::make_pair(".mpg4", "video/mp4"));
     extentions.push_back(std::make_pair(".mpga", "audio/mpeg"));
     extentions.push_back(std::make_pair(".mrc", "application/marc"));
     extentions.push_back(std::make_pair(".mrcx", "application/marcxml+xml"));

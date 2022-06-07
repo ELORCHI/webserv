@@ -40,6 +40,9 @@ httpServers::httpServers(int argc, char **argv)
     }
     //std::vector<int> shared_ports = httpServer::getRepeatedPorts(parsed_servers_data);
     // std::cout << parsed_servers_data.size() << std::endl; 
+    if ((this->KqueueFd = kqueue()) == -1)
+        throw MyException("failure at creating the kernel queue");
+
 }
 
 void httpServers::httpServers_repl()
