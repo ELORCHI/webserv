@@ -15,7 +15,8 @@ parse_request::parse_request():
 	_port_request(0),
 	_my_content_length(0),
 	_chunk_size(-1),
-	_is_file_created(false)
+	_is_file_created(false),
+	_to_erase(0)
 {
 }
 
@@ -92,66 +93,80 @@ std::vector<std::string> parse_request::tokenize(std::string s, std::string del)
     std::vector<std::string> tokens;
 	int start = 0;
 	int end = s.find(del);
-	while (1)
-    {
+	if (end != std::string::npos)
+	{
 		tokens.push_back(s.substr(start, end - start));
-		start = end + del.size();
-		end = s.find(del, start);
-        if (end == std::string::npos)
-        {
-            tokens.push_back(s.substr(start, end - start));
-            break;
-        }
+		tokens.push_back(s.substr(end + 2));
 	}
+	// while (1)
+    // {
+	// 	tokens.push_back(s.substr(start, end - start));
+	// 	start = end + del.size();
+	// 	end = s.find(del, start);
+    //     if (end == std::string::npos)
+    //     {
+    //         tokens.push_back(s.substr(start, end - start));
+    //         break;
+    //     }
+	// }
 	return tokens;
 }
 
 void	parse_request::set_chunked_http_body()
 {
-	std::vector<std::string> splited;
-	splited = tokenize(_data, "\r\n");
-	int i = 0;
-	while (i < splited.size())
-	{		
+	while (!_is_request_complete)
+	{
+		if (_to_erase == 2)
+		{
+			_data.erase(0, 2);
+			_to_erase = 0;
+		}
+		else if (_to_erase == 1)
+		{
+			_data.erase(0, 1);
+			_to_erase = 0;
+		}
 		if (_chunk_size == -1)
 		{
-			// std::cout << splited[i] << std::endl;
-			if (splited[i].size() == 0)
+			size_t found = _data.find("\r\n");
+			if (found != std::string::npos)
 			{
-				write(_file_descriptor, "\r\n", 2);
-				_chunk_size -= 2;
-				i++;
+				std::string chunk_size = _data.substr(0, found);
+				// if (!is_hexnumber(chunk_size))
+				// {
+				// 	_code_status = 400;
+				// 	close(_file_descriptor);
+				// 	// unlink(_path_body.c_str());
+				// 	remove(_path_body.c_str());
+				// }
+				_chunk_size = hex_to_dec(chunk_size);
+				_data.erase(0, found + 2);
 			}
-			if (is_hexnumber(splited[i]))
-				_chunk_size = hex_to_dec(splited[i]);
-			else
-			{
-				// std::cout << "Error: bad chunk size" << std::endl;
-				_code_status = 505;
-				return ;
-			}
-			if (_chunk_size == 0)
+			if (_chunk_size == 0 && (_data.size() < 3))
 			{
 				_is_request_complete = true;
-				return ;
+				close(_file_descriptor);
+				// exit(0) ;
 			}
 		}
-		else
+		if (_chunk_size != -1)
 		{
-			if (splited[i].size() == 0)
+			if (_data.size() > _chunk_size + 2)
 			{
-				write(_file_descriptor, "\r\n", 2);
-				_chunk_size -= 2;
+				write(_file_descriptor, _data.c_str(), _chunk_size);
+				_data.erase(0, _chunk_size + 2);
+				_chunk_size = -1;
+			}
+			else if (_data.size() == _chunk_size + 2)
+			{
+				write(_file_descriptor, _data.c_str(), _chunk_size);
+				_data.clear();
+				_chunk_size = -1;
+				break;
 			}
 			else
-			{
-				write(_file_descriptor, splited[i].c_str(), splited[i].size());
-				_chunk_size -= splited[i].size();
-			}
-			if (_chunk_size == 0)
-				_chunk_size = -1;
+				break ;
 		}
-		i++;
 	}
 }
 

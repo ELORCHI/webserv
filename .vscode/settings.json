@@ -72,7 +72,8 @@
         "concepts": "cpp",
         "set": "cpp",
         "unordered_set": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "queue": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled",
     "powermode.presets": "flames"

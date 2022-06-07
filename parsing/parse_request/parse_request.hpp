@@ -33,6 +33,7 @@ class parse_request
         std::map<std::string, std::string>	_http_path;
         std::map<std::string, std::string>	_http_headers;
         size_t                              _my_content_length;
+        size_t                              _to_erase;
     public:
         parse_request();
         ~parse_request();
