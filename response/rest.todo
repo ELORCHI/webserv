@@ -1,0 +1,11 @@
+1.setresponsebody for parent
+2.setresponesbody for childs
+3.setresponseheaders for parents
+4.setresponseheaders for childs
+5.get index == done not tested ==
+6.HandleCGI
+7.deleter == needs a check ==
+7.Creator == waiting but almost done ==
+7.main
+8.readBody
+9.setAutoindexResponse

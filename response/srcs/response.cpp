@@ -208,7 +208,22 @@ void Locator::checker(void)
 
 std::string Locator::getindexfile(void)
 {
-	// 
+	std::string indexfile;
+	std::vector<std::string> _indexs = getWorkingLocation()->getLocation()->get_indexs();
+	int size = _indexs.size();
+	struct stat s;
+
+	for (int i = 0; i < size; i++)
+	{
+		indexfile = _indexs[i];
+		// indexfile = needs update
+		if (stat(indexfile.c_str(), &s))
+		{
+			if (!(s.st_mode & S_IFDIR))
+				break;
+		}
+	}
+	return (indexfile);
 }
 
 void Locator::setworkingLocation(void)
@@ -409,14 +424,25 @@ int DeleteHandler::handle()
 	return (1);
 };
 
+int DeleteHandler::deleter(std::string path)
+{
+	// should i check for file permisions if yes return 2;
+	if (remove(path.c_str()) == 0)
+		return (0);
+	else
+		return (1);
+}
+
 int DeleteHandler::handleFiles(void)
 {
 	if (godFather->isCgi(godFather->getResourceFullPath()))
 		HandleCGI();
 	else
 	{
-		deleter(godFather->getResourceFullPath()); // you maight need to check deleter return 
-		error = NO_CONTENT;
+		if (deleter(godFather->getResourceFullPath()) == 0) // you maight need to check deleter return 
+			error = NO_CONTENT;
+		else
+			error = INTERNAL_SERVER_ERROR_CODE;
 	}
 	return (1);
 }
@@ -493,9 +519,24 @@ bool PostHandler::supportAppload()
 	return false;
 }
 
+
+// int PostHandler::creator(std::string path)
+// {
+// 	std::string loc = godFather->getWorkingLocation()->getUpload() + godFather->getResourceFullPath();
+// 	std::ofstream filestream(path);
+// 	std::ifstream 
+// 	std::string line;
+
+// 	while (std::getline(, line))
+// 	{
+// 		filestream << line;
+// 	}
+	// return (1) //if error
+// }
+
 int PostHandler::handle()
 {
-	if (supportAppload())
+	if (supportAppload() && creator(godFather->getResourceFullPath()))
 		error = CREATED_CODE;
 	else
 	{
@@ -541,6 +582,10 @@ void PostHandler::buildresponse()
 {
 	switch (error)
 	{
+	case CREATED_CODE:
+		responseHandler::setResposeStatusLine(CREATED_CODE, CREATED_MSG);
+		responseHandler::setResponseHeaders();//add new file location
+		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
 	case NOT_FOUND_CODE:
 		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
 		responseHandler::setResponseHeaders();//
@@ -553,6 +598,10 @@ void PostHandler::buildresponse()
 		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
 		responseHandler::setResponseHeaders();// set location header feild
 		setResponseBody(MOVED_PERMANENTLY_RESPONSE_MSG);
+	case INTERNAL_SERVER_ERROR_CODE:
+		responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+		responseHandler::setResponseHeaders();//no header so just default ones
+		responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
 	default:
 		break;
 	}

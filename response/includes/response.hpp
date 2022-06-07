@@ -26,7 +26,7 @@
 #define MOVED_PERMANENTLY_MSG std::string("301 Moved Permanently")
 #define NO_CONTENT_MSG std::string("204 No Content")
 #define CONFLICT_MSG std::string("409 Conflict")
-#define CREATED_MDG std::string("201 Created")
+#define CREATED_MSG std::string("201 Created")
 
 #define FORBIDDEN_CODE 403
 #define NOT_FOUND_CODE 404
@@ -290,3 +290,4 @@ class PostHandler : public responseHandler
 	private:
 		Locator *godFather;
 };
+
