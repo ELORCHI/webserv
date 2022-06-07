@@ -3,6 +3,23 @@
 
 // if the hanlde method returns 1 the request will be passed to next handler
 // if the handle method returns 0 the request will be handled by the calling object
+
+
+void responseHandler::setResposeStatusLine(int status, std::string status_line)
+{
+	char *tmp;
+
+	std::string line = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\n\r");
+	buffer = strdup(line.c_str());
+	bufferOffset = line.size() + 3;
+}
+
+void responseHandler::setResponseHeaders(void)
+{
+	// add default headers;
+}
+
+
 int system_block_response::handle()
 {
 	int err = 0;
@@ -189,6 +206,11 @@ void Locator::checker(void)
 }
 
 
+std::string Locator::getindexfile(void)
+{
+	// 
+}
+
 void Locator::setworkingLocation(void)
 {
 	this->Locate->setlocation(cl.getReadyRequest());
@@ -251,9 +273,9 @@ void Locator::buildresponse()
 		responseHandler::setResponseHeaders();//no header so just default ones
 		responseHandler::setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
 	case NOT_ALLOWED_CODE:
-		responseHandler::setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
+		responseHandler::setResposeStatusLine(NOT_ALLOWED_CODE, NOT_ALLOWED_MSG);
 		responseHandler::setResponseHeaders();//no header so just default ones
-		responseHandler::setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
+		responseHandler::setResponseBody(NOT_ALLOWED_RESPONSE_MSG);
 	default:
 		break;
 	}
@@ -441,9 +463,9 @@ void DeleteHandler::buildresponse(void)
 		responseHandler::setResponseHeaders();//no header so just default ones
 		responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
 	case CONFLICT:
-		responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+		responseHandler::setResposeStatusLine(CONFLICT, CONFLICT_MSG);
 		responseHandler::setResponseHeaders();
-		this->setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);// describe why
+		this->setResponseBody(CONFLICT_RESPONSE_MSG);// describe why
 	case NOT_FOUND_CODE:
 		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
 		responseHandler::setResponseHeaders();//
@@ -535,3 +557,4 @@ void PostHandler::buildresponse()
 		break;
 	}
 }
+

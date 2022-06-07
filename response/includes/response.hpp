@@ -25,7 +25,7 @@
 #define OK_MSG std::string("200 OK")
 #define MOVED_PERMANENTLY_MSG std::string("301 Moved Permanently")
 #define NO_CONTENT_MSG std::string("204 No Content")
-#define CONFLICT_MSG std::string("409 Conflict");
+#define CONFLICT_MSG std::string("409 Conflict")
 #define CREATED_MDG std::string("201 Created")
 
 #define FORBIDDEN_CODE 403
@@ -144,6 +144,7 @@ class responseHandler : public response// abstract class
 		virtual void setResponseHeaders(void);// need implementation set up general headers subclasses which need more header
 		// could implement their own and they might call the parent method and then append an other headers to the response buffer
 		virtual void setResponseBody(std::string body);// need implementation
+		int send(void);
 	protected:
 		char *buffer;
 		std::string response_status_line;
