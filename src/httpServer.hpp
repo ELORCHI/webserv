@@ -31,14 +31,14 @@
 #include <unordered_set>
 #include <set>
 #include <fstream>
-#include "servers.hpp"
+//#include "servers.hpp"
 
 
 #define NUM_CLIENTS 10
 #define PORT 6000
 #define MAX_MSG_SIZE 256
 #define INVALID_SOCKET -1
-#define MAX_EVENTS 1000
+#define MAX_EVENTS 8000
 class parse_config;
 
 typedef struct {
@@ -54,18 +54,18 @@ class httpServer
     struct sockaddr_in listeningServAddr; 
     int serverKqFd;
     bool canRun;
-    struct kevent _eventList[MAX_EVENTS];
+   // struct kevent _eventList[MAX_EVENTS];
     std::unordered_map<int, client*>clientmap;
     bool is_shared_port;
     server server_parsed_data;
 	int run_once;
     public:
         // httpServer(int port);
-        httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd);
+        httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd, int KqueueFd);
         ~httpServer() {}
         bool start();
         void stop();
-        void run();
+        void run(int num_events, struct kevent *eventList);
         void acceptConnection();
         void disconnectClient(client *c, bool is_delete);
         void read_from_client(client *c, long data_length);

@@ -9,9 +9,10 @@ class httpServers {
     std::vector<int> getRepeatedPorts(std::vector<server> parsed_servers_data);
     int KqueueFd;
     struct kevent _eventList[MAX_EVENTS];
-    std::map<int, client*>clientmap;
     public:
     httpServers(int argc, char **argv);
     ~httpServers() {}
+    void acceptConnection();
+    void disconnectClient(client *c, bool is_delete);
     void httpServers_repl();
 };
