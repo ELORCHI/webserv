@@ -33,7 +33,6 @@ class parse_request
         std::map<std::string, std::string>	_http_path;
         std::map<std::string, std::string>	_http_headers;
         size_t                              _my_content_length;
-        size_t                              _to_erase;
     public:
         parse_request();
         ~parse_request();
@@ -57,14 +56,16 @@ class parse_request
         std::string get_extention() {return _extention;};
         std::map<std::string, std::string> get_http_headers() const {return _http_headers;};
         std::string get_path_body() const {return _path_body;};
+        
         int get_code_status() const {return _code_status;};
 
         //methods
         bool	    is_number(const std::string&);
         bool	    is_hexnumber(const std::string&);
-        int	    start_parsing(char *buff, size_t size);
+        int         start_parsing(char *buff, size_t size);
         std::string gen_random(const int len);
         std::vector<std::string> tokenize(std::string s, std::string del);
+        bool        get_request_stat()const {return _is_request_complete;};
 };
 
 
