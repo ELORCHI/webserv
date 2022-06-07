@@ -129,6 +129,21 @@ location *workingLocation::defaultLocation(server *server)
 	return loc;
 }
 
+
+std::string workingLocation::getUpload(void)
+{
+	return (upload);
+}
+
+std::vector<std::vector<std::string> > workingLocation::getDefaultError(void)
+{
+	return defaultError;
+}
+
+std::vector<std::vector<std::string> > workingLocation::getRedirections()
+{
+	return redirections;
+}
 // sets isAllowed to true if found in the location methods
 // needs getters for allowed methods
 // void Locator::setMethodAllowance(std::string method)
@@ -191,6 +206,11 @@ bool Locator::isMethodAllowd(std::string method)
 	return (false);
 }
 
+workingLocation *Locator::getWorkingLocation(void)
+{
+	return Locate;
+}
+
 int Locator::getResourceType(void)
 {
 	return (resourceType);
@@ -215,6 +235,11 @@ bool Locator::isCgi(std::string path)
 	if (cl.getReadyRequest()->get_request_parsing_data().get_http_path().find_last_of(".php"))
 		return true;
 	return false;
+}
+
+void Locator::setResourceFullPath(std::string path)
+{
+	resourceFullPath = path;
 }
 
 void Locator::buildresponse()
@@ -390,7 +415,7 @@ int DeleteHandler::HandleDir(void)
 		//DELETE ALL DIR FILE
 		if (deleter(godFather->getResourceFullPath()) == 0)
 			error = NO_CONTENT;//IF SUCCES ==> NO_CONTENT
-		else if (error = 2) // this variable may cause a problem if it got changed by deleter method
+		else if (error == 2) // this variable may cause a problem if it got changed by deleter method
 			error = FORBIDDEN_CODE;//	PERMITION ERROR ==> FORBIDEN
 		else
 			error = INTERNAL_SERVER_ERROR_CODE;
@@ -439,7 +464,74 @@ void PostHandler::setGodFather(Locator *_godFather)
 	godFather = _godFather;
 }
 
+bool PostHandler::supportAppload()
+{
+	if (godFather->getWorkingLocation()->getUpload() != std::string(""))
+		return true;
+	return false;
+}
+
 int PostHandler::handle()
 {
-	
+	if (supportAppload())
+		error = CREATED_CODE;
+	else
+	{
+		if (godFather->getResourceType() == FI)
+			handleFiles();
+		else if (godFather->getResourceType() == DIR)
+			HandleDir();
+		else
+			error = NOT_FOUND_CODE;
+	}
+	return (1);
+}
+
+int PostHandler::handleFiles(void)
+{
+	if (godFather->isCgi(godFather->getResourceFullPath()))
+		HandleCGI();
+	else
+		error = FORBIDDEN_CODE;
+	return (1);
+}
+
+int PostHandler::HandleDir(void)
+{
+	std::string newpath;
+	if (godFather->gedEnd())
+	{
+		if (godFather->getIndex())
+		{
+			newpath = godFather->getResourceFullPath() + godFather->getindexfile();
+			godFather->setResourceFullPath(newpath);
+			handleFiles();
+		}
+		else
+			error = FORBIDDEN_CODE;
+	}
+	else
+		error = MOVED_PERMANENTLY;
+	return (1);
+}
+
+void PostHandler::buildresponse()
+{
+	switch (error)
+	{
+	case NOT_FOUND_CODE:
+		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
+		responseHandler::setResponseHeaders();//
+		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
+	case FORBIDDEN_CODE:
+		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
+		responseHandler::setResponseHeaders();//
+		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
+	case MOVED_PERMANENTLY:
+		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
+		responseHandler::setResponseHeaders();// set location header feild
+		setResponseBody(MOVED_PERMANENTLY_RESPONSE_MSG);
+	default:
+		break;
+	}
 }

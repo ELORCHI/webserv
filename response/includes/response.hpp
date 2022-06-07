@@ -26,6 +26,7 @@
 #define MOVED_PERMANENTLY_MSG std::string("301 Moved Permanently")
 #define NO_CONTENT_MSG std::string("204 No Content")
 #define CONFLICT_MSG std::string("409 Conflict");
+#define CREATED_MDG std::string("201 Created")
 
 #define FORBIDDEN_CODE 403
 #define NOT_FOUND_CODE 404
@@ -41,6 +42,7 @@
 #define MOVED_PERMANENTLY 301
 #define NO_CONTENT 204
 #define CONFLICT 409
+#define CREATED_CODE 201
 
 #define GET_RESPONSE 0
 #define POST_RESPONSE 1
@@ -66,6 +68,7 @@
 #define BAD_REQUEST_RESPONSE_MSG std::string("<html><head><title>400 Bad Request</title></head><body><h1>400 Bad Request</h1></body></html>")
 #define MOVED_PERMANENTLY_RESPONSE_MSG std::string("<html><head><title>Moved Permanently</title></head><body><h1>Moved Permanently</h1></body></html>")
 #define NO_CONTENT_RESPONSE_MSG std::string("<html><head><title>No Content</title></head><body><h1>Moved Permanently</h1></body></html>")
+#define CREATED_RESPONSE_MSG std::string("<html><head><title>Created</title></head><body><h1>CREATED</h1></body></html>")
 
 // building response steps
 // 1. check the system and the request
@@ -182,6 +185,9 @@ class workingLocation
 		void			setDefaultError(server *server);
 		void			setlocation(request *request);
 		void			setUpload(std::string path);
+		std::string		getUpload(void);
+		std::vector<std::vector<std::string> > getRedirections(void);
+		std::vector<std::vector<std::string> > getDefaultError(void);
 		location		*getLocation(void);
 		~workingLocation();
 	private:
@@ -209,11 +215,14 @@ class Locator : public responseHandler
 		void			setworkingLocation(void);
 		void			setResourceType(void);
 		void			setResourceFullPath(void);
+		void			setResourceFullPath(std::string path);
 		void			checker(void);
 		void			setIndex(void);
 		void			setAutoIndex(void);
 		std::string		getResourceFullPath(void);
 		std::string		readBody(std::string path);// need implementation
+		workingLocation *getWorkingLocation(void);
+		std::string		getindexfile(void);
 	protected:
 		workingLocation *Locate;
 		responseHandler *methodHandler;
@@ -276,6 +285,7 @@ class PostHandler : public responseHandler
 		int HandleDir(void);
 		int HandleCGI(void);
 		int creator(std::string path);
+		bool supportAppload();
 	private:
 		Locator *godFather;
 };
