@@ -748,7 +748,7 @@ void PostHandler::buildresponse()
 }
 
 
-response *getResponse(client  &cl)
+responseHandler *getResponse(client  &cl)
 {
 	responseHandler *systemResponse = new system_block_response();
 	Locator *locationHandler = new Locator(cl);
