@@ -291,6 +291,9 @@ void Locator::checker(void)
 {
 	struct stat s;
 	std::string path = cl.getReadyRequest()->get_request_parsing_data().get_http_path();
+	setworkingLocation();
+	setResourceFullPath();
+	setAutoIndex();
 	if (isCgi(path))
 		resourceType = CG;
 	else if (stat(path.c_str(), &s))
@@ -441,6 +444,12 @@ GetHandler::GetHandler(Locator *_godFather): responseHandler()
 	godFather = _godFather;
 }
 
+
+std::string GetHandler::setAutoindexResponse(void)
+{
+	
+}
+
 void	Locator::setIndex(void)
 {
 	if (Locate->getLocation()->get_indexs().size() > 0)
@@ -503,7 +512,7 @@ void GetHandler::buildresponse()
 	{
 	case AUTOINDEX_CODE:
 		responseHandler::setResposeStatusLine(AUTOINDEX_CODE, OK_MSG);
-		this->setResponseBody(setAutoindexResponse().c_str());//NOT IMPLEMENTED
+		this->setResponseBody(setAutoindexResponse());//NOT IMPLEMENTED
 		responseHandler::setResponseHeaders();//
 	case MOVED_PERMANENTLY:
 		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
@@ -747,7 +756,9 @@ response *getResponse(client  &cl)
 		delete locationHandler;
 		return (systemResponse);
 	}
-	if (locationHandler->handle())
+	else
+		locationHandler->checker();
+	if (locationHandler->handle())// call checker befor this
 	{
 		delete systemResponse;
 		return locationHandler;

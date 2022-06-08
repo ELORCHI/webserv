@@ -231,7 +231,6 @@ class Locator : public responseHandler
 		int				HandleCGI();
 	protected:
 		workingLocation *Locate;//free
-		responseHandler *methodHandler;//free
 		std::string		resourceFullPath;
 		int				resourceType;
 		bool			endwithslash;
