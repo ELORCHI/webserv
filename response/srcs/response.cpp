@@ -4,26 +4,56 @@
 // if the hanlde method returns 1 the request will be passed to next handler
 // if the handle method returns 0 the request will be handled by the calling object
 
+std::string    formatted_time(void)
+{
+    time_t    current;
+    struct tm * timeinfo;
+    char    buffer[80];
+
+    time(&current);
+    timeinfo = localtime (&current);
+
+    strftime(buffer, 80, "%a,%e %b %Y %X %Z", timeinfo);
+
+    return std::string(buffer);
+}
 
 void responseHandler::setResposeStatusLine(int status, std::string status_line)
 {
 	char *tmp;
 
-	std::string line = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\n\r");
-	buffer = strdup(line.c_str());
-	bufferOffset = line.size() + 3;
+	buffer = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\n");
+	bufferOffset = buffer.size();
 }
 
 void responseHandler::setResponseHeaders(void)
 {
-	// add default headers;
+	std::stringstream s;
+	std::string ss;
+	s << buffer.size();
+	s >> ss;
+	response_body += "content-length: " + std::string(ss) + std::string("\n");
+	response_body += "Server: " + std::string("420 SERVER");
+	response_body += "content-type: " + getexten();
+	response_body += "date: " + formatted_time();
+	
 }
 
+void responseHandler::setResponseBody(std::string body)
+{
+	// if default error exits read from defaul
+	//else buffer += body
+}
+
+void responseHandler::setClient(client &_cl)
+{
+	cl = _cl;
+}
 
 int system_block_response::handle()
 {
 	int err = 0;
-	if (this->isMethodImplemented(cl.getReadyRequest()->get_request_parsing_data().get_http_method()) == 1)
+	if (this->isMethodImplemented(cl.getReadyRequest()->get_request_parsing_data().get_http_method()))
 		err = 1;
 	else if (this->isHttpVersionSupported(cl.getReadyRequest()->get_request_parsing_data().get_http_version()) == 1)
 		err = 1;
@@ -61,17 +91,17 @@ void system_block_response::buildresponse()
 	{
 		case HTTP_VERSION_NOT_SUPPORTED_CODE:
 			responseHandler::setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
-			responseHandler::setResponseHeaders();//no header so just default ones
 			responseHandler::setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
+			responseHandler::setResponseHeaders();//no header so just default ones
 			break;
 		case NOT_IMPLEMENTED_CODE:
-			this->setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
+			responseHandler::setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
+			responseHandler::setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
 			responseHandler::setResponseHeaders();// no header just default ones
-			this->setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
 		case INTERNAL_SERVER_ERROR_CODE:
-			this->setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+			responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
 			responseHandler::setResponseHeaders();//no header so just default ones
-			this->setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
+			responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
 			break;
 		default:
 			return;
@@ -172,6 +202,11 @@ std::vector<std::vector<std::string> > workingLocation::getRedirections()
 
 // 	}
 // }
+
+Locator::Locator(client &_cl): responseHandler()
+{
+	this->setClient(cl);
+}
 
 void Locator::setResourceFullPath()
 {
@@ -306,12 +341,12 @@ void Locator::buildresponse()
 	{
 	case RESPONSE_BAD_REQUEST:
 		responseHandler::setResposeStatusLine(RESPONSE_BAD_REQUEST, BAD_REQUEST_MSG);
+		responseHandler::setResponseBody(BAD_GATEWAY_RESPONSE_MSG);
 		responseHandler::setResponseHeaders();//no header so just default ones
-		responseHandler::setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
 	case NOT_ALLOWED_CODE:
 		responseHandler::setResposeStatusLine(NOT_ALLOWED_CODE, NOT_ALLOWED_MSG);
-		responseHandler::setResponseHeaders();//no header so just default ones
 		responseHandler::setResponseBody(NOT_ALLOWED_RESPONSE_MSG);
+		responseHandler::setResponseHeaders();//no header so just default ones
 	default:
 		break;
 	}
@@ -399,24 +434,24 @@ void GetHandler::buildresponse()
 	{
 	case AUTOINDEX_CODE:
 		responseHandler::setResposeStatusLine(AUTOINDEX_CODE, OK_MSG);
+		this->setResponseBody(setAutoindexResponse().c_str());//NOT IMPLEMENTED
 		responseHandler::setResponseHeaders();//
-		this->setResponseBody(setAutoindexResponse().c_str());
 	case MOVED_PERMANENTLY:
 		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
-		responseHandler::setResponseHeaders();// set location header feild
 		setResponseBody(MOVED_PERMANENTLY_RESPONSE_MSG);
+		this->setResponseHeaders();// set location header feild
 	case 200:
 		responseHandler::setResposeStatusLine(200, OK_MSG);
+		this->setResponseBody(godFather->readBody(godFather->getResourceFullPath()));//not implemented
 		responseHandler::setResponseHeaders();//
-		this->setResponseBody(godFather->readBody(godFather->getResourceFullPath()));
 	case FORBIDDEN_CODE:
 		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
-		responseHandler::setResponseHeaders();//
 		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
+		responseHandler::setResponseHeaders();//
 	case NOT_FOUND_CODE:
 		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
-		responseHandler::setResponseHeaders();//
 		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
+		responseHandler::setResponseHeaders();//
 	default:
 
 		break;
@@ -504,23 +539,23 @@ void DeleteHandler::buildresponse(void)
 	{
 	case NO_CONTENT:
 		responseHandler::setResposeStatusLine(NO_CONTENT, NO_CONTENT_MSG);
-		this->setResponseHeaders();// no content-length
+		this->setResponseHeaders();// no content-length //notimplenented
 	case FORBIDDEN_CODE:
 		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
-		responseHandler::setResponseHeaders();//
 		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
+		responseHandler::setResponseHeaders();//
 	case INTERNAL_SERVER_ERROR_CODE:
 		responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+		this->setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
 		responseHandler::setResponseHeaders();//no header so just default ones
-		responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
 	case CONFLICT:
 		responseHandler::setResposeStatusLine(CONFLICT, CONFLICT_MSG);
+		this->setResponseBody(CONFLICT_RESPONSE_MSG);// describe why// not implementedd
 		responseHandler::setResponseHeaders();
-		this->setResponseBody(CONFLICT_RESPONSE_MSG);// describe why
 	case NOT_FOUND_CODE:
 		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
-		responseHandler::setResponseHeaders();//
 		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
+		responseHandler::setResponseHeaders();//
 	default:
 		break;
 	}
@@ -609,26 +644,68 @@ void PostHandler::buildresponse()
 	{
 	case CREATED_CODE:
 		responseHandler::setResposeStatusLine(CREATED_CODE, CREATED_MSG);
-		responseHandler::setResponseHeaders();//add new file location
-		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
+		responseHandler::setResponseBody(CREATED_RESPONSE_MSG);// MAIGHT NOT BE ADDED
+		this->setResponseHeaders();//add new file location
 	case NOT_FOUND_CODE:
 		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
-		responseHandler::setResponseHeaders();//
 		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
+		responseHandler::setResponseHeaders();//
 	case FORBIDDEN_CODE:
 		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
-		responseHandler::setResponseHeaders();//
 		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
+		responseHandler::setResponseHeaders();//
 	case MOVED_PERMANENTLY:
 		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
-		responseHandler::setResponseHeaders();// set location header feild
 		setResponseBody(MOVED_PERMANENTLY_RESPONSE_MSG);
+		responseHandler::setResponseHeaders();// set location header feild
 	case INTERNAL_SERVER_ERROR_CODE:
 		responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
-		responseHandler::setResponseHeaders();//no header so just default ones
 		responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
+		responseHandler::setResponseHeaders();//no header so just default ones
 	default:
 		break;
 	}
 }
 
+
+response *getResponse(client  &cl)
+{
+	responseHandler *systemResponse = new system_block_response();
+	Locator *locationHandler = new Locator(cl);
+	std::string method = cl.getReadyRequest()->get_request_parsing_data().get_http_method();
+	if (systemResponse->handle())
+	{
+		delete locationHandler;
+		return (systemResponse);
+	}
+	if (locationHandler->handle())
+	{
+		delete systemResponse;
+		return locationHandler;
+	}
+	if (method == std::string("Post"))
+	{
+		responseHandler *_postHandler = new PostHandler(locationHandler);
+		_postHandler->handle();
+		delete locationHandler;
+		delete systemResponse;
+		return (_postHandler);
+	}
+	if (method == std::string("Get"))
+	{
+		responseHandler *_getHandler = new GetHandler(locationHandler);
+		_getHandler->handle();
+		delete locationHandler;
+		delete systemResponse;
+		return (_getHandler);
+	}
+	else
+	{
+		responseHandler *_deleteHandler = new DeleteHandler(locationHandler);
+		_deleteHandler->handle();
+		delete locationHandler;
+		delete systemResponse;
+		return _deleteHandler;
+	}
+	return (0);
+}

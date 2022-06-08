@@ -134,26 +134,26 @@ class response
 class responseHandler : public response// abstract class
 {
 	public:
-		responseHandler(client cl);
+		responseHandler(client _cl);
 		responseHandler();
 		virtual ~responseHandler();
-		virtual int handle() = 0;
+		virtual int handle();
 		virtual void buildresponse() = 0;
-		void appendTobuffer(int buffer_size, int buffer_offset, char *msg);// need implementation
 		virtual void setResposeStatusLine(int status, std::string status_line);// need implementation
 		virtual void setResponseHeaders(void);// need implementation set up general headers subclasses which need more header
 		// could implement their own and they might call the parent method and then append an other headers to the response buffer
 		virtual void setResponseBody(std::string body);// need implementation
+		void setClient(client &_cl);
 		int send(void);
+		std::string getexten(void);// needs implementation
+		std::string setexten(std::string path);
 	protected:
-		char *buffer;
-		std::string response_status_line;
-		std::string	response_headers;
+		std::string buffer;
 		std::string response_body;
 		int bufferSize;// it might be a response length cause we are sending the buffer
 		int bufferOffset;
 		int contentLength;
-		int isChunked;
+		std::string exten;
 		int error;
 		client cl;
 };
@@ -198,7 +198,7 @@ class workingLocation
 		std::string upload;
 		std::vector<std::vector<std::string> >  redirections;
 		std::vector<std::vector<std::string> >  defaultError;
-		cgi *cgiLocation;// free 
+		cgi *cgiLocation;// free
 };
 
 
@@ -207,6 +207,7 @@ class Locator : public responseHandler
 {
 	public:
 		Locator();
+		Locator(client &_cl);
 		~Locator();
 		int				handle();
 		int				getResourceType(void);
@@ -292,3 +293,4 @@ class PostHandler : public responseHandler
 		Locator *godFather;
 };
 
+response *geResponse(client &cl);

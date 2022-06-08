@@ -6,6 +6,6 @@
 6.HandleCGI
 7.deleter == needs a check ==
 7.Creator == waiting but almost done ==
-7.main
+7.main 
 8.readBody
-9.setAutoindexResponse
+9.setAutoindexResponse 
