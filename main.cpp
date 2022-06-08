@@ -11,8 +11,10 @@
 // #include "servers.hpp"
 
 
+
 int main(int argc, char *argv[])
 {
+    
     struct stat buffer;
     int i = stat(argv[1], &buffer);
     if (i == -1)

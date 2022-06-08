@@ -23,7 +23,12 @@ class client {
 	std::fstream bodyFile;
 	request* ready_request;
     parse_request pr;
-
+    typedef struct {
+        int timeout;
+        int max;
+        bool is_keepAlive;
+    } keepAlive;
+    keepAlive keepAliveData;
      public:
         client(int fd, struct sockaddr_in addr);
         ~client();
@@ -51,4 +56,6 @@ class client {
 		std::fstream &getReadTmpFile();
 		bool is_request_complete(long long recieved_data_size, char *buffer);
         parse_request &get_pr() { return pr; }
+        keepAlive getKeepAliveInfo() { return this->keepAliveData; };
+        void setKeepAliveInfo(std::string _kad);
 };

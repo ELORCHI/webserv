@@ -252,8 +252,8 @@ void httpServer::acceptConnection()
     struct kevent kEv;
     EV_SET(&kEv, clFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
     kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-    // EV_SET(&kEv, clFd, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
-    // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+    EV_SET(&kEv, clFd, EVFILT_WRITE, EV_ADD | EV_DISABLE, 0, 0, NULL);
+    kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
     clientmap[clFd] = c;
     //test block
     // send(c->getClientFd(), "bruh", 4, 0);
@@ -293,75 +293,21 @@ void httpServer::read_from_client(client *c, long data_length)
     char *c_buffer = new char[data_length];
 	// std::cerr << "DBG_00" << std::endl;
     int bytesRead = recv(c->getClientFd(), c_buffer, data_length, 0);
-    std::cout << c_buffer << std::endl;
+    // std::cout << c_buffer << std::endl;
     
-    int k = c->get_pr().start_parsing(c_buffer, bytesRead);
-    if (k)
-        c->set_reading_status(true);
 
-    std::cout << k << std::endl;
-	//size += bytesRead;
-
-	// std::cerr << "size : " << bytesRead <<  " total : " << size << std::endl;
-	// std::cout << "a time" << data_length << "  BYTESREAD: " << bytesRead << std::endl;
-	// c->appendToReadBodyFile(c_buffer, data_length);
-	// std::cerr << "DBG_01" << std::endl;
 	if (bytesRead <= 0)
 	{
-	// std::cerr << "DBG_02" << std::endl;
        disconnectClient(c, true);
-		// bytesRead = 40000;
 	}
-	// std::cerr << "DBG_04"<< std::endl;
 	else
     {
-		// if (request::is_requestHeaderComplete(c->getHeadersBuffer()))
-		// {
 
-		// }
-		
-		// c->appendToReadBodyFile(c_buffer, data_length);
-		// delete[] c_buffer;
-		//get the headers buffer from BodyFile
-		// c->appendToReadBodyFile(c_buffer, bytesRead);
-	// 	if (!request::is_requestHeaderComplete(c->getHeadersBuffer()))
-	// 	{
-    // 		c->appendToHeadersBuffer(c_buffer);
-	// 	// }
-	// 	// else
-	// 	// {
-	// 	// 	//get Keep-Alive header
-	// 	// 	std::string keepAlive = request::get_header_value(c->getHeadersBuffer(), "Connection");
-	// 	// }
-	// 	if (request::is_requestHeaderComplete(c->getHeadersBuffer()))
-	// // 	{
-	// 		// std::string s = c->getHeadersBuffer();
-	// 		std::string s = std::string(c_buffer, bytesRead);
-	// 		// if (!run_once && s.substr(s.find("\r\n\r\n")+4).size())
-	// 		if (s.substr(s.find("\r\n\r\n")+4).size())
-	// 		{
-	// 			// std::cout << "am i here" << std::endl;
-	// 			//std::cout << c->getHeadersBuffer() << std::endl;
-	// 			std::string ss = s.substr(s.find("\r\n\r\n") + 4); 
-	// 			// std::cout << ss.c_str() << std::endl;
-	// 			c->appendToReadBodyFile(ss.data(), ss.size());
-	// 		    delete[] c_buffer;
-	// 			return ;	
-	// 		}
-	// 		else
-	// 		{
-	// 			c->appendToReadBodyFile(c_buffer, bytesRead);
-	// 			delete[] c_buffer;
-	// 			// std::cout << "this shouldn't happen: " << c_buffer << std::endl;
-	// 			// std::cout << c->getHeadersBuffer() << std::endl;
-	// 		}
-	// 	}
-
+        int k = c->get_pr().start_parsing(c_buffer, bytesRead);
+        if (k)
+            c->set_reading_status(true);
+        std::cout << k << std::endl;
     }
-	// std::fstream &body = c->getBodyFile();
-	// body.seekg(0, std::ios::end);
-	// int body_length = body.tellg();
-	// body.seekg(0, std::ios::beg);
 	
     delete[] c_buffer;
 }
@@ -375,10 +321,8 @@ void httpServer::run(int num_events, struct kevent *_eventList)
     if (canRun)
     {
         //get all the triggered events
-        //num_events = kevent(serverKqFd, NULL, 0, _eventList, MAX_EVENTS, NULL);
         if (num_events <= 0)
 		{
-			// std::cout << "haaaah" << std::endl;
             return ;
 		}
         for (int i = 0; i < num_events; i++)
@@ -396,6 +340,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                 else
 				{
                     cl = clientmap[_eventList[i].ident];
+
 				}
                 if (cl == NULL)
                 {	
@@ -418,8 +363,14 @@ void httpServer::run(int num_events, struct kevent *_eventList)
 					read_from_client(cl, _eventList[i].data);	
                     if (cl->is_reading_complete())
                     {
-                        std::cout << "req complete" << std::endl;
-						disconnectClient(cl, true);	
+                        // std::cout << "req complete" << std::endl;
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_ENABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+
+                        //keep alive header
+						// disconnectClient(cl, true);	
                     }
                         
 
@@ -430,8 +381,24 @@ void httpServer::run(int num_events, struct kevent *_eventList)
 					{
 						std::string rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 37\r\n\r\n<html><body><h2>ok</h2></body></html>";
 						int s = send(cl->getClientFd(), rep.c_str(), rep.length(), 0);
-						std::cout << "request complete" << std::endl;
-						disconnectClient(cl, true);	
+						// std::cout << "request complete" << std::endl;
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        cl->set_reading_status(false);
+                        if (cl->get_pr().get_http_headers().count("Keep-Alive") > 0)
+                        {
+                            //get timeout and from keep-alive string
+                            std::string s = cl->get_pr().get_http_headers()["Keep-Alive"];
+                            cl->setKeepAliveInfo(s);
+                            // std::cout << s << std::endl;
+                        }
+                        else
+                        {
+    						disconnectClient(cl, true);
+                        }
+                        
 					}
                     // if (cl->isThereARequestReady() == true)
 					// {

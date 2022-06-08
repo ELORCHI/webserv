@@ -19,6 +19,8 @@ size_t parse_config::get_lines_size() const
     return (_lines.size());
 }
 
+
+
 void    parse_config::read_lines()
 {
     for (std::vector<std::string>::iterator it = _lines.begin(); it != _lines.end(); ++it)

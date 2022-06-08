@@ -21,6 +21,7 @@ location::location() : _locations_path(""),
                         {}
 location::~location() {}
 
+
 /*
 * GETTERS
 */

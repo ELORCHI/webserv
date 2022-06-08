@@ -19,6 +19,7 @@ parse_request::parse_request():
 {
 }
 
+
 parse_request::~parse_request()
 {
 }
@@ -62,7 +63,7 @@ void    parse_request::set_http_method(std::string &line)
 {
 	if (line != "POST" && line != "GET" && line != "DELETE")
 	{
-		std::cout << "Error: bad request 1" << std::endl;
+		std::cout << "Error: bad request" << std::endl;
 		_code_status = 405;
 	}
 	else
@@ -130,6 +131,9 @@ void	parse_request::set_unchunked_http_body()
 	{
 		std::cout << "Error: bad content length" << std::endl;
 		_code_status = 400;
+		close(_file_descriptor);
+		remove(_path_body.c_str());
+		return ;
 	}
 	write(_file_descriptor, _data.data(), _data.size());
 	_my_content_length += _data.size();
@@ -140,17 +144,22 @@ void	parse_request::set_unchunked_http_body()
 	{
 		std::cout << "Error: bad content length" << std::endl;
 		_code_status = 400;
+		close(_file_descriptor);
+		remove(_path_body.c_str());
+		return ;
 	}
 	close(_file_descriptor);
 }
 
 void	parse_request::set_http_body()
 {
-	// std::cout << _data << "bhdjsgkd" << std::endl;
 	if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers.find("Content-Length") != _http_headers.end())
 	{
-		std::cout << "Error: bad request 2" << std::endl;
+		std::cout << "Error: bad request" << std::endl;
 		_code_status = 400;
+		close(_file_descriptor);
+		remove(_path_body.c_str());
+		_is_request_complete = true;
 		return ;
 	}
 	else if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers["Transfer-Encoding"] == "chunked")
@@ -159,8 +168,11 @@ void	parse_request::set_http_body()
 		set_unchunked_http_body();
 	else
 	{
-		std::cout << "Error: bad request 3" << std::endl;
+		std::cout << "Error: bad request" << std::endl;
 		_code_status = 400;
+		close(_file_descriptor);
+		remove(_path_body.c_str());
+		_is_request_complete = true;
 		return ;
 	}
 }
@@ -187,7 +199,7 @@ void    parse_request::set_http_headers(std::string &line)
 		else
 		{
 			std::cout << "Error: bad headers" << std::endl;
-			_code_status = 500;
+			_code_status = 400;
 		}
 	}
 }
@@ -241,7 +253,6 @@ int    parse_request::start_parsing(char *buff, size_t size)
 		{
 			if (_data.find("\r\n\r\n") != std::string::npos)
 			{
-				// std::cout << _data << std::endl;
 				std::string header = _data.substr(0, _data.find("\r\n\r\n"));
 				_tmp = _data.substr(_data.find("\r\n\r\n") + 4);
 				_data.clear();
@@ -249,10 +260,12 @@ int    parse_request::start_parsing(char *buff, size_t size)
 				_tmp.clear();
 				_is_header_complete = true;
 				header = set_http_vmp(header);
-				// if (_code_status == 0)
+				if (_code_status == 0)
 					set_http_headers(header);
-				if (get_http_method() != "POST")
+				if (get_http_method() != "POST" || _code_status)
 				{
+					if (!_code_status)
+						_code_status = 200;
 					_is_request_complete = true;
 					return _is_request_complete;
 				}
@@ -263,36 +276,26 @@ int    parse_request::start_parsing(char *buff, size_t size)
 			if (_path_body == "")
 			{
 				set_extention();
-				_path_body = gen_random(10) + _extention;
+				_path_body = "/tmp/" + gen_random(10) + _extention;
 			}
-			// std::cout << _path_body << std::endl;
 			_file_descriptor = open(_path_body.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
 			if (_file_descriptor == -1)
 			{
-				std::cout << "Error: bad request 4" << std::endl;
+				std::cout << "Error: bad request" << std::endl;
 				_code_status = 500;
-				close(_file_descriptor);
-				remove(_path_body.c_str());
 				_is_request_complete = true;
 				return _is_request_complete;
 			}
-			// if (_code_status == 0)
+			if (_code_status == 0)
 				set_http_body();
 		}
 	}
-	if (_is_request_complete)
+	if (_is_request_complete && _code_status == 0)
+	{
 		close(_file_descriptor);
+		_code_status = 200;
+	}
 	return _is_request_complete;
-	// std::string headers;
-    // headers = this->set_http_vmp(header);
-	// if (_code_status != 0)
-	// 	this->set_http_headers(headers);
-	// if (_code_status != 0)
-	// 	set_extention();
-	// if (_code_status != 0)
-	// 	set_http_body(filename);
-	// if (_code_status != 0)
-	// 	_code_status = 200;
 	// std::cout << "Method: " << get_http_method() << std::endl;
 	// std::cout << "Version: " << get_http_version() << std::endl;
 	// std::cout << "Path: " << get_http_path() << std::endl;

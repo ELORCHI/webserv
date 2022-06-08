@@ -338,7 +338,8 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".yin", "application/yin+xml"));
     extentions.push_back(std::make_pair(".yml", "text/yaml"));
     extentions.push_back(std::make_pair(".zip", "application/zip"));
-    
+
+
     if (_http_headers.find("Content-Type") != _http_headers.end())
     {
         for (std::vector<std::pair<std::string, std::string> >::iterator it = extentions.begin();
