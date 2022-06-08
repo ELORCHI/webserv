@@ -48,6 +48,7 @@ class parse_request
         void eraseAllSubStr(std::string&, const std::string&);
         size_t hex_to_dec(std::string num);
 
+
         //getters
         std::string get_http_method() const {return _http_method;};  
         std::string get_http_version() const {return _http_version;};  

@@ -20,6 +20,7 @@
 class cgi;
 class location
 {
+    
 protected:
     const std::string           _name;
     std::string                 _locations_path;

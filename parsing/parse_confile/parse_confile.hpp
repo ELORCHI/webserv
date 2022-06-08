@@ -27,6 +27,7 @@ class location;
 class server;
 class parse_config
 {
+    
     protected:
         std::vector<std::string> _lines;
         std::vector<std::string> _words;

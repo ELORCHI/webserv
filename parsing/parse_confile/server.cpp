@@ -31,6 +31,7 @@ server::server():
     _client_max_body_size(-1),
     _autoindex(false)
 {
+
 }
     // _location(),
     // _cgi()
@@ -40,6 +41,7 @@ std::string server_names[] = {"listen","root","allow_methods", "upload_path", "i
 server::~server()
 {
 }
+
 
 //-------------seters------------------
 
