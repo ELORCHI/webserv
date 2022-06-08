@@ -131,6 +131,9 @@ void	parse_request::set_unchunked_http_body()
 	{
 		std::cout << "Error: bad content length" << std::endl;
 		_code_status = 400;
+		close(_file_descriptor);
+		remove(_path_body.c_str());
+		return ;
 	}
 	write(_file_descriptor, _data.data(), _data.size());
 	_my_content_length += _data.size();
@@ -141,20 +144,22 @@ void	parse_request::set_unchunked_http_body()
 	{
 		std::cout << "Error: bad content length" << std::endl;
 		_code_status = 400;
+		close(_file_descriptor);
+		remove(_path_body.c_str());
+		return ;
 	}
 	close(_file_descriptor);
 }
 
 void	parse_request::set_http_body()
 {
-	// std::cout << _data << "bhdjsgkd" << std::endl;
 	if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers.find("Content-Length") != _http_headers.end())
 	{
 		std::cout << "Error: bad request" << std::endl;
 		_code_status = 400;
 		close(_file_descriptor);
 		remove(_path_body.c_str());
-		_is_request_complete = 1;
+		_is_request_complete = true;
 		return ;
 	}
 	else if (_http_headers.find("Transfer-Encoding") != _http_headers.end() && _http_headers["Transfer-Encoding"] == "chunked")
@@ -167,7 +172,7 @@ void	parse_request::set_http_body()
 		_code_status = 400;
 		close(_file_descriptor);
 		remove(_path_body.c_str());
-		_is_request_complete = 1;
+		_is_request_complete = true;
 		return ;
 	}
 }
@@ -194,7 +199,7 @@ void    parse_request::set_http_headers(std::string &line)
 		else
 		{
 			std::cout << "Error: bad headers" << std::endl;
-			_code_status = 500;
+			_code_status = 400;
 		}
 	}
 }
@@ -261,7 +266,6 @@ int    parse_request::start_parsing(char *buff, size_t size)
 				{
 					if (!_code_status)
 						_code_status = 200;
-					//if !_code_status then _code_status = 200
 					_is_request_complete = true;
 					return _is_request_complete;
 				}
@@ -279,8 +283,6 @@ int    parse_request::start_parsing(char *buff, size_t size)
 			{
 				std::cout << "Error: bad request" << std::endl;
 				_code_status = 500;
-				close(_file_descriptor);
-				remove(_path_body.c_str());
 				_is_request_complete = true;
 				return _is_request_complete;
 			}
