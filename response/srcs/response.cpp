@@ -295,6 +295,28 @@ void system_block_response::buildresponse()
 // we will match the path of the request with the path of each location and chose the location with the longest match
 //Nginx begins by checking all prefix-based location matches.
 //It checks each location against the complete request URI.
+workingLocation::workingLocation()
+{
+	serverlocation = NULL;
+	upload = "";
+	cgiLocation = NULL;
+}
+
+// copy constructor
+workingLocation::workingLocation(const workingLocation &wl)
+{
+	serverlocation = wl.serverlocation;
+	upload = wl.upload;
+	cgiLocation = wl.cgiLocation;
+}
+
+workingLocation::~workingLocation()
+{
+	delete serverlocation;
+	delete cgiLocation;
+}
+
+
 location* workingLocation::searchLocation(std::vector<location> locations, std::string source)
 {
 	int max_match_length = 0;
@@ -379,6 +401,16 @@ std::vector<std::vector<std::string> > workingLocation::getRedirections()
 Locator::Locator(client &_cl): responseHandler()
 {
 	this->setClient(cl);
+	Locate = new workingLocation;
+	resourceFullPath = "";
+	hasIndex = false;
+	autoindex = false;
+	hasIndex = false;
+}
+
+Locator::~Locator()
+{
+	delete Locate;
 }
 
 void Locator::setResourceFullPath()
@@ -390,6 +422,9 @@ std::string Locator::getResourceFullPath(void)
 {
 	return resourceFullPath;
 }
+
+
+
 
 void Locator::checker(void)
 {
@@ -976,7 +1011,7 @@ responseHandler *getResponse(client  &cl)
 		delete systemResponse;
 		return locationHandler;
 	}
-	if (method == std::string("Post"))
+	if (method == std::string("POST"))
 	{
 		responseHandler *_postHandler = new PostHandler(locationHandler);
 		_postHandler->handle();
@@ -984,7 +1019,7 @@ responseHandler *getResponse(client  &cl)
 		delete systemResponse;
 		return (_postHandler);
 	}
-	if (method == std::string("Get"))
+	if (method == std::string("GET"))
 	{
 		responseHandler *_getHandler = new GetHandler(locationHandler);
 		_getHandler->handle();
