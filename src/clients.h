@@ -27,6 +27,8 @@ class client {
         int timeout;
         int max;
         bool is_keepAlive;
+        std::string connection_type;
+        bool is_connection; 
     } keepAlive;
     keepAlive keepAliveData;
      public:
@@ -58,4 +60,5 @@ class client {
         parse_request &get_pr() { return pr; }
         keepAlive getKeepAliveInfo() { return this->keepAliveData; };
         void setKeepAliveInfo(std::string _kad);
+        void setConnectionType(std::string connectionType);
 };

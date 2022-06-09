@@ -28,6 +28,9 @@ client::client(int fd, struct sockaddr_in addr)
 	this->keepAliveData.timeout = 0;
 	this->keepAliveData.max = 0;
 	this->keepAliveData.is_keepAlive = false;
+	this->keepAliveData.is_connection = true;
+	this->keepAliveData.connection_type = "close";
+
 	//bodyFileName = std::string("/tmp/") +  getRandomName();
 	//bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
 }
@@ -85,6 +88,12 @@ void client::setKeepAliveInfo(std::string _kad)
 	ss << max;
 	ss >> this->keepAliveData.max;
 	this->keepAliveData.is_keepAlive = true;
+}
+
+void setConnectionType(std::string connectionType)
+{
+	this->keepAliveData.is_connection = true;
+	this->keepAliveData.connection_type = connectionType;
 }
 
 // bool client::is_request_complete(long long recieved_data_size, char *buffer)

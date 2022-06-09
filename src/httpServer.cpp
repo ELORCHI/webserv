@@ -177,44 +177,6 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     //return true;
 }
 
-// bool httpServer::start() {
-//     canRun = false;
-//     listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
-//     socket_data sd;
-//     try {
-//         if (listenServerFd == INVALID_SOCKET)
-//             throw MyException("failed at creating the server socket!");
-//         int bind_r = bind(listenServerFd, (struct sockaddr*)&listeningServAddr, sizeof(listeningServAddr));
-//         if (bind_r != 0)
-//         {
-//             throw MyException("binding address to socket failed!");
-//         }
-//         if (listen(listenServerFd, 100) != 0) {
-//             throw MyException("failed to put socket in listening state!");
-//         }
-//         sd = create_listening_socket(listenServerPort);
-//         if ((serverKqFd = kqueue()) == -1)
-//             throw MyException("failure at creating the kernel queue");
-        
-//     }
-//     catch (std::exception &e)
-//     {
-//         std::cerr << e.what() << std::endl;
-//         return false;
-//     }
-//     listenServerFd = sd.listenServerFd;
-//     listeningServAddr = sd.listeningServAddr;
-//     //set server listening socket as non blockin
-//     fcntl(listenServerFd, F_SETFL, O_NONBLOCK);
-
-//     //add event read event to kqueue
-//     struct kevent _kEvent;
-//     EV_SET(&_kEvent, listenServerFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
-//     kevent(serverKqFd, &_kEvent, 1, NULL, 0, NULL);
-//     canRun = true;
-//     return true;
-// }
-
 
 void httpServer::stop()
 {
@@ -391,8 +353,19 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         {
                             //get timeout and from keep-alive string
                             std::string s = cl->get_pr().get_http_headers()["Keep-Alive"];
+                            // std::string con = cl->get_pr().get_http_headers()["Connection"];
                             cl->setKeepAliveInfo(s);
-                            // std::cout << s << std::endl;
+                            // cl->setConnectionType(con);
+
+                        }
+                        if (cl->get_pr().get_http_headers().count("Connection") > 0)
+                        {
+                            std::string con = cl->get_pr().get_http_headers()["Connection"];
+                            cl->setConnectionType(con);
+                            if (con == "close")
+                            {
+                                disconnectClient(cl, true);
+                            }
                         }
                         else
                         {
