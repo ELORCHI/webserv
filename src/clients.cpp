@@ -24,7 +24,7 @@ client::client(int fd, struct sockaddr_in addr)
     is_done_reading_from = false;
     read_buffer.resize(8000);
 	ready_request = NULL;
-	isHeadersBufferResidue = false;
+	// isHeadersBufferResidue = false;
 	this->keepAliveData.timeout = 0;
 	this->keepAliveData.max = 0;
 	this->keepAliveData.is_keepAlive = false;
@@ -42,7 +42,7 @@ client& client::operator= (const client& other)
 	is_done_reading_from = other.is_done_reading_from;
 	read_buffer = other.read_buffer;
 	ready_request = other.ready_request;
-	isHeadersBufferResidue = other.isHeadersBufferResidue;
+	// isHeadersBufferResidue = other.isHeadersBufferResidue;
 	this->keepAliveData.timeout = other.keepAliveData.timeout;
 	this->keepAliveData.max = other.keepAliveData.max;
 	this->keepAliveData.is_keepAlive = other.keepAliveData.is_keepAlive;
@@ -53,19 +53,6 @@ client& client::operator= (const client& other)
 	return *this;	
 }
 
-void client::appendToHeadersBuffer(char *buffer)
-{
-    this->headersBuffer += buffer; 
-}
-
-void client::appendToReadBodyFile(const char *buffer, size_t size)
-{
-	bodyFile.write(buffer, size);
-	std::cout << std::string(buffer, size);
-	// flush std::cout
-	std::cout.flush();
-	// bodyFile << buffer;
-}
 
 
 client::~client() {
