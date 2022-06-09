@@ -196,7 +196,7 @@ class GetHandler : public responseHandler
 		int HandleDir(void);
 		void buildresponse(void);
 		void setGodFather(Locator *_godFather);
-		std::string setAutoindexResponse(void);//needs implemantation
+		std::string setAutoindexResponse(void);
 	private:
 		Locator *godFather;
 };

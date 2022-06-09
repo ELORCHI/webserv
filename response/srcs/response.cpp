@@ -4,6 +4,75 @@
 // if the hanlde method returns 1 the request will be passed to next handler
 // if the handle method returns 0 the request will be handled by the calling object
 
+
+//// check this  if delete method caused a problem
+
+int rmtree(const char path[])
+{
+    size_t path_len;
+    char *full_path;
+    DIR *dir;
+    struct stat stat_path, stat_entry;
+    struct dirent *entry;
+
+    // stat for the path
+    stat(path, &stat_path);
+
+    // if path does not exists or is not dir - exit with status -1
+    if (S_ISDIR(stat_path.st_mode) == 0) {
+        fprintf(stderr, "%s: %s\n", "Is not directory", path);
+        return (2);
+    }
+
+    // if not possible to read the directory for this user
+    if ((dir = opendir(path)) == NULL) {
+        fprintf(stderr, "%s: %s\n", "Can`t open directory", path);
+        return (2);
+    }
+
+    // the length of the path
+    path_len = strlen(path);
+
+    // iteration through entries in the directory
+    while ((entry = readdir(dir)) != NULL) {
+
+        // skip entries "." and ".."
+        if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+            continue;
+
+        // determinate a full path of an entry
+        full_path = (char *)calloc(path_len + strlen(entry->d_name) + 1, sizeof(char));
+        strcpy(full_path, path);
+        strcat(full_path, "/");
+        strcat(full_path, entry->d_name);
+
+        // stat for the entry
+        stat(full_path, &stat_entry);
+
+        // recursively remove a nested directory
+        if (S_ISDIR(stat_entry.st_mode) != 0) {
+            if (rmtree(full_path) == 2)
+				return (2);
+			continue;
+        }
+
+        // remove a file object
+        if (unlink(full_path) == 0)
+            printf("Removed a file: %s\n", full_path);
+        else
+            return (2);
+        free(full_path);
+    }
+    // remove the devastated directory and close the object of it
+    if (rmdir(path) == 0)
+        printf("Removed a directory: %s\n", path);
+    else
+        return (2);
+
+    closedir(dir);
+	return (1);
+}
+
 std::string    formatted_time(void)
 {
     time_t    current;
@@ -700,17 +769,10 @@ int DeleteHandler::handle()
 };
 
 int DeleteHandler::deleter(std::string path)
-{	// add folders to be deleted too
-	// should i check for file permisions if yes return 2;
+{
 	if (godFather->getResourceType() == DIRE)
 	{
-		DIR *folder = opendir(godFather->getResourceFullPath().c_str());
-		struct dirent *next;
-		char *subpaths[256];
-		while ((next = readdir(folder)) != NULL)
-		{
-
-		}	
+		return (rmtree(path.c_str()));	
 	}
 	else if (remove(path.c_str()) == 0)
 		return (0);
@@ -724,10 +786,13 @@ int DeleteHandler::handleFiles(void)
 		godFather->HandleCGI();
 	else
 	{
-		if (deleter(godFather->getResourceFullPath()) == 0) // you maight need to check deleter return 
+		if (deleter(godFather->getResourceFullPath()) == 0)
 			error = NO_CONTENT;
 		else
-			error = INTERNAL_SERVER_ERROR_CODE;
+			error = INTERNAL_SERVER_ERROR_CODE;//check this
+			// not allowed or server error ? 
+			//i guess a server error 
+			//because if the resourse is found within a location, the user might delete it
 	}
 	return (1);
 }
@@ -745,7 +810,6 @@ int DeleteHandler::HandleDir(void)
 	}
 	else
 	{
-		//DELETE ALL DIR FILE
 		if (deleter(godFather->getResourceFullPath()) == 0)
 			error = NO_CONTENT;//IF SUCCES ==> NO_CONTENT
 		else if (error == 2) // this variable may cause a problem if it got changed by deleter method

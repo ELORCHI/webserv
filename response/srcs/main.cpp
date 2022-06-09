@@ -8,8 +8,7 @@
 #include <unistd.h>
 
 
-void
-rmtree(const char path[])
+int rmtree(const char path[])
 {
     size_t path_len;
     char *full_path;
@@ -23,13 +22,13 @@ rmtree(const char path[])
     // if path does not exists or is not dir - exit with status -1
     if (S_ISDIR(stat_path.st_mode) == 0) {
         fprintf(stderr, "%s: %s\n", "Is not directory", path);
-        exit(-1);
+        return (2);
     }
 
     // if not possible to read the directory for this user
     if ((dir = opendir(path)) == NULL) {
         fprintf(stderr, "%s: %s\n", "Can`t open directory", path);
-        exit(-1);
+        return (2);
     }
 
     // the length of the path
@@ -53,27 +52,27 @@ rmtree(const char path[])
 
         // recursively remove a nested directory
         if (S_ISDIR(stat_entry.st_mode) != 0) {
-            rmtree(full_path);
-            continue;
+            if (rmtree(full_path) == 2)
+				return (2);
+			continue;
         }
 
         // remove a file object
         if (unlink(full_path) == 0)
             printf("Removed a file: %s\n", full_path);
         else
-            printf("Can`t remove a file: %s\n", full_path);
+            return (2);
         free(full_path);
     }
-
     // remove the devastated directory and close the object of it
     if (rmdir(path) == 0)
         printf("Removed a directory: %s\n", path);
     else
-        printf("Can`t remove a directory: %s\n", path);
+        return (2);
 
     closedir(dir);
+	return (1);
 }
-
 
 int
 main(const int argc, char const *argv[])
