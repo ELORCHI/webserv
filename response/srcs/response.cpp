@@ -61,6 +61,22 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 	return headers;
 }
 
+std::string getResponseHeaders(int status, int body_size)
+{
+	std::string headers;
+	std::stringstream s;
+	std::string ss;
+	s << body_size;
+	s >> ss;
+	if (status != NO_CONTENT)
+		headers += "content-length: " + std::string(ss) + std::string("\n");
+	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
+	headers += "content-type: " + std::string("text/html") + std::string("\n");
+	headers += "date: " + formatted_time() + std::string("\n");
+	headers += "\r\n";
+	return headers;
+}
+
 client responseHandler::getClient(void)
 {
 	return cl;
@@ -188,19 +204,17 @@ void system_block_response::buildresponse()
 	switch (error)
 	{
 		case HTTP_VERSION_NOT_SUPPORTED_CODE:
-		statusLine = getResponseStatusLine(error, HTTP_VERSION_NOT_SUPPORTED_MSG);
-		// 	response_body = getResponseBody(error, HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG, this);
-			
-		// 	break;
-		// case NOT_IMPLEMENTED_CODE:
-		// 	responseHandler::setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
-		// 	responseHandler::setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
-		// 	responseHandler::setResponseHeaders();// no header just default ones
-		// case INTERNAL_SERVER_ERROR_CODE:
-		// 	responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
-		// 	responseHandler::setResponseHeaders();//no header so just default ones
-		// 	responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
-		// 	break;
+			response_body = getErroBody(error, HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG, cl);
+			statusLine = getResponseStatusLine(error, HTTP_VERSION_NOT_SUPPORTED_MSG);		
+			headers = 	getResponseHeaders(error, response_body.size());
+		case NOT_IMPLEMENTED_CODE:
+			response_body = getErroBody(error, NOT_IMPLEMENTED_RESPONSE_MSG, cl);
+			statusLine = getResponseStatusLine(error, NOT_IMPLEMENTED_MSG);		
+			headers = 	getResponseHeaders(error, response_body.size());
+		case INTERNAL_SERVER_ERROR_CODE:
+			response_body = getErroBody(error, INTERNAL_SERVER_ERROR_RESPONSE_MSG, cl);
+			statusLine = getResponseStatusLine(error, INTERNAL_SERVER_ERROR_MSG);		
+			headers = 	getResponseHeaders(error, response_body.size());
 		default:
 			return;
 	}
