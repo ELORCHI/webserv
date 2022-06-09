@@ -90,7 +90,7 @@ void client::setKeepAliveInfo(std::string _kad)
 	this->keepAliveData.is_keepAlive = true;
 }
 
-void setConnectionType(std::string connectionType)
+void client::setConnectionType(std::string connectionType)
 {
 	this->keepAliveData.is_connection = true;
 	this->keepAliveData.connection_type = connectionType;
