@@ -25,6 +25,8 @@ httpServers::httpServers(int argc, char **argv)
             }
         }
     }
+    if ((this->KqueueFd = kqueue()) == -1)
+        throw MyException("failure at creating the kernel queue");
 
     for (int i = 0; i < parsed_servers_data.size(); i++)
     {
@@ -32,21 +34,28 @@ httpServers::httpServers(int argc, char **argv)
         if (std::find(sharedPorts.begin(), sharedPorts.end(), port) != sharedPorts.end())
         {
             socket_data *sd = shared_sockets[port];
-            _servers.push_back(httpServer(parsed_servers_data[i], true, sd));
+            _servers.push_back(httpServer(parsed_servers_data[i], true, sd, KqueueFd));
             // httpServer::httpServer kk(parsed_servers_data[i], true, sd);
         }
         else
-            _servers.push_back(httpServer(parsed_servers_data[i], false, NULL));
+            _servers.push_back(httpServer(parsed_servers_data[i], false, NULL, KqueueFd));
     }
     //std::vector<int> shared_ports = httpServer::getRepeatedPorts(parsed_servers_data);
     // std::cout << parsed_servers_data.size() << std::endl; 
+
 }
 
 void httpServers::httpServers_repl()
 {
+    int num_events = 0;
     while (1)
     {
         for (int i = 0; i < _servers.size(); i++)
-            _servers[i].run();
-    }
+		{
+            num_events = kevent(KqueueFd, NULL, 0, _eventList, MAX_EVENTS, NULL);
+			// std::cerr << "WEWEWEWEWEWEWEWEWEWEWEWE" << std::endl;
+            _servers[i].run(num_events, _eventList);
+			// std::cerr << "WAWAWAWAWAWAWAWAWAWAWAWA" << std::endl;
+		}
+	}
 }
