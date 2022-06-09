@@ -131,6 +131,7 @@ class workingLocation
 		void			setlocation(request *request);
 		void			setUpload(std::string path);
 		void			setCgi(cgi cgi);
+		workingLocation(const workingLocation &other);
 		std::string		getUpload(void);
 		std::vector<std::vector<std::string> >	getRedirections(void);
 		std::vector<std::vector<std::string> >	getDefaultError(void);
@@ -156,9 +157,10 @@ class Locator : public responseHandler
 		~Locator();
 		int				handle();
 		int				getResourceType(void);
+		int				isredirection(void);
 		bool			gedEnd(void);
 		bool			isMethodAllowd(std::string method);
-		bool				isCgi(std::string path);
+		bool			isCgi(std::string path);
 		bool			getIndex();
 		bool			getAutoIndex();
 		void			buildresponse();
