@@ -394,9 +394,53 @@ void workingLocation::setCgi(cgi Cgi)
 	*cgiLocation = Cgi;
 }
 
+
+
+std::string readBody(std::string path)
+{
+	std::fstream in_file(path);
+	std::string body = "";
+	struct stat sb;
+
+    FILE* input_file = fopen(path.c_str(), "r");
+    if (input_file == nullptr) {
+		return (body);
+    }
+	stat(path.c_str(), &sb);
+    body.resize(sb.st_size);
+    fread(const_cast<char*>(body.data()), sb.st_size, 1, input_file);
+    fclose(input_file);
+
+    return body;
+}
+
+
 int Locator::getResourceType(void)
 {
 	return (resourceType);
+}
+
+std::string getErroBody(int erroCode, std::string definebody, client &cl)
+{
+	if (erroCode < 400)
+		return (definebody);
+	std::vector<std::vector<std::string> > defaultError = cl.getReadyRequest()->get_server()->get_error_pages();
+	int size;
+	std::string errorstring;
+	std::stringstream stream;
+	std::string path = std::string("");
+
+	stream << erroCode;
+	stream >> errorstring;
+	size = defaultError.size();
+	for (int i = 0; i < size; i++)
+	{
+		if (defaultError[i][0] == errorstring)
+			path = defaultError[i][1];
+	}
+	if (path != std::string(""))
+		return (readBody(path));
+	return (path); 
 }
 
 std::string Locator::readBody(std::string path)
