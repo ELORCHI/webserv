@@ -30,7 +30,7 @@ void execute_cgi::set_environement(parse_request request)
     setenv( "SERVER_PORT", GetPortFromHeaders(request).c_str(),1);
     setenv( "REMOTE_ADDR", "0.0.0.0",1);
     setenv( "PATH_INFO", request.get_http_path().c_str(),1);
-    // setenv( "SCRIPT_FILENAME" , get_http_path(),1); //need full path
+    setenv( "SCRIPT_FILENAME" , file_full_path,1); //need full path
     setenv( "QUERY_STRING" , request.get_http_query().c_str(),1);
     setenv( "REQUEST_METHOD" , request.get_http_method().c_str(),1);
     setenv( "REDIRECT_STATUS" , "true",1);
@@ -65,7 +65,7 @@ std::string execute_cgi::gen_random(const int len) {
 
 int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_path, parse_request request)
 {
-    pid_t   pid;
+    pid_t   pid = -1;
     int fd[2] = {-1};
     if (request.get_path_body() != "")
         fd[0] = open(request.get_path_body().c_str(), O_RDONLY);
@@ -78,7 +78,8 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
     if (pid == -1)
     {
         close(fd[1]);
-        remove(_file_full_path.c_str());
+        if (_file_full_path != "")
+            remove(_file_full_path.c_str());
         if (fd[0] > 0)
             close(fd[0]);
         return 500;
@@ -98,6 +99,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
         tmp[1] = (char *)file_full_path.c_str();// file_full_path
         tmp[2] = NULL;
         int ret = execvp(tmp[0], tmp);
+        std::cout << "execve failed: " << strerror(errno) << std::endl;
         remove(_file_full_path.c_str());
         exit(ret);
         //dup to 1 && (dup to 0 if body is here)
@@ -112,7 +114,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
         timeout = 0;
         while (difftime(time(NULL),  t) <= 5)
         {
-            status = waitpid(pid ,&stats, WNOHANG);
+            status = waitpid(pid ,&stats, 0);
             if (status == 0)
                 timeout = 1;
             else
