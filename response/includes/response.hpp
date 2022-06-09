@@ -72,58 +72,6 @@
 #define NO_CONTENT_RESPONSE_MSG std::string("<html><head><title>No Content</title></head><body><h1>Moved Permanently</h1></body></html>")
 #define CREATED_RESPONSE_MSG std::string("<html><head><title>Created</title></head><body><h1>CREATED</h1></body></html>")
 
-// building response steps
-// 1. check the system and the request
-	//1.1 if the system is not available, return 503
-	//1.2 is the method implemented?, return 501
-	//1.3 is sytem_block_ok?, return 500 enternal server error
-	//1.4 is http version supported?, return 505
-// 2. check the request
-	//2.1 is method allowed?, return 405. doing this by checking the request method
-	//2.2 is forbidden?, return. doing this by checking if the client is allowed to access the resource
-	//2.3 is request_block_ok?, return 400 bad request. doing this by checking the request's syntax
-
-// 3. check if the request should be redirected
-	//doing this if the target resource is found but its a directory, return 302
-	//there still more cases to be added
-	//but a redirection i guess is done only after locating the resource
-	// no redirection for post and delete methods
-
-// does resquest needs cgi?
-	// if the request needs a cgi to be executed then the cgi will be responsblie only for the response body
-	// method body without cgi will be only readu
-	// 4. is method get?
-		//4.1 is the resource found?, return 404
-		//4.2 is the resource a directory without slaches?, return 302
-		//4.3 is the resource a directory with slaches looking for indexes ?, return 302
-			//4.3.1 if no index is found look for autoindex
-				// if autoindex is found, return 200 with a list of files in the directory
-				// if no autoindex is found, return 404
-		//4.4 is the resource a file?, return 200
-	// 5. is method delete? // when this method is allowed ? the user cannot delete anything he wants? that would be a mess
-		// if successful
-			// return 204 accepted if th action is to be queued
-			// return 204 No content if the action if the action executed but the response does not include an entity.
-			// return 200 if the response includes an entity describing the status.
-		// if not successfull
-			// the rousource file is not found return 404
-			//	Forbidden. The requester does not have permission to access the specified resource.
-	// 6. is method post?
-
-
-// if the response is chuncked. do not add a content length header
-// chunked or transfer encoding ====NEED TO READ MORE ABOUT IT====
-	// if the response is chunked, the response body is sent in chunks.
-	// if the response is not chunked, the response body is sent in a single chunk.
-	// the chunked encoding is used when the response body is too large to be sent in a single chunk and the client is capable of receiving the response body in multiple chunks.
-	// or the client specified the transfer encoding in the request.
-	// send method will handle the chunked encoding and the transfer encoding
-
-
-
-
-// if the hanlde method returns 1 the request will be passed to next hanle
-// if the handle method returns 0 the request will be handled by the calling object
 
 class response
 {
@@ -320,23 +268,12 @@ bool isError(int status)
 }
 
 
-std::string getDefaultError(int status, Locator *info)
-{
-	std::string body = "";
-	std::string path;
-	if (status >= 400)
-	{
-		path = info->getWorkingLocation()->getDefaultError(status);
-		body = info->readBody(path);
-	}
-	return (body);
-}
-
 
 //thsi will handle get post delete and locating problem
 // this will use a function to get default error pages
 // this function cant handle system_response object
 // system_response_object will need only get default error pages function
+std::string getDefaultError(int status, Locator *info);
 std::string getResponseBody(int status, std::string bodyMsg, Locator *info);
 std::string    formatted_time(void);
 std::string getResponseHeaders(int status, Locator *info, int body_size);

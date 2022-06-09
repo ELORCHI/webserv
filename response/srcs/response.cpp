@@ -26,6 +26,19 @@ std::string getResponseBody(int status, std::string bodyMsg, Locator *info)
 		return (bodyMsg);
 }
 
+std::string getDefaultError(int status, Locator *info)
+{
+	std::string body = "";
+	std::string path;
+	if (status >= 400)
+	{
+		path = info->getWorkingLocation()->getDefaultError(status);
+		body = info->readBody(path);
+	}
+	return (body);
+}
+
+
 std::string getResponseHeaders(int status, Locator *info, int body_size)
 {
 	std::string headers;
@@ -44,6 +57,7 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
 	if (it != headersmap.end())
 		headers += "connection " + headersmap["connection"] + std::string("\n");
+	headers += "\r\n";
 	return headers;
 }
 
@@ -173,8 +187,8 @@ void system_block_response::buildresponse()
 {
 	switch (error)
 	{
-		// case HTTP_VERSION_NOT_SUPPORTED_CODE:
-		// 	statusLine = getResponseStatusLine(error, HTTP_VERSION_NOT_SUPPORTED_MSG);
+		case HTTP_VERSION_NOT_SUPPORTED_CODE:
+		statusLine = getResponseStatusLine(error, HTTP_VERSION_NOT_SUPPORTED_MSG);
 		// 	response_body = getResponseBody(error, HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG, this);
 			
 		// 	break;
@@ -437,13 +451,13 @@ void Locator::buildresponse()
 	switch (error)
 	{
 	case RESPONSE_BAD_REQUEST:
-		responseHandler::setResposeStatusLine(RESPONSE_BAD_REQUEST, BAD_REQUEST_MSG);
-		responseHandler::setResponseBody(BAD_GATEWAY_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//no header so just default ones
+		response_body = getResponseBody(RESPONSE_BAD_REQUEST, BAD_REQUEST_RESPONSE_MSG, this);
+		statusLine = getResponseStatusLine(RESPONSE_BAD_REQUEST, BAD_REQUEST_MSG);
+		headers = getResponseHeaders(RESPONSE_BAD_REQUEST, this, response_body.size());
 	case NOT_ALLOWED_CODE:
-		responseHandler::setResposeStatusLine(NOT_ALLOWED_CODE, NOT_ALLOWED_MSG);
-		responseHandler::setResponseBody(NOT_ALLOWED_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//no header so just default ones
+		response_body = getResponseBody(NOT_ALLOWED_CODE, NOT_ALLOWED_RESPONSE_MSG, this);
+		statusLine = getResponseStatusLine(NOT_ALLOWED_CODE, NOT_ALLOWED_MSG);
+		headers = getResponseHeaders(NOT_ALLOWED_CODE, this, response_body.size());
 	default:
 		break;
 	}
@@ -576,25 +590,25 @@ void GetHandler::buildresponse()
 	switch (error)
 	{
 	case AUTOINDEX_CODE:
-		this->setResponseBody(setAutoindexResponse());//NOT IMPLEMENTED
-		responseHandler::setResposeStatusLine(AUTOINDEX_CODE, OK_MSG);
-		responseHandler::setResponseHeaders();//
+		response_body = getResponseBody(200, setAutoindexResponse(), godFather);
+		statusLine = getResponseStatusLine(AUTOINDEX_CODE, OK_MSG);
+		headers = getResponseHeaders(200, godFather, response_body.size());
 	case MOVED_PERMANENTLY:
-		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
-		setResponseBody(MOVED_PERMANENTLY_RESPONSE_MSG);
-		this->setResponseHeaders();// set location header feild
+		response_body = getResponseBody(MOVED_PERMANENTLY, MOVED_PERMANENTLY_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
+		headers = getResponseHeaders(MOVED_PERMANENTLY, godFather, response_body.size());
 	case 200:
 		response_body = getResponseBody(200, godFather->readBody(godFather->getResourceFullPath()), godFather);
 		statusLine = getResponseStatusLine(200, OK_MSG);
 		headers = getResponseHeaders(200, godFather, response_body.size());
 	case FORBIDDEN_CODE:
-		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
-		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//
+		response_body = getResponseBody(FORBIDDEN_CODE, FORBIDDEN_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
+		headers = getResponseHeaders(FORBIDDEN_CODE, godFather, response_body.size());
 	case NOT_FOUND_CODE:
-		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
-		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//
+		response_body = getResponseBody(NOT_FOUND_CODE, NOT_FOUND_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(NOT_FOUND_CODE, FORBIDDEN_MSG);
+		headers = getResponseHeaders(NOT_FOUND_CODE, godFather, response_body.size());
 	default:
 
 		break;
@@ -681,24 +695,24 @@ void DeleteHandler::buildresponse(void)
 	switch (error)
 	{
 	case NO_CONTENT:
-		responseHandler::setResposeStatusLine(NO_CONTENT, NO_CONTENT_MSG);
-		this->setResponseHeaders();// no content-length //notimplenented
+		statusLine = getResponseStatusLine(NO_CONTENT, NO_CONTENT_MSG);
+		headers = getResponseHeaders(NO_CONTENT, godFather, 0);
 	case FORBIDDEN_CODE:
-		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
-		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//
+		response_body = getResponseBody(FORBIDDEN_CODE, FORBIDDEN_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
+		headers = getResponseHeaders(FORBIDDEN_CODE, godFather, response_body.size());
 	case INTERNAL_SERVER_ERROR_CODE:
-		responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
-		this->setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//no header so just default ones
+		response_body = getResponseBody(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+		headers = getResponseHeaders(INTERNAL_SERVER_ERROR_CODE, godFather, response_body.size());
 	case CONFLICT:
-		responseHandler::setResposeStatusLine(CONFLICT, CONFLICT_MSG);
-		this->setResponseBody(CONFLICT_RESPONSE_MSG);// describe why// not implementedd
-		responseHandler::setResponseHeaders();
+		response_body = getResponseBody(CONFLICT, CONFLICT_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(CONFLICT, CONFLICT_MSG);
+		headers = getResponseHeaders(CONFLICT, godFather, response_body.size());
 	case NOT_FOUND_CODE:
-		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
-		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//
+		response_body = getResponseBody(NOT_FOUND_CODE, NOT_FOUND_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(NOT_FOUND_CODE, FORBIDDEN_MSG);
+		headers = getResponseHeaders(NOT_FOUND_CODE, godFather, response_body.size());
 	default:
 		break;
 	}
@@ -788,25 +802,25 @@ void PostHandler::buildresponse()
 	switch (error)
 	{
 	case CREATED_CODE:
-		responseHandler::setResposeStatusLine(CREATED_CODE, CREATED_MSG);
-		responseHandler::setResponseBody(CREATED_RESPONSE_MSG);
-		this->setResponseHeaders();//add new file location
+		response_body = getResponseBody(CREATED_CODE, CREATED_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(CREATED_CODE, CREATED_MSG);
+		headers = getResponseHeaders(CREATED_CODE, godFather, response_body.size());
 	case NOT_FOUND_CODE:
-		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
-		responseHandler::setResponseBody(NOT_FOUND_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//
+		response_body = getResponseBody(NOT_FOUND_CODE, NOT_FOUND_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(NOT_FOUND_CODE, FORBIDDEN_MSG);
+		headers = getResponseHeaders(NOT_FOUND_CODE, godFather, response_body.size());
 	case FORBIDDEN_CODE:
-		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
-		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//
+		response_body = getResponseBody(FORBIDDEN_CODE, FORBIDDEN_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
+		headers = getResponseHeaders(FORBIDDEN_CODE, godFather, response_body.size());
 	case MOVED_PERMANENTLY:
-		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
-		setResponseBody(MOVED_PERMANENTLY_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();// set location header feild
+		response_body = getResponseBody(MOVED_PERMANENTLY, MOVED_PERMANENTLY_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
+		headers = getResponseHeaders(MOVED_PERMANENTLY, godFather, response_body.size());
 	case INTERNAL_SERVER_ERROR_CODE:
-		responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
-		responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
-		responseHandler::setResponseHeaders();//no header so just default ones
+		response_body = getResponseBody(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_RESPONSE_MSG, godFather);
+		statusLine = getResponseStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+		headers = getResponseHeaders(INTERNAL_SERVER_ERROR_CODE, godFather, response_body.size());
 	default:
 		break;
 	}
@@ -856,4 +870,5 @@ responseHandler *getResponse(client  &cl)
 	}
 	return (0);
 }
+
 
