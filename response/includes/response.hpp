@@ -281,3 +281,5 @@ std::string    formatted_time(void);
 std::string getResponseHeaders(int status, Locator *info, int body_size);
 std::string readBody(std::string path);
 std::string getErroBody(int erroCode, std::string definebody, client &cl);
+responseHandler *getResponse(client  &cl);
+

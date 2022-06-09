@@ -147,6 +147,7 @@ std::string getResponseHeaders(int status, int body_size)
 	s >> ss;
 	if (status != NO_CONTENT)
 		headers += "content-length: " + std::string(ss) + std::string("\n");
+	headers += "connection: close\n";
 	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
 	headers += "content-type: " + std::string("text/html") + std::string("\n");
 	headers += "date: " + formatted_time() + std::string("\n");
@@ -593,7 +594,8 @@ int Locator::isredirection()
 	int size = redirections.size();
 	for (int i = 0; i < size; i++)
 	{
-		if (redirections[i][0] == cl.getReadyRequest()->get_request_parsing_data().get_http_path())
+		std::vector<std::string> it = redirections[i];
+		if (it[0] == cl.getReadyRequest()->get_request_parsing_data().get_http_path())
 			return (i);
 	}
 	return (-1);
@@ -606,7 +608,7 @@ int Locator::handle()
 		error = NOT_ALLOWED_CODE;
 	else if (cl.getReadyRequest()->get_request_parsing_data().get_code_status() == 400)
 		error = RESPONSE_BAD_REQUEST;
-	else if (isredirection())
+	else if (isredirection() != -1)
 		error = MOVED_PERMANENTLY;
 		return (0);
 	if (error != 0)
