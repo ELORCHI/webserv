@@ -34,7 +34,7 @@ class client {
      public:
         client(int fd, struct sockaddr_in addr);
         ~client();
-
+        client& operator= (const client& other);
         sockaddr_in getClientAddr()
         {
             return clientAddr;
