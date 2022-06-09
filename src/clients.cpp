@@ -35,6 +35,23 @@ client::client(int fd, struct sockaddr_in addr)
 	//bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
 }
 
+client& client::operator= (const client& other)
+{
+	clientFd = other.clientFd;
+	clientAddr = other.clientAddr;
+	is_done_reading_from = other.is_done_reading_from;
+	read_buffer = other.read_buffer;
+	ready_request = other.ready_request;
+	isHeadersBufferResidue = other.isHeadersBufferResidue;
+	this->keepAliveData.timeout = other.keepAliveData.timeout;
+	this->keepAliveData.max = other.keepAliveData.max;
+	this->keepAliveData.is_keepAlive = other.keepAliveData.is_keepAlive;
+	this->keepAliveData.is_connection = other.keepAliveData.is_connection;
+	this->keepAliveData.connection_type = other.keepAliveData.connection_type;
+	//bodyFileName = other.bodyFileName;
+	//bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
+	return *this;	
+}
 
 void client::appendToHeadersBuffer(char *buffer)
 {

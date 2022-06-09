@@ -23,6 +23,7 @@ class client {
 	std::fstream bodyFile;
 	request* ready_request;
     parse_request pr;
+    client& operator= (const client& other);
     typedef struct {
         int timeout;
         int max;
