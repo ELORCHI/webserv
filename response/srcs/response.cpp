@@ -702,7 +702,17 @@ int DeleteHandler::handle()
 int DeleteHandler::deleter(std::string path)
 {	// add folders to be deleted too
 	// should i check for file permisions if yes return 2;
-	if (remove(path.c_str()) == 0)
+	if (godFather->getResourceType() == DIRE)
+	{
+		DIR *folder = opendir(godFather->getResourceFullPath().c_str());
+		struct dirent *next;
+		char *subpaths[256];
+		while ((next = readdir(folder)) != NULL)
+		{
+
+		}	
+	}
+	else if (remove(path.c_str()) == 0)
 		return (0);
 	else
 		return (1);
