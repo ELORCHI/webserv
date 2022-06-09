@@ -129,13 +129,6 @@ std::string Locator::getContentType(void)
 }
 
 
-void responseHandler::setResponseBody(std::string body)
-{
-	//thre cases read from yassine cgi
-	// check default files if errors
-	// read from a file
-}
-
 void responseHandler::setClient(client &_cl)
 {
 	cl = _cl;

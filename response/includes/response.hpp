@@ -141,10 +141,6 @@ class responseHandler : public response// abstract class
 		virtual ~responseHandler();
 		virtual int handle();
 		virtual void buildresponse() = 0;
-		virtual void setResposeStatusLine(int status, std::string status_line);// need implementation
-		virtual void setResponseHeaders(void);// need implementation set up general headers subclasses which need more header
-		// could implement their own and they might call the parent method and then append an other headers to the response buffer
-		virtual void setResponseBody(std::string body);// need implementation
 		void setClient(client &_cl);
 		int send(void);
 		client getClient(void);
@@ -291,18 +287,22 @@ class PostHandler : public responseHandler
 
 response *geResponse(client &cl);
 
-// std::string workingLocation::getDefaultError(int erroCode)
-// {
-// 	std::vector<std::vector<std::string> > tmp;
-// 	std::string page;
+std::string workingLocation::getDefaultError(int erroCode)
+{
+	int size;
+	std::string errorstring;
+	std::stringstream stream;
 
-// 	tmp = defaultError;
-// 	for (int i = 0; i < defaultError.size(); i++)
-// 	{
-// 		defaultError[i][0]
-// 	}
-// 	//if exist read from path and fill body
-// }
+	stream << erroCode;
+	stream >> errorstring;
+	size = defaultError.size();
+	for (int i = 0; i < size; i++)
+	{
+		if (defaultError[i][0] == errorstring)
+			return (defaultError[i][1]);
+	}
+	return ("");
+}
 
 std::string getResponseStatusLine(int status, std::string status_line)
 {
@@ -322,12 +322,13 @@ bool isError(int status)
 
 std::string getDefaultError(int status, Locator *info)
 {
-	std::string body = "errro";
-
-	// if (status >= 400)
-	// {
-	// 	info->getWorkingLocation()->
-	// }
+	std::string body = "";
+	std::string path;
+	if (status >= 400)
+	{
+		path = info->getWorkingLocation()->getDefaultError(status);
+		body = info->readBody(path);
+	}
 	return (body);
 }
 
