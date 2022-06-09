@@ -120,7 +120,15 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
 	headers += "content-type: " + info->getContentType() + std::string("\n");
 	headers += "date: " + formatted_time() + std::string("\n");
-	if (status == MOVED_PERMANENTLY || CREATED_CODE)
+	if (status == MOVED_PERMANENTLY)
+	{
+		int i = info->isredirection();
+		if (i != -1)
+			headers += "location: " + info->getWorkingLocation()->getRedirections()[i][1] + std::string("\n");
+		else
+			headers += "location: " + info->getResourceFullPath() + std::string("\n");
+	}
+	else if (status == CREATED_CODE)
 		headers += "location: " + info->getResourceFullPath() + std::string("\n");
 	std::map<std::string, std::string> headersmap =  info->getClient().getReadyRequest()->get_request_parsing_data().get_http_headers();
 	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
@@ -579,6 +587,18 @@ std::string Locator::readBody(std::string path)
     return body;
 }
 
+int Locator::isredirection()
+{
+	std::vector<std::vector<std::string> > redirections = getWorkingLocation()->getRedirections();
+	int size = redirections.size();
+	for (int i = 0; i < size; i++)
+	{
+		if (redirections[i][0] == cl.getReadyRequest()->get_request_parsing_data().get_http_path())
+			return (i);
+	}
+	return (-1);
+}
+
 int Locator::handle()
 {
 	error = 0;
@@ -586,7 +606,8 @@ int Locator::handle()
 		error = NOT_ALLOWED_CODE;
 	else if (cl.getReadyRequest()->get_request_parsing_data().get_code_status() == 400)
 		error = RESPONSE_BAD_REQUEST;
-	else
+	else if (isredirection())
+		error = MOVED_PERMANENTLY;
 		return (0);
 	if (error != 0)
 		buildresponse();
@@ -620,6 +641,10 @@ void Locator::buildresponse()
 		response_body = getResponseBody(NOT_ALLOWED_CODE, NOT_ALLOWED_RESPONSE_MSG, this);
 		statusLine = getResponseStatusLine(NOT_ALLOWED_CODE, NOT_ALLOWED_MSG);
 		headers = getResponseHeaders(NOT_ALLOWED_CODE, this, response_body.size());
+	case MOVED_PERMANENTLY:
+		response_body = getResponseBody(MOVED_PERMANENTLY, MOVED_PERMANENTLY_RESPONSE_MSG, this);
+		statusLine = getResponseStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
+		headers = getResponseHeaders(MOVED_PERMANENTLY, this, response_body.size());
 	default:
 		break;
 	}
@@ -721,7 +746,11 @@ int GetHandler::HandleDir(void)
 	std::string newpath;
 
 	if (!godFather->gedEnd())
+	{
+		newpath = godFather->getResourceFullPath() + "/";
+		godFather->setResourceFullPath(newpath);
 		error = MOVED_PERMANENTLY;
+	}
 	else if (!godFather->getIndex())
 	{
 		if (godFather->getAutoIndex())
@@ -960,7 +989,12 @@ int PostHandler::HandleDir(void)
 			error = FORBIDDEN_CODE;
 	}
 	else
+	{
+		//append slach
+		newpath = godFather->getResourceFullPath() + "/";
+		godFather->setResourceFullPath(newpath);
 		error = MOVED_PERMANENTLY;
+	}
 	return (1);
 }
 
