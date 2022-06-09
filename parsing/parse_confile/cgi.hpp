@@ -28,12 +28,13 @@ public:
     cgi();
     ~cgi();
 
-    std::string                 &get_cgi_path();
-    std::string                 &get_cgi_methods(int i);
-    std::string                 &get_cgi_name();
-    void                        set_cgi_path(std::string &cgi_path);
-    void                        set_cgi_methods(std::string &methods);
-    void                        set_cgi_name(std::string &name);
+    std::string                 get_cgi_path() const;
+    std::string                 get_cgi_methods(int i) const;
+    std::string                 get_cgi_name() const;
+    std::vector<std::string>    get_cgi_methods() const;
+    void                        set_cgi_path(std::string cgi_path);
+    void                        set_cgi_methods(std::string methods);
+    void                        set_cgi_name(std::string name);
     unsigned int                get_cgi_methods_size();
     bool                        not_predefined(std::string &word) const;
     cgi                         &operator=(cgi const & rhs);

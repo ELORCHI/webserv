@@ -1,8 +1,6 @@
 {
     "files.associations": {
-        "iosfwd": "cpp",
         "__bit_reference": "cpp",
-        "__bits": "cpp",
         "__config": "cpp",
         "__debug": "cpp",
         "__errc": "cpp",
@@ -24,7 +22,6 @@
         "bitset": "cpp",
         "cctype": "cpp",
         "chrono": "cpp",
-        "clocale": "cpp",
         "cmath": "cpp",
         "complex": "cpp",
         "cstdarg": "cpp",
@@ -43,6 +40,7 @@
         "initializer_list": "cpp",
         "iomanip": "cpp",
         "ios": "cpp",
+        "iosfwd": "cpp",
         "iostream": "cpp",
         "istream": "cpp",
         "iterator": "cpp",
@@ -54,7 +52,9 @@
         "new": "cpp",
         "optional": "cpp",
         "ostream": "cpp",
+        "queue": "cpp",
         "ratio": "cpp",
+        "set": "cpp",
         "sstream": "cpp",
         "stack": "cpp",
         "stdexcept": "cpp",
@@ -66,11 +66,8 @@
         "type_traits": "cpp",
         "typeinfo": "cpp",
         "unordered_map": "cpp",
+        "unordered_set": "cpp",
         "utility": "cpp",
         "vector": "cpp"
-    },
-    "C_Cpp.errorSquiggles": "Disabled",
-    "C_Cpp.dimInactiveRegions": false,
-    "editor.detectIndentation": false,
-    "editor.insertSpaces": false
+    }
 }

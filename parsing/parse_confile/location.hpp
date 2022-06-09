@@ -27,36 +27,43 @@ protected:
     std::string                 _root;
     long long int                 _client_max_body_size;
     std::vector<std::string>    _index;
-    // std::vector<cgi>            _cgi;
     bool                        _autoindex;
 public:
     location();
     ~location();
 
-    std::string                 &get_locations_path();
-    std::vector<std::string>    &get_methods();
-    std::string                 &get_root();
-    bool                        &get_autoindex();
-    // std::vector<cgi>            &get_cgi();
-    long long int                 &get_client_max_body_size();
+    std::string                 get_locations_path() const;
+    std::vector<std::string>    get_methods() const;
+    std::string                 get_root() const;
+    void                         set_client_max_body_size(int max_body_size)
+    {
+        this->_client_max_body_size = max_body_size;
+    }
+    void                        set_index(std::vector<std::string> indexs)
+    {
+        this->_index = indexs;
+    }
+    void                        set_allowed_methods(std::vector<std::string> all)
+    {
+        this->_allow_methods = all;
+    }
+    bool                        get_autoindex() const;
+    long long int               get_client_max_body_size() const;
     std::string                 get_index(unsigned int i) const;
     unsigned int                get_index_size() const;
     std::string                 get_methods(unsigned int i) const;
+    std::vector<std::string>    get_index() const;
     unsigned int                get_methods_size() const;
-    void                        set_locations_path(std::string &locations_path);
-    void                        set_methods(std::string &methods);
-    void                        set_root(std::string &root);
+    void                        set_locations_path(std::string locations_path);
+    void                        set_methods(std::string methods);
+    void                        set_root(std::string root);
     void                        set_autoindex(bool autoindex);
-    void                        set_client_max_body_size(std::string &client_max_body_size);
-    void                        set_index(std::string &index);
-    // void                         set_cgi(cgi cgi);
-    // unsigned int                 get_cgi_size() const;
-    // cgi                          get_cgi(int i) const;
+    void                        set_client_max_body_size(std::string client_max_body_size);
+    void                        set_index(std::string index);
     unsigned int                 fill_allowed_methods(std::vector<std::string>, unsigned int);
     unsigned int                 fill_index(std::vector<std::string>, unsigned int);
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
-    // unsigned int                 fill_cgi(std::vector<std::string>, unsigned int, bool&);
-    bool                         is_number(const std::string& str);
+    bool                         is_number(const std::string &str);
     bool                         not_predefined(std::string &) const;
     location                    &operator=(location const & rhs);
 };

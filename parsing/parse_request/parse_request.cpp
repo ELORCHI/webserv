@@ -5,12 +5,12 @@ parse_request::parse_request():
     _http_method(),
     _http_path(),
     _http_headers(),
-    _http_body(),
 	_headers_part(),
 	_body_part(),
 	_port_request(0),
 	_extention(),
-	_code_status(0)
+	_code_status(0),
+	_path_body("")
 {
 }
 
@@ -120,7 +120,7 @@ void	parse_request::set_chunked_http_body(std::string &filename)
 						fout << line.substr(0, size);
 						size = 0;
 					}
-					else if (line.length() =< size)
+					else if (line.length() <= size)
 					{
 						fout << line;
 						size -= line.length();
@@ -182,13 +182,13 @@ void	parse_request::set_unchunked_http_body(std::string &filename)
 		if (fin.eof())
 			break ;
 		line += "\n";
-		eraseAllSubStr(lines, "\r\n");
+		eraseAllSubStr(line, "\r\n");
 		if (line.length() > content_length)
 		{
 			std::cout << "Error: bad request" << std::endl;
 			_code_status = 400;
 		}
-		else if (line.length() =< content_length)
+		else if (line.length() <= content_length)
 		{
 			fout << line;
 			content_length -= line.length();
@@ -278,7 +278,10 @@ std::string    parse_request::set_http_vmp(std::string line)
 				_http_path["query"].assign(token, found + 1, (token.size() - found));
 			}
 			else
+			{
 				_http_path["path"] = token;
+				_http_path["query"] = "";
+			}
         }
         else if (i == 2)
 			set_http_version(token);
