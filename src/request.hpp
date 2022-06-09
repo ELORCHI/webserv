@@ -32,7 +32,9 @@ class request {
     public:
         int get_port();
         static int get_content_length(std::string astring);
-        static bool is_request_complete(std::string buffer);
-        static bool is_chunked_request_complete(std::string buffer);
+        static bool is_chunked_request_complete(std::fstream &body);
 		static bool is_requestHeaderComplete(std::string buffer);
+        static bool is_request_complete(std::string headers, std::fstream &body);
+        static bool is_request_complete_(std::string headers, long long size, char *buffer);
+		static std::string get_header_value(std::string headers, std::string header_name);
 };

@@ -6,6 +6,31 @@
 #include <utility>
 
 
+void send_file_to_socket(int fd, char *path)
+{
+	std::ifstream file(path, std::ios::binary);
+	if (!file.is_open())
+		return;
+	char buffer[4096];
+	while (!file.eof())
+	{
+		file.read(buffer, 4096);
+		int size = file.gcount();
+		send(fd, buffer, size, 0);
+	}
+	file.close();
+}
+
+size_t file_size(std::string path)
+{
+	std::ifstream file(path, std::ios::binary);
+	if (!file.is_open())
+		return 0;
+	file.seekg(0, std::ios::end);
+	size_t size = file.tellg();
+	file.close();
+	return size;
+}
 
 bool httpServer::doesHttpRequestBelongs(request *rq)
 {
@@ -115,12 +140,12 @@ int	httpServer::parsing_conf(int ac, char **av,parse_config *conf)
 //     listeningServAddr.sin_addr.s_addr = htonl(INADDR_ANY); //accept all connections aka set address to 0.0.0.0
 // }
 
-httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd)
+httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd, int KqueueFd)
 {
     listenServerFd = INVALID_SOCKET;
     listenServerPort = server_parsed_data.get_listen_port(); 
     canRun = false;
-    serverKqFd = -1;
+    this->serverKqFd = KqueueFd;
     canRun = false;
     // listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
     this->server_parsed_data = server_parsed_data;
@@ -128,13 +153,14 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     try {
         if (!is_shared_port) 
             sd = create_listening_socket(listenServerPort, server_parsed_data.get_listen_host());
-        if ((serverKqFd = kqueue()) == -1)
-            throw MyException("failure at creating the kernel queue");
+        // if ((serverKqFd = kqueue()) == -1)
+        //     throw MyException("failure at creating the kernel queue");
     }
     catch (std::exception &e)
     {
         // std::cerr << e.what() << std::endl÷;
         std::cerr << e.what() << std::endl;
+        exit(420);
     }
     listenServerFd = (*sd).listenServerFd;
     listeningServAddr = (*sd).listeningServAddr;
@@ -145,48 +171,11 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     struct kevent _kEvent;
     EV_SET(&_kEvent, listenServerFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
     kevent(serverKqFd, &_kEvent, 1, NULL, 0, NULL);
+    // std::cout << "daaaah" << std::endl;
     canRun = true;
 	run_once = 0;
     //return true;
 }
-
-// bool httpServer::start() {
-//     canRun = false;
-//     listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
-//     socket_data sd;
-//     try {
-//         if (listenServerFd == INVALID_SOCKET)
-//             throw MyException("failed at creating the server socket!");
-//         int bind_r = bind(listenServerFd, (struct sockaddr*)&listeningServAddr, sizeof(listeningServAddr));
-//         if (bind_r != 0)
-//         {
-//             throw MyException("binding address to socket failed!");
-//         }
-//         if (listen(listenServerFd, 100) != 0) {
-//             throw MyException("failed to put socket in listening state!");
-//         }
-//         sd = create_listening_socket(listenServerPort);
-//         if ((serverKqFd = kqueue()) == -1)
-//             throw MyException("failure at creating the kernel queue");
-        
-//     }
-//     catch (std::exception &e)
-//     {
-//         std::cerr << e.what() << std::endl;
-//         return false;
-//     }
-//     listenServerFd = sd.listenServerFd;
-//     listeningServAddr = sd.listeningServAddr;
-//     //set server listening socket as non blockin
-//     fcntl(listenServerFd, F_SETFL, O_NONBLOCK);
-
-//     //add event read event to kqueue
-//     struct kevent _kEvent;
-//     EV_SET(&_kEvent, listenServerFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
-//     kevent(serverKqFd, &_kEvent, 1, NULL, 0, NULL);
-//     canRun = true;
-//     return true;
-// }
 
 
 void httpServer::stop()
@@ -225,7 +214,7 @@ void httpServer::acceptConnection()
     struct kevent kEv;
     EV_SET(&kEv, clFd, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
     kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-    EV_SET(&kEv, clFd, EVFILT_WRITE, EV_ADD, 0, 0, NULL);
+    EV_SET(&kEv, clFd, EVFILT_WRITE, EV_ADD | EV_DISABLE, 0, 0, NULL);
     kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
     clientmap[clFd] = c;
     //test block
@@ -253,75 +242,56 @@ void httpServer::disconnectClient(client *c, bool is_delete)
 // set the headers buffer then store the rest of the body in a file 
 void httpServer::read_from_client(client *c, long data_length)
 {
-    if (!c || c->is_reading_complete() == true)
-        return ; 
-    char *c_buffer = new char[data_length];
-    int bytesRead = recv(c->getClientFd(), c_buffer, data_length, 0);
-    if (bytesRead <= 0)
-        disconnectClient(c, true);
-    else
-    {
-		if (!request::is_requestHeaderComplete(c->getHeadersBuffer()))
-		{
-    		c->appendToHeadersBuffer(c_buffer);
-			//std::cout << c->getHeadersBuffer() << std::endl;
-		}
-		if (request::is_requestHeaderComplete(c->getHeadersBuffer()))
-		{
-			std::string s = c->getHeadersBuffer();
-			if (!run_once && s.substr(s.find("\r\n\r\n")+4).size())
-			{
-				// if (s.find("\r\n") != std::string::npos)
-				std::cout << c->getHeadersBuffer() << std::endl;
-				std::string ss = s.substr(s.find("\r\n\r\n") + 4); 
-				c->appendToReadBodyFile(ss.c_str());
-				// std::cout << "foo: " << ss << std::endl;
+    
+	// static long long size = 0;
+    // if (!c || request::is_request_complete(c->getHeadersBuffer(), c->getBodyFile()))
+	// {
+	// 	printf("wesh the pointer is: %p\n", c);
+	// 	c->set_reading_status(true);
+	// 	//disconnectClient(c, true);
+    //     return ; 
+	// }
 
-				// std::string st =  s.substr(s.find(" 3") + 2);
-				// for (int i = 0; i < s.size(); i++)
-					// std::cout << (int)s[i] << std::endl;
-///				std::cout << "Made it\n";
-				run_once = 1;
-			}
-			else
-			{
-				// std::cout << c_buffer << std::endl;
-				c->appendToReadBodyFile(c_buffer);
-			}
-			// std::cout << "omega: " << c_buffer << std::endl;
-		}
-		// c->appendToReadTmpFile(c_buffer);
+    char *c_buffer = new char[data_length];
+	// std::cerr << "DBG_00" << std::endl;
+    int bytesRead = recv(c->getClientFd(), c_buffer, data_length, 0);
+    // std::cout << c_buffer << std::endl;
+    
+
+	if (bytesRead <= 0)
+	{
+       disconnectClient(c, true);
+	}
+	else
+    {
+
+        int k = c->get_pr().start_parsing(c_buffer, bytesRead);
+        if (k)
+            c->set_reading_status(true);
+        std::cout << k << std::endl;
     }
-	std::fstream &body = c->getBodyFile();
-	//count the number of characters in body
-	body.seekg(0, std::ios::end);
-	int body_length = body.tellg();
-	body.seekg(0, std::ios::beg);
+	
     delete[] c_buffer;
 }
 
-void httpServer::run()
+void httpServer::run(int num_events, struct kevent *_eventList)
 {
-    int num_events = 0;
+    //int num_events = 0;
     client *cl;
     struct kevent kEv;
 
     if (canRun)
     {
         //get all the triggered events
-        num_events = kevent(serverKqFd, NULL, 0, _eventList, MAX_EVENTS, NULL);
         if (num_events <= 0)
 		{
-			// std::cout << "haaaah" << std::endl;
             return ;
 		}
         for (int i = 0; i < num_events; i++)
         {
-			// std::cout << "hoooooo" << std::endl;
             if (_eventList[i].ident == listenServerFd) //a client is waiting to connect
 			{
                 acceptConnection();
-				// std::cout << "fuck" << std::endl;
 			}
             else //a client fd triggered an event
             {
@@ -330,67 +300,78 @@ void httpServer::run()
                     cl = NULL;
 				}
                 else
+				{
                     cl = clientmap[_eventList[i].ident];
+
+				}
                 if (cl == NULL)
-                {
-                    EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-                    kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                    EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
-                    kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                    close(_eventList[i].ident);                    
+                {	
+                    // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+                    // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                    // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+                    // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                    // close(_eventList[i].ident);
+					// std::cout << "cl is null" << std::endl;              
                     continue ;
                 }
 
-                if (_eventList[i].flags & EV_EOF) {
-                    disconnectClient(cl, true);
-                    continue;
-                }
+                // if (_eventList[i].flags & EV_EOF) {
+				// 	// std::cout << "yo am i here" << std::endl;
+                //     disconnectClient(cl, true);
+                //     continue;
+                // }
                 if (_eventList[i].filter == EVFILT_READ)
-                {
-                    //read data from client socket
-                    // std::cout << "smth cooking" << std::endl;
-					// std::cout << "bro" << std::endl;	
-                    read_from_client(cl, _eventList[i].data);
+                { 
+					read_from_client(cl, _eventList[i].data);	
+                    if (cl->is_reading_complete())
+                    {
+                        // std::cout << "req complete" << std::endl;
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_ENABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
 
-						// std::cout << cl->getHeadersBuffer() << std::endl;
-					// disconnectClient(cl, true);
-                    //have kqueue disable tracking read events and enable write events
-                    // if (request::is_requestHeaderComplete(cl->getHeadersBuffer()))
-					// {
-						// if (request)
-						// char buffer[40000];
-						// std::ifstream fs;
-						// fs.open("index.html");
-						// fs.read(buffer,40000);
-						//fs.read()
+                        //keep alive header
+						// disconnectClient(cl, true);	
+                    }
+                        
 
-						// std::string rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 37\r\n\r\n<html><body><h2>yo booooooy</h2></body></html>";
-						// send(cl->getClientFd(), rep.c_str(), 102, 0);
-						// disconnectClient(cl, true);
-					// }
-                    // if (cl->is_reading_complete())
-                    // {
-						//	disconnectClient(cl, true);
-                        //do smth with the data recieved
-                        // request
-                        // request *rq = new request(cl->getReadBuffer(), listenServerPort, &server_parsed_data);
-                        // if (doesHttpRequestBelongs(rq))
-                        //     cl->setRequest(rq);
-                        // else
-                        //     delete rq;
-                        // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
-                        // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                        // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_ENABLE, 0, 0, NULL);
-                        // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                    // }
-                }
+	            }
                 else if (_eventList[i].filter == EVFILT_WRITE)
                 {
-					if (request::is_requestHeaderComplete(cl->getHeadersBuffer()))
+                    if (cl->is_reading_complete())
 					{
-						std::string rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 37\r\n\r\n<html><body><h2>yo booooooy wassup</h2></body></html>";
-						send(cl->getClientFd(), rep.c_str(), 102, 0);
-						disconnectClient(cl, true);	
+						std::string rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 37\r\n\r\n<html><body><h2>ok</h2></body></html>";
+						int s = send(cl->getClientFd(), rep.c_str(), rep.length(), 0);
+						// std::cout << "request complete" << std::endl;
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
+                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        cl->set_reading_status(false);
+                        if (cl->get_pr().get_http_headers().count("Keep-Alive") > 0)
+                        {
+                            //get timeout and from keep-alive string
+                            std::string s = cl->get_pr().get_http_headers()["Keep-Alive"];
+                            // std::string con = cl->get_pr().get_http_headers()["Connection"];
+                            cl->setKeepAliveInfo(s);
+                            // cl->setConnectionType(con);
+
+                        }
+                        if (cl->get_pr().get_http_headers().count("Connection") > 0)
+                        {
+                            std::string con = cl->get_pr().get_http_headers()["Connection"];
+                          //  cl->setConnectionType(con);
+                            if (con == "close")
+                            {
+                                disconnectClient(cl, true);
+                            }
+                        }
+                        else
+                        {
+    						disconnectClient(cl, true);
+                        }
+                        
 					}
                     // if (cl->isThereARequestReady() == true)
 					// {
@@ -430,3 +411,7 @@ void httpServer::run()
     }
 }
 
+int httpServer::getServerFd()
+{
+    return (this->listenServerFd);
+}

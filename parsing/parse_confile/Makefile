@@ -13,9 +13,6 @@ $(NAME):
 	@c++ -std=c++98 -Wall -Wextra -Werror $(SRC) -o $(NAME) -fsanitize=address -g 
 	@echo "✅✅✅"
 
-#bonus:
-#	@gcc -Wall -Wextra -Werror $(SRC_BONUS) -o $(NAME_BONUS)
-#	@echo "🎁🎁🎁"
 
 clean:
 	@rm -f $(OBJECT)

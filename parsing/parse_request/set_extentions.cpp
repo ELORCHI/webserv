@@ -4,13 +4,11 @@ void parse_request::set_extention()
 {
     std::vector <std::pair <std::string, std::string> > extentions;
     extentions.push_back(std::make_pair(".*3gpp", "audio/3gpp"));
-    extentions.push_back(std::make_pair(".*jpm", "video/jpm"));
     extentions.push_back(std::make_pair(".*mp3", "audio/mp3"));
     extentions.push_back(std::make_pair(".*rtf", "text/rtf"));
     extentions.push_back(std::make_pair(".*wav", "audio/wave"));
     extentions.push_back(std::make_pair(".*xml", "text/xml"));
     extentions.push_back(std::make_pair(".3g2", "video/3gpp2"));
-    extentions.push_back(std::make_pair(".3gp", "video/3gpp"));
     extentions.push_back(std::make_pair(".3gpp", "video/3gpp"));
     extentions.push_back(std::make_pair(".ac", "application/pkix-attr-cert"));
     extentions.push_back(std::make_pair(".adp", "audio/adpcm"));
@@ -38,7 +36,6 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".cgm", "image/cgm"));
     extentions.push_back(std::make_pair(".class", "application/java-vm"));
     extentions.push_back(std::make_pair(".coffee", "text/coffeescript"));
-    extentions.push_back(std::make_pair(".conf", "text/plain"));
     extentions.push_back(std::make_pair(".cpt", "application/mac-compactpro"));
     extentions.push_back(std::make_pair(".crl", "application/pkix-crl"));
     extentions.push_back(std::make_pair(".css", "text/css"));
@@ -47,7 +44,6 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".davmount", "application/davmount+xml"));
     extentions.push_back(std::make_pair(".dbk", "application/docbook+xml"));
     extentions.push_back(std::make_pair(".deb", "application/octet-stream"));
-    extentions.push_back(std::make_pair(".def", "text/plain"));
     extentions.push_back(std::make_pair(".deploy", "application/octet-stream"));
     extentions.push_back(std::make_pair(".disposition-notification", "message/disposition-notification"));
     extentions.push_back(std::make_pair(".dist", "application/octet-stream"));
@@ -97,16 +93,14 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".hjson", "application/hjson"));
     extentions.push_back(std::make_pair(".hlp", "application/winhlp"));
     extentions.push_back(std::make_pair(".hqx", "application/mac-binhex40"));
-    extentions.push_back(std::make_pair(".htm", "text/html"));
     extentions.push_back(std::make_pair(".html", "text/html"));
+    extentions.push_back(std::make_pair(".htm", "text/html"));
     extentions.push_back(std::make_pair(".ics", "text/calendar"));
     extentions.push_back(std::make_pair(".ief", "image/ief"));
     extentions.push_back(std::make_pair(".ifb", "text/calendar"));
     extentions.push_back(std::make_pair(".iges", "model/iges"));
     extentions.push_back(std::make_pair(".igs", "model/iges"));
     extentions.push_back(std::make_pair(".img", "application/octet-stream"));
-    extentions.push_back(std::make_pair(".in", "text/plain"));
-    extentions.push_back(std::make_pair(".ini", "text/plain"));
     extentions.push_back(std::make_pair(".ink", "application/inkml+xml"));
     extentions.push_back(std::make_pair(".inkml", "application/inkml+xml"));
     extentions.push_back(std::make_pair(".ipfix", "application/ipfix"));
@@ -115,7 +109,6 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".jar", "application/java-archive"));
     extentions.push_back(std::make_pair(".jls", "image/jls"));
     extentions.push_back(std::make_pair(".jp2", "image/jp2"));
-    extentions.push_back(std::make_pair(".jpe", "image/jpeg"));
     extentions.push_back(std::make_pair(".jpeg", "image/jpeg"));
     extentions.push_back(std::make_pair(".jpf", "image/jpx"));
     extentions.push_back(std::make_pair(".jpg", "image/jpeg"));
@@ -133,9 +126,7 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".kar", "audio/midi"));
     extentions.push_back(std::make_pair(".ktx", "image/ktx"));
     extentions.push_back(std::make_pair(".less", "text/less"));
-    extentions.push_back(std::make_pair(".list", "text/plain"));
     extentions.push_back(std::make_pair(".litcoffee", "text/coffeescript"));
-    extentions.push_back(std::make_pair(".log", "text/plain"));
     extentions.push_back(std::make_pair(".lostxml", "application/lost+xml"));
     extentions.push_back(std::make_pair(".lrf", "application/octet-stream"));
     extentions.push_back(std::make_pair(".m1v", "video/mpeg"));
@@ -178,12 +169,10 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".mp4", "video/mp4"));
     extentions.push_back(std::make_pair(".mp4a", "audio/mp4"));
     extentions.push_back(std::make_pair(".mp4s", "application/mp4"));
-    extentions.push_back(std::make_pair(".mp4v", "video/mp4"));
     extentions.push_back(std::make_pair(".mpd", "application/dash+xml"));
     extentions.push_back(std::make_pair(".mpe", "video/mpeg"));
     extentions.push_back(std::make_pair(".mpeg", "video/mpeg"));
     extentions.push_back(std::make_pair(".mpg", "video/mpeg"));
-    extentions.push_back(std::make_pair(".mpg4", "video/mp4"));
     extentions.push_back(std::make_pair(".mpga", "audio/mpeg"));
     extentions.push_back(std::make_pair(".mrc", "application/marc"));
     extentions.push_back(std::make_pair(".mrcx", "application/marcxml+xml"));
@@ -283,7 +272,6 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".t38", "image/t38"));
     extentions.push_back(std::make_pair(".tei", "application/tei+xml"));
     extentions.push_back(std::make_pair(".teicorpus", "application/tei+xml"));
-    extentions.push_back(std::make_pair(".text", "text/plain"));
     extentions.push_back(std::make_pair(".tfi", "application/thraud+xml"));
     extentions.push_back(std::make_pair(".tfx", "image/tiff-fx"));
     extentions.push_back(std::make_pair(".tif", "image/tiff"));
@@ -350,13 +338,14 @@ void parse_request::set_extention()
     extentions.push_back(std::make_pair(".yin", "application/yin+xml"));
     extentions.push_back(std::make_pair(".yml", "text/yaml"));
     extentions.push_back(std::make_pair(".zip", "application/zip"));
-    
+
+
     if (_http_headers.find("Content-Type") != _http_headers.end())
     {
         for (std::vector<std::pair<std::string, std::string> >::iterator it = extentions.begin();
             it < extentions.end(); it++)
         {
-            if (_http_headers["Transfer-Encoding"] == it->second)
+            if (_http_headers["Content-Type"] == it->second)
             {
                 _extention = it->first;
                 break ;

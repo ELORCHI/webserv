@@ -21,6 +21,7 @@ class location;
 class cgi;
 class server
 {
+    
 protected:
     std::vector<std::string>                _name;
     int                                     _listen_port;
@@ -39,27 +40,6 @@ protected:
 public:
     server();
     ~server();
-    std::vector<std::vector<std::string> > get_error_pages()
-    {
-        return this->_error_pages;
-    }
-    std::vector<std::vector<std::string> > get_redirections()
-    {
-        return this->_redirections;
-    }
-    void                         set_client_max_body_size(int max_body_size)
-    {
-        this->_client_max_body_size = max_body_size;
-    }
-    std::vector<std::string>                get_index()
-    {
-        return this->_index;
-    }
-    std::vector<std::string>                 get_allowed_methods()
-    {
-        return this->_allowed_methods;
-    }
-
     void                         set_to_default();
     void                         set_name(std::string name);
     void                         set_listen(std::string listen);

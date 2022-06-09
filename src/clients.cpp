@@ -25,9 +25,34 @@ client::client(int fd, struct sockaddr_in addr)
     read_buffer.resize(8000);
 	ready_request = NULL;
 	isHeadersBufferResidue = false;
-	bodyFileName = std::string("/tmp/") +  getRandomName();
-	bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary);
+	this->keepAliveData.timeout = 0;
+	this->keepAliveData.max = 0;
+	this->keepAliveData.is_keepAlive = false;
+	this->keepAliveData.is_connection = true;
+	this->keepAliveData.connection_type = "close";
+
+	//bodyFileName = std::string("/tmp/") +  getRandomName();
+	//bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
 }
+
+client& client::operator= (const client& other)
+{
+	clientFd = other.clientFd;
+	clientAddr = other.clientAddr;
+	is_done_reading_from = other.is_done_reading_from;
+	read_buffer = other.read_buffer;
+	ready_request = other.ready_request;
+	isHeadersBufferResidue = other.isHeadersBufferResidue;
+	this->keepAliveData.timeout = other.keepAliveData.timeout;
+	this->keepAliveData.max = other.keepAliveData.max;
+	this->keepAliveData.is_keepAlive = other.keepAliveData.is_keepAlive;
+	this->keepAliveData.is_connection = other.keepAliveData.is_connection;
+	this->keepAliveData.connection_type = other.keepAliveData.connection_type;
+	//bodyFileName = other.bodyFileName;
+	//bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
+	return *this;	
+}
+
 
 
 void client::appendToHeadersBuffer(char *buffer)
@@ -35,9 +60,13 @@ void client::appendToHeadersBuffer(char *buffer)
     this->headersBuffer += buffer; 
 }
 
-void client::appendToReadBodyFile(const char *buffer)
+void client::appendToReadBodyFile(const char *buffer, size_t size)
 {
-	bodyFile << buffer;
+	bodyFile.write(buffer, size);
+	std::cout << std::string(buffer, size);
+	// flush std::cout
+	std::cout.flush();
+	// bodyFile << buffer;
 }
 
 
@@ -65,3 +94,17 @@ void client::setRequest(request *rq)
 	this->ready_request = rq;
 }
 
+void client::setKeepAliveInfo(std::string _kad)
+{
+	//get first number from _kad
+	std::string s = _kad;
+	std::string timeout = s.substr(s.find("timeout=") + 8, s.find(",") - s.find("timeout=") - 8);
+    std::string max = s.substr(s.find("max=") + 4);
+	std::stringstream ss;
+	ss << timeout;
+	ss >> this->keepAliveData.timeout;
+	ss.clear();
+	ss << max;
+	ss >> this->keepAliveData.max;
+	this->keepAliveData.is_keepAlive = true;
+}
