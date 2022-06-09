@@ -4,6 +4,8 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <dirent.h>
+#include <cctype>
 
 
 #define GET std::string("GET")
@@ -145,15 +147,13 @@ class responseHandler : public response// abstract class
 		virtual void setResponseBody(std::string body);// need implementation
 		void setClient(client &_cl);
 		int send(void);
-		std::string getexten(void);// needs implementation
+		client getClient(void);
 		std::string setexten(std::string path);
 	protected:
 		std::string buffer;
 		std::string response_body;
-		int bufferSize;// it might be a response length cause we are sending the buffer
-		int bufferOffset;
-		int contentLength;
-		std::string exten;
+		std::string statusLine;
+		std::string headers;
 		int error;
 		client cl;
 };
@@ -188,8 +188,9 @@ class workingLocation
 		void			setUpload(std::string path);
 		void			setCgi(cgi cgi);
 		std::string		getUpload(void);
-		std::vector<std::vector<std::string> > getRedirections(void);
-		std::vector<std::vector<std::string> > getDefaultError(void);
+		std::vector<std::vector<std::string> >	getRedirections(void);
+		std::vector<std::vector<std::string> >	getDefaultError(void);
+		std::string								getDefaultError(int erroCode);
 		location		*getLocation(void);
 		cgi				*getCgi(void);
 		~workingLocation();
@@ -225,9 +226,11 @@ class Locator : public responseHandler
 		void			setIndex(void);
 		void			setAutoIndex(void);
 		std::string		getResourceFullPath(void);
-		std::string		readBody(std::string path);// need implementation
+		std::string		readBody(std::string path);
 		workingLocation *getWorkingLocation(void);
 		std::string		getindexfile(void);
+		std::string		getContentType(void);
+
 		int				HandleCGI();
 	protected:
 		workingLocation *Locate;//free
@@ -248,8 +251,6 @@ class GetHandler : public responseHandler
 		int handleFiles(void);
 		int HandleDir(void);
 		void buildresponse(void);
-		void setResponseBody(std::string body);// need implementation
-		void setResponseHeaders(void);// need implementation set up general headers subclasses which need more headers
 		void setGodFather(Locator *_godFather);
 		std::string setAutoindexResponse(void);//needs implemantation
 	private:
@@ -263,8 +264,6 @@ class DeleteHandler : public responseHandler
 		~DeleteHandler();
 		int handle();
 		void buildresponse();
-		void setResponseBody(std::string body);// need implementation
-		void setResponseHeaders(void);// need implementation set up general headers subclasses which need more headers
 		void setGodFather(Locator *_godFather);
 		int handleFiles(void);
 		int HandleDir(void);
@@ -281,8 +280,6 @@ class PostHandler : public responseHandler
 		~PostHandler();
 		int handle();
 		void buildresponse();
-		void setResponseBody(std::string body);// need implementation
-		void setResponseHeaders(void);// need implementation set up general headers subclasses which need more headers
 		void setGodFather(Locator *_godFather);
 		int handleFiles(void);
 		int HandleDir(void);
@@ -293,3 +290,76 @@ class PostHandler : public responseHandler
 };
 
 response *geResponse(client &cl);
+
+// std::string workingLocation::getDefaultError(int erroCode)
+// {
+// 	std::vector<std::vector<std::string> > tmp;
+// 	std::string page;
+
+// 	tmp = defaultError;
+// 	for (int i = 0; i < defaultError.size(); i++)
+// 	{
+// 		defaultError[i][0]
+// 	}
+// 	//if exist read from path and fill body
+// }
+
+std::string getResponseStatusLine(int status, std::string status_line)
+{
+	std::string buffer;
+
+	buffer = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\n");
+	return buffer;
+}
+
+bool isError(int status)
+{
+	if (status)
+		return true;
+	return (false);
+}
+
+
+std::string getDefaultError(int status, Locator *info)
+{
+	std::string body = "errro";
+
+	// if (status >= 400)
+	// {
+	// 	info->getWorkingLocation()->
+	// }
+	return (body);
+}
+
+
+//thsi will handle get post delete and locating problem
+// this will use a function to get default error pages
+// this function cant handle system_response object
+// system_response_object will need only get default error pages function
+std::string getResponseBody(int status, std::string bodyMsg, Locator *info)
+{
+	if (isError(status))
+		return (getDefaultError(status, info));
+	else
+		return (bodyMsg);
+}
+
+std::string getResponseHeaders(int status, Locator *info, int body_size)
+{
+	std::string headers;
+	std::stringstream s;
+	std::string ss;
+	s << body_size;
+	s >> ss;
+	if (status != NO_CONTENT)
+		headers += "content-length: " + std::string(ss) + std::string("\n");
+	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
+	headers += "content-type: " + info->getContentType() + std::string("\n");
+	headers += "date: " + formatted_time() + std::string("\n");
+	if (status == MOVED_PERMANENTLY || CREATED_CODE)
+		headers += "location: " + info->getResourceFullPath() + std::string("\n");
+	std::map<std::string, std::string> headersmap =  info->getClient().getReadyRequest()->get_request_parsing_data().get_http_headers();
+	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
+	if (it != headersmap.end())
+		headers += "connection " + headersmap["connection"] + std::string("\n");
+}

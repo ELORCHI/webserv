@@ -18,18 +18,21 @@ std::string    formatted_time(void)
     return std::string(buffer);
 }
 
-void responseHandler::setResposeStatusLine(int status, std::string status_line)
+client responseHandler::getClient(void)
 {
-
-	buffer = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\n");
-	bufferOffset = buffer.size();
+	return cl;
 }
 
-std::string responseHandler::getexten(void)
+std::string Locator::getContentType(void)
 {
 	std::string res;
-
-	// set res to get file ext
+	size_t i = resourceFullPath.rfind('.', resourceFullPath.length());
+	if (i != std::string::npos)
+	{
+	   res.substr(i + 1, resourceFullPath.length() - i);
+	}
+	else
+		res = "";
     if (!res.empty())
 	{
 		if (res == ".html") return "text/html";
@@ -96,18 +99,6 @@ std::string responseHandler::getexten(void)
     return "plain/text";
 }
 
-void responseHandler::setResponseHeaders(void)
-{
-	std::stringstream s;
-	std::string ss;
-	s << buffer.size();
-	s >> ss;
-	response_body += "content-length: " + std::string(ss) + std::string("\n");
-	response_body += "Server: " + std::string("420 SERVER");
-	response_body += "content-type: " + getexten();
-	response_body += "date: " + formatted_time();
-	
-}
 
 void responseHandler::setResponseBody(std::string body)
 {
@@ -160,20 +151,20 @@ void system_block_response::buildresponse()
 {
 	switch (error)
 	{
-		case HTTP_VERSION_NOT_SUPPORTED_CODE:
-			responseHandler::setResposeStatusLine(HTTP_VERSION_NOT_SUPPORTED_CODE, HTTP_VERSION_NOT_SUPPORTED_MSG);
-			responseHandler::setResponseBody(HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG);
-			responseHandler::setResponseHeaders();//no header so just default ones
-			break;
-		case NOT_IMPLEMENTED_CODE:
-			responseHandler::setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
-			responseHandler::setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
-			responseHandler::setResponseHeaders();// no header just default ones
-		case INTERNAL_SERVER_ERROR_CODE:
-			responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
-			responseHandler::setResponseHeaders();//no header so just default ones
-			responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
-			break;
+		// case HTTP_VERSION_NOT_SUPPORTED_CODE:
+		// 	statusLine = getResponseStatusLine(error, HTTP_VERSION_NOT_SUPPORTED_MSG);
+		// 	response_body = getResponseBody(error, HTTP_VERSION_NOT_SUPPORTED_RESPONSE_MSG, this);
+			
+		// 	break;
+		// case NOT_IMPLEMENTED_CODE:
+		// 	responseHandler::setResposeStatusLine(NOT_IMPLEMENTED_CODE, NOT_IMPLEMENTED_MSG);
+		// 	responseHandler::setResponseBody(NOT_IMPLEMENTED_RESPONSE_MSG);
+		// 	responseHandler::setResponseHeaders();// no header just default ones
+		// case INTERNAL_SERVER_ERROR_CODE:
+		// 	responseHandler::setResposeStatusLine(INTERNAL_SERVER_ERROR_CODE, INTERNAL_SERVER_ERROR_MSG);
+		// 	responseHandler::setResponseHeaders();//no header so just default ones
+		// 	responseHandler::setResponseBody(INTERNAL_SERVER_ERROR_RESPONSE_MSG);
+		// 	break;
 		default:
 			return;
 	}
@@ -264,15 +255,7 @@ std::vector<std::vector<std::string> > workingLocation::getRedirections()
 {
 	return redirections;
 }
-// sets isAllowed to true if found in the location methods
-// needs getters for allowed methods
-// void Locator::setMethodAllowance(std::string method)
-// {
-// 	for (int i; i < workingLocation->get_allowd_methods().size; i++)
-// 	{
 
-// 	}
-// }
 
 Locator::Locator(client &_cl): responseHandler()
 {
@@ -380,6 +363,24 @@ int Locator::getResourceType(void)
 	return (resourceType);
 }
 
+std::string Locator::readBody(std::string path)
+{
+	std::fstream in_file(path);
+	std::string body = "";
+	struct stat sb;
+
+    FILE* input_file = fopen(path.c_str(), "r");
+    if (input_file == nullptr) {
+		return (body);
+    }
+	stat(path.c_str(), &sb);
+    body.resize(sb.st_size);
+    fread(const_cast<char*>(body.data()), sb.st_size, 1, input_file);
+    fclose(input_file);
+
+    return body;
+}
+
 int Locator::handle()
 {
 	error = 0;
@@ -447,10 +448,16 @@ GetHandler::GetHandler(Locator *_godFather): responseHandler()
 }
 
 
-std::string GetHandler::setAutoindexResponse(void)
-{
+// std::string GetHandler::setAutoindexResponse(void)
+// {
+// 	std::string path	= godFather->getResourceFullPath();
+// 	std::string host	= cl.getReadyRequest()->get_server()->get_listen_host();
+// 	int port			= cl.getReadyRequest()->get_server()->get_listen_port();
 
-}
+//     std::string dirName(path);
+// 	DIR *dir;
+// 	return path;
+// }
 
 void	Locator::setIndex(void)
 {
@@ -513,17 +520,17 @@ void GetHandler::buildresponse()
 	switch (error)
 	{
 	case AUTOINDEX_CODE:
-		responseHandler::setResposeStatusLine(AUTOINDEX_CODE, OK_MSG);
 		this->setResponseBody(setAutoindexResponse());//NOT IMPLEMENTED
+		responseHandler::setResposeStatusLine(AUTOINDEX_CODE, OK_MSG);
 		responseHandler::setResponseHeaders();//
 	case MOVED_PERMANENTLY:
 		responseHandler::setResposeStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
 		setResponseBody(MOVED_PERMANENTLY_RESPONSE_MSG);
 		this->setResponseHeaders();// set location header feild
 	case 200:
-		responseHandler::setResposeStatusLine(200, OK_MSG);
-		this->setResponseBody(godFather->readBody(godFather->getResourceFullPath()));//not implemented
-		responseHandler::setResponseHeaders();//
+		response_body = getResponseBody(200, godFather->readBody(godFather->getResourceFullPath()), godFather);
+		statusLine = getResponseStatusLine(200, OK_MSG);
+		headers = getResponseHeaders(200, godFather, response_body.size());
 	case FORBIDDEN_CODE:
 		responseHandler::setResposeStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
 		responseHandler::setResponseBody(FORBIDDEN_RESPONSE_MSG);
@@ -660,6 +667,8 @@ bool PostHandler::supportAppload()
 }
 
 
+//======= needs to be implemented =====
+
 // int PostHandler::creator(std::string path)
 // {
 // 	std::string loc = godFather->getWorkingLocation()->getUpload() + godFather->getResourceFullPath();
@@ -724,7 +733,7 @@ void PostHandler::buildresponse()
 	{
 	case CREATED_CODE:
 		responseHandler::setResposeStatusLine(CREATED_CODE, CREATED_MSG);
-		responseHandler::setResponseBody(CREATED_RESPONSE_MSG);// MAIGHT NOT BE ADDED
+		responseHandler::setResponseBody(CREATED_RESPONSE_MSG);
 		this->setResponseHeaders();//add new file location
 	case NOT_FOUND_CODE:
 		responseHandler::setResposeStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
@@ -760,7 +769,7 @@ responseHandler *getResponse(client  &cl)
 	}
 	else
 		locationHandler->checker();
-	if (locationHandler->handle())// call checker befor this
+	if (locationHandler->handle())
 	{
 		delete systemResponse;
 		return locationHandler;
