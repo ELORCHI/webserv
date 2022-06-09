@@ -52,7 +52,7 @@
 
 #define AUTOINDEX_CODE 100
 
-#define DIR 1
+#define DIRE 4
 #define FI  0
 #define NO -1
 #define CG  2
@@ -336,30 +336,6 @@ std::string getDefaultError(int status, Locator *info)
 // this will use a function to get default error pages
 // this function cant handle system_response object
 // system_response_object will need only get default error pages function
-std::string getResponseBody(int status, std::string bodyMsg, Locator *info)
-{
-	if (isError(status))
-		return (getDefaultError(status, info));
-	else
-		return (bodyMsg);
-}
-
-std::string getResponseHeaders(int status, Locator *info, int body_size)
-{
-	std::string headers;
-	std::stringstream s;
-	std::string ss;
-	s << body_size;
-	s >> ss;
-	if (status != NO_CONTENT)
-		headers += "content-length: " + std::string(ss) + std::string("\n");
-	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
-	headers += "content-type: " + info->getContentType() + std::string("\n");
-	headers += "date: " + formatted_time() + std::string("\n");
-	if (status == MOVED_PERMANENTLY || CREATED_CODE)
-		headers += "location: " + info->getResourceFullPath() + std::string("\n");
-	std::map<std::string, std::string> headersmap =  info->getClient().getReadyRequest()->get_request_parsing_data().get_http_headers();
-	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
-	if (it != headersmap.end())
-		headers += "connection " + headersmap["connection"] + std::string("\n");
-}
+std::string getResponseBody(int status, std::string bodyMsg, Locator *info);
+std::string    formatted_time(void);
+std::string getResponseHeaders(int status, Locator *info, int body_size);

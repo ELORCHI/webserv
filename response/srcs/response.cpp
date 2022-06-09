@@ -18,6 +18,35 @@ std::string    formatted_time(void)
     return std::string(buffer);
 }
 
+std::string getResponseBody(int status, std::string bodyMsg, Locator *info)
+{
+	if (isError(status))
+		return (getDefaultError(status, info));
+	else
+		return (bodyMsg);
+}
+
+std::string getResponseHeaders(int status, Locator *info, int body_size)
+{
+	std::string headers;
+	std::stringstream s;
+	std::string ss;
+	s << body_size;
+	s >> ss;
+	if (status != NO_CONTENT)
+		headers += "content-length: " + std::string(ss) + std::string("\n");
+	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
+	headers += "content-type: " + info->getContentType() + std::string("\n");
+	headers += "date: " + formatted_time() + std::string("\n");
+	if (status == MOVED_PERMANENTLY || CREATED_CODE)
+		headers += "location: " + info->getResourceFullPath() + std::string("\n");
+	std::map<std::string, std::string> headersmap =  info->getClient().getReadyRequest()->get_request_parsing_data().get_http_headers();
+	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
+	if (it != headersmap.end())
+		headers += "connection " + headersmap["connection"] + std::string("\n");
+	return headers;
+}
+
 client responseHandler::getClient(void)
 {
 	return cl;
@@ -285,7 +314,7 @@ void Locator::checker(void)
 	{
 		if (s.st_mode & S_IFDIR)
 		{
-			resourceType = DIR;
+			resourceType = DIRE;
 			setIndex();
 		}
 		else
@@ -448,16 +477,50 @@ GetHandler::GetHandler(Locator *_godFather): responseHandler()
 }
 
 
-// std::string GetHandler::setAutoindexResponse(void)
-// {
-// 	std::string path	= godFather->getResourceFullPath();
-// 	std::string host	= cl.getReadyRequest()->get_server()->get_listen_host();
-// 	int port			= cl.getReadyRequest()->get_server()->get_listen_port();
+std::string getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port) 
+{
+    std::stringstream   ss;
+    ss << "\t\t<p><a href=\"http://" + host + ":" <<\
+        port << dirName + "/" + dirEntry + "\">" + dirEntry + "</a></p>\n";
+    return ss.str();
+}
 
-//     std::string dirName(path);
-// 	DIR *dir;
-// 	return path;
-// }
+std::string GetHandler::setAutoindexResponse(void)
+{
+	std::string path	= godFather->getResourceFullPath();
+	std::string host	= cl.getReadyRequest()->get_server()->get_listen_host();
+	int port			= cl.getReadyRequest()->get_server()->get_listen_port();
+
+    std::string dirName(path);
+    DIR *dir = opendir(path.c_str());
+    std::string page =\
+    "<!DOCTYPE html>\n\
+    <html>\n\
+    <head>\n\
+            <title>" + dirName + "</title>\n\
+    </head>\n\
+    <body>\n\
+    <h1>INDEX</h1>\n\
+    <p>\n";
+
+	if (dir == NULL)
+	{
+		error = INTERNAL_SERVER_ERROR_CODE;
+		return ("");
+	}
+    if (dirName[0] != '/')
+        dirName = "/" + dirName;
+    for (struct dirent *dirEntry = readdir(dir); dirEntry; dirEntry = readdir(dir)) {
+        page += getLink(std::string(dirEntry->d_name), dirName, host, port);
+    }
+    page +="\
+    </p>\n\
+    </body>\n\
+    </html>\n";
+    closedir(dir);
+
+	return page;
+}
 
 void	Locator::setIndex(void)
 {
@@ -691,7 +754,7 @@ int PostHandler::handle()
 	{
 		if (godFather->getResourceType() == FI)
 			handleFiles();
-		else if (godFather->getResourceType() == DIR)
+		else if (godFather->getResourceType() == DIRE)
 			HandleDir();
 		else
 			error = NOT_FOUND_CODE;
@@ -800,3 +863,4 @@ responseHandler *getResponse(client  &cl)
 	}
 	return (0);
 }
+
