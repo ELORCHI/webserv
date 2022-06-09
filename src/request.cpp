@@ -1,6 +1,7 @@
 #include "request.hpp"
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 std::vector<std::string> splitString(const std::string input, const char& delimiter) {
 
@@ -32,33 +33,76 @@ bool request::is_chunked_request_complete(std::string buffer)
     return false;
 }
 
-bool request::is_request_complete(std::string buffer)
-{
-    size_t content_length = 0;
-    std::string buffer_body;
-    if (buffer.find("\n\n") == std::string::npos)
-        return false;
-    if (buffer.find("Transfer-Encoding:") != std::string::npos)
-        return (is_chunked_request_complete(buffer));
-    if (buffer.find("Content-Length:") == std::string::npos)
-        return false;
-    std::string line;
-    std::stringstream ss(buffer);
-    while (std::getline(ss, line))
-    {
-        if (line.find("Content-Length:") != std::string::npos)
-        {
-            content_length = get_content_length(line);
-            continue;
-        }
-    }
-    if (content_length)
-        buffer_body = buffer.substr(buffer.find("\n\n") + 2);
-    if (buffer_body.length() < content_length || buffer_body.length() > content_length)
-        return false;
-    return (true);
+// bool request::is_request_complete(std::string buffer)
+// {
+//     size_t content_length = 0;
+//     std::string buffer_body;
+//     if (buffer.find("\n\n") == std::string::npos)
+//         return false;
+//     if (buffer.find("Transfer-Encoding:") != std::string::npos)
+//         return (is_chunked_request_complete(buffer));
+//     if (buffer.find("Content-Length:") == std::string::npos)
+//         return false;
+//     std::string line;
+//     std::stringstream ss(buffer);
+//     while (std::getline(ss, line))
+//     {
+//         if (line.find("Content-Length:") != std::string::npos)
+//         {
+//             content_length = get_content_length(line);
+//             continue;
+//         }
+//     }
+//     if (content_length)
+//         buffer_body = buffer.substr(buffer.find("\n\n") + 2);
+//     if (buffer_body.length() < content_length || buffer_body.length() > content_length)
+//         return false;
+//     return (true);
+// }
+
+// std::string gen_random(const int len) {
+//     srand((unsigned)time(NULL) * getpid());
+//     static const char alphanum[] ="0123456789" "ABCDEFGHIJKLMNOPQRSTUVWXYZ" "abcdefghijklmnopqrstuvwxyz";
+//     std::string tmp_s;
+//     tmp_s.reserve(len);
+//     for (int i = 0; i < len; ++i) {
+//         tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+//     }
+//     return tmp_s;
+// }
+
+bool request::is_requestHeaderComplete(std::string buffer)
+{	
+     if (buffer.find("\r\n\r\n") != std::string::npos)
+       	return true;
+	// std::cout << "bruh" << std::endl;
+	return false;
 }
 
+//     size_t content_length = 0;
+//     std::string buffer_body;
+//     if (buffer.find("\n\n") == std::string::npos)
+//         return false;
+//     if (buffer.find("Transfer-Encoding:") != std::string::npos)
+//         return (is_chunked_request_complete(buffer));
+//     if (buffer.find("Content-Length:") == std::string::npos)
+//         return false;
+//     std::string line;
+//     std::stringstream ss(buffer);
+//     while (std::getline(ss, line))
+//     {
+//         if (line.find("Content-Length:") != std::string::npos)
+//         {
+//             content_length = get_content_length(line);
+//             continue;
+//         }
+//     }
+//     if (content_length)
+//         buffer_body = buffer.substr(buffer.find("\n\n") + 2);
+//     if (buffer_body.length() < content_length || buffer_body.length() > content_length)
+//         return false;
+//     return (true);
+// }
 request::request(std::string request_text, int port, server *server_parsed_data)
 {
     parse_request pr;

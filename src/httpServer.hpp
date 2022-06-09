@@ -30,6 +30,7 @@
 #include "../src/request.hpp"
 #include <unordered_set>
 #include <set>
+#include <fstream>
 
 
 #define NUM_CLIENTS 10
@@ -56,6 +57,7 @@ class httpServer
     std::unordered_map<int, client*>clientmap;
     bool is_shared_port;
     server server_parsed_data;
+	int run_once;
     public:
         // httpServer(int port);
         httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd);

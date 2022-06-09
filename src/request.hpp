@@ -34,4 +34,5 @@ class request {
         static int get_content_length(std::string astring);
         static bool is_request_complete(std::string buffer);
         static bool is_chunked_request_complete(std::string buffer);
+		static bool is_requestHeaderComplete(std::string buffer);
 };

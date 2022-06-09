@@ -1,6 +1,21 @@
+
+   
 #include "clients.h"
 #include <iostream>
 #include "request.hpp"
+
+
+std::string getRandomName()
+{
+	char value[12];	
+	std::ifstream devrandom("/dev/random");
+	devrandom.read(value, 12);
+	unsigned int random = *(unsigned int*)value;
+	std::stringstream ss;
+	ss << random;
+	devrandom.close();
+	return ss.str();
+}
 
 client::client(int fd, struct sockaddr_in addr)
 {
@@ -9,15 +24,20 @@ client::client(int fd, struct sockaddr_in addr)
     is_done_reading_from = false;
     read_buffer.resize(8000);
 	ready_request = NULL;
-
+	isHeadersBufferResidue = false;
+	bodyFileName = std::string("/tmp/") +  getRandomName();
+	bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary);
 }
 
 
-void client::appendToReadBuffer(char *buffer)
+void client::appendToHeadersBuffer(char *buffer)
 {
-    read_buffer += buffer;
-    if (request::is_request_complete(read_buffer))
-        is_done_reading_from = true;
+    this->headersBuffer += buffer; 
+}
+
+void client::appendToReadBodyFile(const char *buffer)
+{
+	bodyFile << buffer;
 }
 
 
@@ -44,3 +64,4 @@ void client::setRequest(request *rq)
 {
 	this->ready_request = rq;
 }
+
