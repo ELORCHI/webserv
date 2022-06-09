@@ -20,6 +20,7 @@ cgi::~cgi()
 {
 }
 
+
 void cgi::set_cgi_path(std::string cgi_path)
 {
     if (not_predefined(cgi_path))

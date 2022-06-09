@@ -361,7 +361,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         if (cl->get_pr().get_http_headers().count("Connection") > 0)
                         {
                             std::string con = cl->get_pr().get_http_headers()["Connection"];
-                            cl->setConnectionType(con);
+                          //  cl->setConnectionType(con);
                             if (con == "close")
                             {
                                 disconnectClient(cl, true);

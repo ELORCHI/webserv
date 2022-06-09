@@ -40,4 +40,5 @@ public:
     cgi                         &operator=(cgi const & rhs);
 };
 
+
 #endif

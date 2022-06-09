@@ -20,6 +20,7 @@
 class cgi;
 class location
 {
+    
 protected:
     const std::string           _name;
     std::string                 _locations_path;
@@ -35,18 +36,6 @@ public:
     std::string                 get_locations_path() const;
     std::vector<std::string>    get_methods() const;
     std::string                 get_root() const;
-    void                         set_client_max_body_size(int max_body_size)
-    {
-        this->_client_max_body_size = max_body_size;
-    }
-    void                        set_index(std::vector<std::string> indexs)
-    {
-        this->_index = indexs;
-    }
-    void                        set_allowed_methods(std::vector<std::string> all)
-    {
-        this->_allow_methods = all;
-    }
     bool                        get_autoindex() const;
     long long int               get_client_max_body_size() const;
     std::string                 get_index(unsigned int i) const;
