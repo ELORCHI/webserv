@@ -23,7 +23,6 @@ class client {
 	std::fstream bodyFile;
 	request* ready_request;
     parse_request pr;
-    client& operator= (const client& other);
     typedef struct {
         int timeout;
         int max;
@@ -32,7 +31,8 @@ class client {
         bool is_connection; 
     } keepAlive;
     keepAlive keepAliveData;
-     public:
+    public:
+    client& operator= (const client& other);
         client(int fd, struct sockaddr_in addr);
         ~client();
 
