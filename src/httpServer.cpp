@@ -349,28 +349,28 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
                         kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
                         cl->set_reading_status(false);
-                        if (cl->get_pr().get_http_headers().count("Keep-Alive") > 0)
-                        {
-                            //get timeout and from keep-alive string
-                            std::string s = cl->get_pr().get_http_headers()["Keep-Alive"];
-                            // std::string con = cl->get_pr().get_http_headers()["Connection"];
-                            cl->setKeepAliveInfo(s);
-                            // cl->setConnectionType(con);
+                        // if (cl->get_pr().get_http_headers().count("Keep-Alive") > 0)
+                        // {
+                        //     //get timeout and from keep-alive string
+                        //     std::string s = cl->get_pr().get_http_headers()["Keep-Alive"];
+                        //     // std::string con = cl->get_pr().get_http_headers()["Connection"];
+                        //     cl->setKeepAliveInfo(s);
+                        //     // cl->setConnectionType(con);
 
-                        }
-                        if (cl->get_pr().get_http_headers().count("Connection") > 0)
-                        {
-                            std::string con = cl->get_pr().get_http_headers()["Connection"];
-                          //  cl->setConnectionType(con);
-                            if (con == "close")
-                            {
-                                disconnectClient(cl, true);
-                            }
-                        }
-                        else
-                        {
-    						disconnectClient(cl, true);
-                        }
+                        // }
+                        // if (cl->get_pr().get_http_headers().count("Connection") > 0)
+                        // {
+                        //     std::string con = cl->get_pr().get_http_headers()["Connection"];
+                        //     cl->setConnectionType(con);
+                        //     if (con == "close")
+                        //     {
+                        //         disconnectClient(cl, true);
+                        //     }
+                        // }
+    					disconnectClient(cl, true);
+                        // else
+                        // {
+                        // }
                         
 					}
                     // if (cl->isThereARequestReady() == true)

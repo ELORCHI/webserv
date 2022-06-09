@@ -34,7 +34,7 @@ class client {
      public:
         client(int fd, struct sockaddr_in addr);
         ~client();
-        client& operator= (const client& other);
+
         sockaddr_in getClientAddr()
         {
             return clientAddr;
@@ -60,4 +60,5 @@ class client {
         parse_request &get_pr() { return pr; }
         keepAlive getKeepAliveInfo() { return this->keepAliveData; };
         void setKeepAliveInfo(std::string _kad);
+        void setConnectionType(std::string connectionType);
 };
