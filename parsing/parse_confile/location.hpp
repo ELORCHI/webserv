@@ -44,6 +44,7 @@ public:
     std::vector<std::string>    get_index() const;
     unsigned int                get_methods_size() const;
     void                        set_locations_path(std::string locations_path);
+    void                        set_client_max_body_size(long long int client_max_body_size);
     void                        set_methods(std::string methods);
     void                        set_root(std::string root);
     void                        set_autoindex(bool autoindex);

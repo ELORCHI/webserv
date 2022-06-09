@@ -218,6 +218,11 @@ void    server::set_client_max_body_size(std::string client_max_body_size)
         throw std::runtime_error("Error: client max body size should be number");
 }
 
+void    server::set_client_max_body_size(long long int client_max_body_size)
+{
+    _client_max_body_size = client_max_body_size;
+}
+
 void    server::set_autoindex(bool autoindex)
 {
     _autoindex = autoindex;
@@ -258,6 +263,11 @@ int   server::get_listen_port() const
 std::string  server::get_allowed_methods(int i) const
 {
     return _allowed_methods[i];
+}
+
+std::vector<std::string>  server::get_allowed_methods() const
+{
+    return _allowed_methods;
 }
 
 std::vector<std::string> server::get_error_pages(int i) const
@@ -309,6 +319,11 @@ cgi     server::get_cgi(int i) const
 unsigned int    server::get_allowed_methods_size() const
 {
     return _allowed_methods.size();
+}
+
+std::vector<std::vector<std::string> > server::get_redirections() const
+{
+    return this->_redirections;
 }
 
 //----------methods

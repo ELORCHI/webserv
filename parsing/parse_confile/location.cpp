@@ -138,6 +138,10 @@ std::string                 location::get_methods(unsigned int i) const
     return  (this->_allow_methods[i]);
 }
 
+void    location::set_client_max_body_size(long long int client_max_body_size)
+{
+    _client_max_body_size = client_max_body_size;
+}
 
 /*
     operator

@@ -384,9 +384,10 @@ location *workingLocation::defaultLocation(server *server)
 	location *loc = new location();
 	loc->set_root(server->get_root());
 	loc->set_client_max_body_size(server->get_client_max_body_size());
-	loc->set_index(server->get_index());
+	// loc->set_index(server->get_index());
+	loc->fill_index(server->get_index(), 0);
 	loc->set_autoindex(server->get_autoindex());
-	loc->set_allowed_methods(server->get_allowed_methods());
+	loc->fill_allowed_methods(server->get_allowed_methods(), 0);
 	return loc;
 }
 
@@ -471,7 +472,7 @@ void Locator::checker(void)
 std::string Locator::getindexfile(void)
 {
 	std::string indexfile;
-	std::vector<std::string> _indexs = getWorkingLocation()->getLocation()->get_indexs();
+	std::vector<std::string> _indexs = getWorkingLocation()->getLocation()->get_index();
 	int size = _indexs.size();
 	struct stat s;
 
@@ -720,7 +721,7 @@ std::string GetHandler::setAutoindexResponse(void)
 
 void	Locator::setIndex(void)
 {
-	if (Locate->getLocation()->get_indexs().size() > 0)
+	if (Locate->getLocation()->get_index().size() > 0)
 		hasIndex = true;
 	else
 		hasIndex = false;
