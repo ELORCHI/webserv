@@ -490,6 +490,41 @@ std::string Locator::getResourceFullPath(void)
 	return resourceFullPath;
 }
 
+void PostHandler::setClient(client &_cl)
+{
+	cl = _cl;
+}
+
+system_block_response::~system_block_response()
+{
+	
+}
+
+GetHandler::~GetHandler()
+{
+}
+
+
+PostHandler::~PostHandler()
+{
+}
+
+
+void GetHandler::setClient(client &_cl)
+{
+	cl = _cl;
+}
+
+void DeleteHandler::setClient(client &_cl)
+{
+	cl = _cl;
+}
+
+void Locator::setClient(client &_cl)
+{
+	cl = _cl;
+}
+
 
 void Locator::checker(void)
 {
@@ -734,6 +769,16 @@ GetHandler::GetHandler(Locator *_godFather): responseHandler(_godFather->getClie
 	godFather = _godFather;
 }
 
+
+void system_block_response::setClient(client &_cl)
+{
+	cl = _cl;
+}
+
+client system_block_response::getClient(void)
+{
+	return (cl);
+}
 
 std::string getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port) 
 {
@@ -996,8 +1041,11 @@ bool PostHandler::supportAppload()
 	return false;
 }
 
+client PostHandler::getClient(void)
+{
+	return (cl);
+}
 
-//======= needs to be implemented =====
 
 int PostHandler::creator(std::string path)
 {
