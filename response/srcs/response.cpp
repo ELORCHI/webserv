@@ -938,19 +938,35 @@ bool PostHandler::supportAppload()
 
 //======= needs to be implemented =====
 
-// int PostHandler::creator(std::string path)
-// {
-// 	std::string loc = godFather->getWorkingLocation()->getUpload() + godFather->getResourceFullPath();
-// 	std::ofstream filestream(path);
-// 	std::ifstream 
-// 	std::string line;
+int PostHandler::creator(std::string path)
+{
+	std::string newf = godFather->getWorkingLocation()->getLocation()->get_root();
+	newf += godFather->getWorkingLocation()->getUpload();
+	newwf += getClient().getReadyRequest()->get_request_parsing_data().get_path_body();
+	
+	int new_fd = open(newf.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
+	int old_fd = open(getClient().getReadyRequest()->get_request_parsing_data().get_path_body().c_str(), O_RDONLY, 0644);
+	char buffer[2000] = {0};
+	int ret = 1;
 
-// 	while (std::getline(, line))
-// 	{
-// 		filestream << line;
-// 	}
-	// return (1) //if error
-// }
+	if (new_fd == -1 || old_fd == -1)
+		return (500);
+	lseek(old_fd, 0, SEEK_SET);
+    while (ret > 0)
+	{
+		memset(buffer, 0, 2000);
+		ret = read(old_fd, buffer, 2000 - 1);
+		if (ret >= 0)
+			write(new_fd, buffer, ret);
+        else
+            return 500;
+	}
+	close(new_fd);
+	close(old_fd);
+	unlink(getClient().getReadyRequest()->get_request_parsing_data().get_path_body().c_str());
+	remove(getClient().getReadyRequest()->get_request_parsing_data().get_path_body().c_str());
+	return (1);
+}
 
 int PostHandler::handle()
 {

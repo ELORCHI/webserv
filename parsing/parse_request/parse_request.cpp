@@ -272,7 +272,7 @@ int    parse_request::start_parsing(char *buff, size_t size)
 			if (_path_body == "")
 			{
 				set_extention();
-				_path_body = "/tmp/" + gen_random(10) + _extention;
+				_path_body = gen_random(10) + _extention;
 			}
 			_file_descriptor = open(_path_body.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
 			if (_file_descriptor == -1)
