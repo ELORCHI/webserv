@@ -5,8 +5,6 @@
 // if the handle method returns 0 the request will be handled by the calling object
 
 
-//// check this  if delete method caused a problem
-
 
 response::response()
 {
@@ -27,6 +25,38 @@ responseHandler::responseHandler(client _cl): cl(_cl)
 	error = 0;
 }
 
+
+std::string workingLocation::getDefaultError(int erroCode)
+{
+	int size;
+	std::string errorstring;
+	std::stringstream stream;
+
+	stream << erroCode;
+	stream >> errorstring;
+	size = defaultError.size();
+	for (int i = 0; i < size; i++)
+	{
+		if (defaultError[i][0] == errorstring)
+			return (defaultError[i][1]);
+	}
+	return ("");
+}
+
+std::string getResponseStatusLine(int status, std::string status_line)
+{
+	std::string buffer;
+
+	buffer = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\n");
+	return buffer;
+}
+
+bool isError(int status)
+{
+	if (status < 400)
+		return true;
+	return (false);
+}
 
 responseHandler::responseHandler(): cl()
 {
@@ -406,7 +436,10 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 		}
 	}
 	if (max_match_length == 0)
+	{
+		delete loc;
 		return (NULL);
+	}
 	return loc;
 }
 
@@ -414,7 +447,13 @@ void workingLocation::setlocation(request *request)
 {
 	location *loc = this->searchLocation(request->get_server()->get_location(), request->get_request_parsing_data().get_http_path());
 	if (loc == NULL)
+	{
 		loc = this->defaultLocation(request->get_server());
+	}
+	else
+	{
+		loc->set_root(request->get_server()->get_root() + loc->get_root());
+	}
 	serverlocation = loc;
 	setUpload(request->get_server()->get_upload_path());
 	setRedirections(request->get_server());
@@ -564,6 +603,7 @@ int Locator::HandleCGI()
 		statusLine = getResponseStatusLine(200, OK_MSG);
 	response_body = readBody(cgiHandler.get_file_full_path());
 	error = -1337;
+	return (error);
 }
 
 std::string Locator::getindexfile(void)

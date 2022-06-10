@@ -243,37 +243,12 @@ class PostHandler : public responseHandler
 };
 
 
-std::string workingLocation::getDefaultError(int erroCode)
-{
-	int size;
-	std::string errorstring;
-	std::stringstream stream;
 
-	stream << erroCode;
-	stream >> errorstring;
-	size = defaultError.size();
-	for (int i = 0; i < size; i++)
-	{
-		if (defaultError[i][0] == errorstring)
-			return (defaultError[i][1]);
-	}
-	return ("");
-}
 
-std::string getResponseStatusLine(int status, std::string status_line)
-{
-	std::string buffer;
+std::string getResponseStatusLine(int status, std::string status_line);
 
-	buffer = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\n");
-	return buffer;
-}
+bool isError(int status);
 
-bool isError(int status)
-{
-	if (status)
-		return true;
-	return (false);
-}
 
 
 

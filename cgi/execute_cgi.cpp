@@ -4,7 +4,7 @@
 execute_cgi::execute_cgi():
     _file_full_path(""),
     _file_body_path(""),
-    _headers({})
+    _headers()
 {
 }
 
@@ -23,6 +23,7 @@ std::string execute_cgi::GetPortFromHeaders(parse_request request)
         port = tmp.substr(found + 1);
     else
         port = "80";
+    return port;
 }
 
 void execute_cgi::set_environement(parse_request request, std::string file_full_path)
@@ -32,7 +33,7 @@ void execute_cgi::set_environement(parse_request request, std::string file_full_
     setenv( "SERVER_PORT", GetPortFromHeaders(request).c_str(),1);
     setenv( "REMOTE_ADDR", "0.0.0.0",1);
     setenv( "PATH_INFO", request.get_http_path().c_str(),1);
-    setenv( "SCRIPT_FILENAME" , file_full_path,1); //need full path
+    setenv( "SCRIPT_FILENAME" , file_full_path.c_str(),1); //need full path
     setenv( "QUERY_STRING" , request.get_http_query().c_str(),1);
     setenv( "REQUEST_METHOD" , request.get_http_method().c_str(),1);
     setenv( "REDIRECT_STATUS" , "true",1);

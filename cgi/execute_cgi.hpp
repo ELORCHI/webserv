@@ -30,9 +30,11 @@ class execute_cgi
         std::string    get_file_body_path() { return _file_body_path;};
         std::map<std::string, std::string>    get_headers() { return _headers;};
         //methods
-        int execute_cgi::start_execute_cgi(std::string, std::string, parse_request );
-        void set_environement(parse_request request);
+        int start_execute_cgi(std::string, std::string, parse_request );
+        void set_environement(parse_request request, std::string file_full_path);
         std::string GetPortFromHeaders(parse_request request);
+        void    set_headers(std::string &line);
+
 };
 
 
