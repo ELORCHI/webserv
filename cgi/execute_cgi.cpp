@@ -178,5 +178,6 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
             //    std::cout << it->first << " => " << it->second << '\n';
             // }
         }
+        return 1;
     }
 }

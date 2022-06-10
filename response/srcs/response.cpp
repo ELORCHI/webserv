@@ -186,7 +186,7 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 			headers += "location: " + info->getResourceFullPath() + std::string("\n");
 	}
 	else if (status == CREATED_CODE)
-		headers += "location: " + info->getResourceFullPath() + std::string("\n");
+		headers += "location: " + info->getResourceFullPath() + std::string("\n");//to be tested
 	std::map<std::string, std::string> headersmap =  info->getClient().getReadyRequest()->get_request_parsing_data().get_http_headers();
 	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
 	if (it != headersmap.end())
@@ -208,7 +208,7 @@ std::string getResponseHeaders(int status, int body_size)
 	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
 	headers += "content-type: " + std::string("text/html") + std::string("\n");
 	headers += "date: " + formatted_time() + std::string("\n");
-	headers += "\r\n";
+	headers += "\n";
 	return headers;
 }
 
@@ -482,7 +482,7 @@ Locator::~Locator()
 
 void Locator::setResourceFullPath()
 {
-	resourceFullPath = Locate->getLocation()->get_root() + cl.getReadyRequest()->get_request_parsing_data().get_http_path();
+	resourceFullPath = Locate->getLocation()->get_root() + cl.getReadyRequest()->get_request_parsing_data().get_http_path();//problem
 }
 
 std::string Locator::getResourceFullPath(void)
@@ -497,7 +497,7 @@ void PostHandler::setClient(client &_cl)
 
 system_block_response::~system_block_response()
 {
-	
+
 }
 
 GetHandler::~GetHandler()
@@ -554,10 +554,17 @@ void Locator::checker(void)
 }
 
 
-// int Locator::HandleCGI()
-// {
-// 	error = 1;
-// }
+int Locator::HandleCGI()
+{
+	execute_cgi cgiHandler;
+
+	if (cgiHandler.start_execute_cgi(resourceFullPath, getWorkingLocation()->getCgi()->get_cgi_path(), cl.getReadyRequest()->get_request_parsing_data()) != 1)
+		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
+	else
+		statusLine = getResponseStatusLine(200, OK_MSG);
+	response_body = readBody(cgiHandler.get_file_full_path());
+	error = -1337;
+}
 
 std::string Locator::getindexfile(void)
 {
@@ -657,7 +664,7 @@ std::string getErroBody(int erroCode, std::string definebody, client &cl)
 	}
 	if (path != std::string(""))
 		return (readBody(path));
-	return (path); 
+	return (definebody); 
 }
 
 std::string Locator::readBody(std::string path)
@@ -700,7 +707,6 @@ int Locator::handle()
 		error = RESPONSE_BAD_REQUEST;
 	else if (isredirection() != -1)
 		error = MOVED_PERMANENTLY;
-		return (0);
 	if (error != 0)
 		buildresponse();
 	return (1);
