@@ -346,7 +346,17 @@ int parse_config::parsing_conf(int ac, char const **av)
 	std::string line;
 	std::vector<std::string> lines;
 	while (std::getline(file, line))
-		lines.push_back(line);
+	{
+		std::replace( line.begin(), line.end(), '	', ' ');
+		// if (line.size() > 0 && line[0] != '#')
+		// 	lines.push_back(line);
+		size_t i = 0;
+		while (i < line.size() && line[i] == ' ')
+			i++;
+		if (line != " " && line != "" && (i != line.size()))
+			lines.push_back(line);
+			
+	}
 	file.close();
 	set_lines(lines);
 	try
