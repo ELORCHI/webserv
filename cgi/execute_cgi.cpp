@@ -25,7 +25,7 @@ std::string execute_cgi::GetPortFromHeaders(parse_request request)
         port = "80";
 }
 
-void execute_cgi::set_environement(parse_request request, std::string file_full_path, std::string cgi_path)
+void execute_cgi::set_environement(parse_request request, std::string file_full_path)
 {
     setenv( "GATEWAY_INTERFACE", "CGI/1.1",1);
     setenv( "SERVER_PROTOCOL", "HTTP/1.1",1);
@@ -109,7 +109,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
     }
     if (pid == 0)
     {
-        set_environement(request, file_full_path, cgi_path);
+        set_environement(request, file_full_path);
         if (fd[0] > 0)
         {
             dup2(fd[0], 0);
