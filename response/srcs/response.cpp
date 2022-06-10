@@ -434,8 +434,6 @@ std::string Locator::getResourceFullPath(void)
 }
 
 
-
-
 void Locator::checker(void)
 {
 	struct stat s;
@@ -941,7 +939,13 @@ bool PostHandler::supportAppload()
 int PostHandler::creator(std::string path)
 {
 	std::string newf = godFather->getWorkingLocation()->getLocation()->get_root();
+	if ((newf.find_last_of("/") != newf.size() - 1) && (godFather->getWorkingLocation()->getUpload().find_first_of("/") != 0))
+		newf += "/";
+	else if ((newf.find_last_of("/") != newf.size() - 1) && (godFather->getWorkingLocation()->getUpload().find_first_of("/") != 0))
+		newf.pop_back();
 	newf += godFather->getWorkingLocation()->getUpload();
+	if (newf.find_last_of("/") != newf.size() - 1)
+		newf += "/";
 	newwf += getClient().getReadyRequest()->get_request_parsing_data().get_path_body();
 	
 	int new_fd = open(newf.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
