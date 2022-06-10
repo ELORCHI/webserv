@@ -7,6 +7,63 @@
 
 //// check this  if delete method caused a problem
 
+
+response::response()
+{
+
+}
+
+response::~response()
+{
+
+}
+
+responseHandler::responseHandler(client _cl): cl(_cl)
+{
+	buffer = "";
+	response_body = "";
+	headers = "";
+	statusLine = "";
+	error = 0;
+}
+
+
+responseHandler::responseHandler(): cl()
+{
+	buffer = "";
+	response_body = "";
+	headers = "";
+	statusLine = "";
+	error = 0;
+}
+
+responseHandler::~responseHandler()
+{
+}
+
+
+std::string responseHandler::getBuffer()
+{
+	return (statusLine + headers + response_body);
+}
+
+location *workingLocation::getLocation()
+{
+	return serverlocation;
+}
+
+void workingLocation::setUpload(std::string path)
+{
+	upload = path;
+}
+
+
+system_block_response::system_block_response(): responseHandler()
+{
+}
+
+
+
 int rmtree(const char path[])
 {
     size_t path_len;
@@ -408,9 +465,9 @@ std::vector<std::vector<std::string> > workingLocation::getRedirections()
 }
 
 
-Locator::Locator(client &_cl): responseHandler()
+Locator::Locator(client &_cl): responseHandler(_cl)
 {
-	this->setClient(cl);
+	// this->setClient(cl);
 	Locate = new workingLocation;
 	resourceFullPath = "";
 	hasIndex = false;
@@ -477,7 +534,6 @@ std::string Locator::getindexfile(void)
 	for (int i = 0; i < size; i++)
 	{
 		indexfile = _indexs[i];
-		// indexfile = needs update
 		if (stat(indexfile.c_str(), &s))
 		{
 			if (!(s.st_mode & S_IFDIR))
@@ -666,7 +722,14 @@ bool Locator::getAutoIndex(void)
 	return autoindex;
 }
 
-GetHandler::GetHandler(Locator *_godFather): responseHandler()
+bool Locator::getIndex()
+{
+	if (Locate->getLocation()->get_index().size() == 0)
+		return (false);
+	return (true);
+}
+
+GetHandler::GetHandler(Locator *_godFather): responseHandler(_godFather->getClient())
 {
 	godFather = _godFather;
 }
@@ -807,7 +870,7 @@ void GetHandler::buildresponse()
 	}
 }
 
-DeleteHandler::DeleteHandler(Locator *_godFather): responseHandler()
+DeleteHandler::DeleteHandler(Locator *_godFather): responseHandler(_godFather->getClient())
 {
 	godFather = _godFather;
 }
@@ -916,7 +979,7 @@ void DeleteHandler::buildresponse(void)
 }
 
 
-PostHandler::PostHandler(Locator *_godFather): responseHandler()
+PostHandler::PostHandler(Locator *_godFather): responseHandler(_godFather->getClient())
 {
 	godFather = _godFather;
 }
@@ -946,7 +1009,7 @@ int PostHandler::creator(std::string path)
 	newf += godFather->getWorkingLocation()->getUpload();
 	if (newf.find_last_of("/") != newf.size() - 1)
 		newf += "/";
-	newwf += getClient().getReadyRequest()->get_request_parsing_data().get_path_body();
+	newf += getClient().getReadyRequest()->get_request_parsing_data().get_path_body();
 	
 	int new_fd = open(newf.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
 	int old_fd = open(getClient().getReadyRequest()->get_request_parsing_data().get_path_body().c_str(), O_RDONLY, 0644);

@@ -87,12 +87,12 @@ class responseHandler : public response// abstract class
 		responseHandler(client _cl);
 		responseHandler();
 		virtual ~responseHandler();
-		virtual int handle();
+		virtual int handle() = 0;
 		virtual void buildresponse() = 0;
-		void setClient(client &_cl);
-		int send(void);
-		client getClient(void);
-		std::string setexten(std::string path);
+		virtual void setClient(client &_cl);
+		virtual client getClient(void);
+		virtual std::string setexten(std::string path);
+		virtual std::string getBuffer(void);
 	protected:
 		std::string buffer;
 		std::string response_body;
