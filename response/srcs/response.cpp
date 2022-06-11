@@ -1295,6 +1295,7 @@ int PostHandler::creator(std::string path)
         else
             return 500;
 	}
+	godFather->setResourceFullPath(newf);
 	close(new_fd);
 	close(old_fd);
 	unlink(getClient()->getReadyRequest()->get_request_parsing_data().get_path_body().c_str());
@@ -1312,6 +1313,7 @@ int PostHandler::handle()
 			error = INTERNAL_SERVER_ERROR_CODE;
 		else
 			error = CREATED_CODE;
+		std::cout << "==========================================================" << error << std::endl;
 	}
 	else
 	{
@@ -1322,6 +1324,7 @@ int PostHandler::handle()
 		else
 			error = NOT_FOUND_CODE;
 	}
+	buildresponse();
 	return (1);
 }
 
