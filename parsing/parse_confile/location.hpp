@@ -22,7 +22,7 @@ class location
 {
     
 protected:
-    const std::string           _name;
+    std::string           _name;
     std::string                 _locations_path;
     std::vector<std::string>    _allow_methods;
     std::string                 _root;
