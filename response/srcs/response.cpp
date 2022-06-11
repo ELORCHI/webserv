@@ -32,16 +32,16 @@ std::string workingLocation::getDefaultError(int erroCode)
 	int size;
 	std::string errorstring;
 	std::stringstream stream;
-
-	std::cout << "==========================================================" << std::endl;
-	std::cout << "getDefaultError: " << erroCode << std::endl;
 	stream << erroCode;
 	stream >> errorstring;
 	size = defaultError.size();
 	for (int i = 0; i < size; i++)
 	{
-		if (defaultError[i][0] == errorstring)
-			return (defaultError[i][1]);
+		if (defaultError[i][1] == errorstring)
+		{
+			std::cout << defaultError[i][0] << std::endl;
+			return (defaultError[i][0]);
+		}
 	}
 	return ("");
 }
@@ -194,14 +194,12 @@ std::string getDefaultError(int status, Locator *info)
 {
 	std::string body = "";
 	std::string path;
-	std::cout << "==========================================================" << std::endl;
 	std::cout << "getDefaultError:returns full erro body page " << status << std::endl;
 	if (status >= 400)
 	{
 		path = info->getWorkingLocation()->getDefaultError(status);
 		if (path != std::string(""))
 			body = info->readBody(path);
-		std::cout << "getDefaultError:returns full erro body page " << body << std::endl;
 	}
 	return (body);
 }
@@ -220,7 +218,10 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 		headers += "content-length: " + std::string(ss) + std::string("\n");
 	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
 	headers += "date: " + formatted_time() + std::string("\n");
-	headers += "content-type: " + info->getContentType() + std::string("\n");
+	if (status >= 400)
+		headers += "content-type: " + std::string("text/html") + std::string("\n");
+	else
+		headers += "content-type: " + info->getContentType() + std::string("\n");
 	if (status == MOVED_PERMANENTLY)
 	{
 		int i = info->isredirection();
@@ -834,15 +835,17 @@ std::string Locator::readBody(std::string path)
 	struct stat sb;
 
 	std::cout << "call to readBody CHECKER" << std::endl;
+	std::cout << "path to error file" << path << std::endl;
     FILE* input_file = fopen(path.c_str(), "r");
+	std::cout << strerror(errno) << std::endl;
     if (input_file == nullptr) {
+		std::cout <<"%%%%%%%%%%%%%%%%9%%%" << std::endl;
 		return (body);
     }
 	stat(path.c_str(), &sb);
     body.resize(sb.st_size);
     fread(const_cast<char*>(body.data()), sb.st_size, 1, input_file);
     fclose(input_file);
-
     return body;
 }
 
@@ -855,8 +858,11 @@ int Locator::isredirection()
 	for (int i = 0; i < size; i++)
 	{
 		std::vector<std::string> it = redirections[i];
-		if (it[0] == cl->getReadyRequest()->get_request_parsing_data().get_http_path())// need update
+		if (it[0] == cl->getReadyRequest()->get_request_parsing_data().get_http_path())
+		{// need update
+			std::cout << it[0] << std::endl;
 			return (i);
+		}
 	}
 	std::cout << "		return -1" << std::endl;
 	return (-1);
@@ -1165,10 +1171,13 @@ int DeleteHandler::deleter(std::string path)
 		error = rmtree(path.c_str());
 		return (error);
 	}
-	else if (remove(path.c_str()) == 0)
+	else if (access(path.c_str(), W_OK) == 0)
+	{
+		remove(path.c_str());
 		return (0);
+	}
 	else
-		return (1);
+		return ((error = 2));
 }
 
 int DeleteHandler::handleFiles(void)
@@ -1181,6 +1190,8 @@ int DeleteHandler::handleFiles(void)
 	{
 		if (deleter(godFather->getResourceFullPath()) == 0)
 			error = NO_CONTENT;
+		else if (error == 2)
+			error = FORBIDDEN_CODE;
 		else
 			error = INTERNAL_SERVER_ERROR_CODE;//check this
 			// not allowed or server error ? 
@@ -1466,6 +1477,7 @@ responseHandler *getResponse(client  *cl)
 		std::cout << "DeleteHandler" << std::endl;		
 		responseHandler *_deleteHandler = new DeleteHandler(locationHandler);
 		_deleteHandler->handle();
+		std::cout << _deleteHandler->getBuffer() << std::endl;
 		delete locationHandler;
 		delete systemResponse;
 		return _deleteHandler;

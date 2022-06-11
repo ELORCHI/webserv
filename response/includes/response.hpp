@@ -6,6 +6,9 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <cctype>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 
 #define GET std::string("GET")
