@@ -1267,16 +1267,17 @@ int PostHandler::creator(std::string path)
 	std::cout << "==========================================================" << std::endl;
 	std::cout << "	call to PostHandler::creator" << std::endl;
 
-	std::string newf = godFather->getWorkingLocation()->getLocation()->get_root();
-	if ((newf.find_last_of("/") != newf.size() - 1) && (godFather->getWorkingLocation()->getUpload().find_first_of("/") != 0))
-		newf += "/";
-	else if ((newf.find_last_of("/") != newf.size() - 1) && (godFather->getWorkingLocation()->getUpload().find_first_of("/") != 0))
-		newf.pop_back();
-	newf += godFather->getWorkingLocation()->getUpload();
+	//std::string newf = godFather->getWorkingLocation()->getLocation()->get_root();
+	// if ((newf.find_last_of("/") != newf.size() - 1) && (godFather->getWorkingLocation()->getUpload().find_first_of("/") != 0))
+	// 	newf += "/";
+	// else if ((newf.find_last_of("/") != newf.size() - 1) && (godFather->getWorkingLocation()->getUpload().find_first_of("/") != 0))
+	// 	newf.pop_back();
+	std::string newf = godFather->getWorkingLocation()->getUpload();
+	std::cout << "newf 00: " << newf << std::endl;	
 	if (newf.find_last_of("/") != newf.size() - 1)
 		newf += "/";
 	newf += getClient()->getReadyRequest()->get_request_parsing_data().get_path_body();
-	
+	std::cout << "newf 01: " << newf << std::endl;	
 	int new_fd = open(newf.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
 	int old_fd = open(getClient()->getReadyRequest()->get_request_parsing_data().get_path_body().c_str(), O_RDONLY, 0644);
 	char buffer[2000] = {0};
@@ -1305,7 +1306,7 @@ int PostHandler::handle()
 {
 	std::cout << "==========================================================" << std::endl;
 	std::cout << "	call to PostHandler::handle" << std::endl;
-	if (supportAppload() && godFather->getResourceType() == FI)
+	if (supportAppload())
 	{	
 		if (creator(godFather->getResourceFullPath()) == 500)
 			error = INTERNAL_SERVER_ERROR_CODE;
@@ -1411,43 +1412,41 @@ responseHandler *getResponse(client  *cl)
 		return (systemResponse);
 	}
 	else
-		locationHandler->checker();
-	
+		locationHandler->checker();	
+	if (locationHandler->handle())
+	{
+		std::cout << "location handler" << std::endl;
+		delete systemResponse;
+		return locationHandler;
+	}
+	if (method == std::string("POST"))
+	{
+		std::cout << "PostHandler" << std::endl;
 
-	// if (locationHandler->handle())
-	// {
-	// 	std::cout << "location handler" << std::endl;
-	// 	delete systemResponse;
-	// 	return locationHandler;
-	// }
-	// if (method == std::string("POST"))
-	// {
-	// 	std::cout << "PostHandler" << std::endl;
-
-	// 	responseHandler *_postHandler = new PostHandler(locationHandler);
-	// 	_postHandler->handle();
-	// 	delete locationHandler;
-	// 	delete systemResponse;
-	// 	return (_postHandler);
-	// }
-	// if (method == std::string("GET"))
-	// {
-	// 	std::cout << "GetHandler" << std::endl;
-	// 	responseHandler *_getHandler = new GetHandler(locationHandler);
-	// 	_getHandler->handle();
-	// 	delete locationHandler;
-	// 	delete systemResponse;
-	// 	return (_getHandler);
-	// }
-	// else
-	// {
-	// 	std::cout << "DeleteHandler" << std::endl;		
-	// 	responseHandler *_deleteHandler = new DeleteHandler(locationHandler);
-	// 	_deleteHandler->handle();
-	// 	delete locationHandler;
-	// 	delete systemResponse;
-	// 	return _deleteHandler;
-	// }
+		responseHandler *_postHandler = new PostHandler(locationHandler);
+		_postHandler->handle();
+		delete locationHandler;
+		delete systemResponse;
+		return (_postHandler);
+	}
+	if (method == std::string("GET"))
+	{
+		std::cout << "GetHandler" << std::endl;
+		responseHandler *_getHandler = new GetHandler(locationHandler);
+		_getHandler->handle();
+		delete locationHandler;
+		delete systemResponse;
+		return (_getHandler);
+	}
+	else
+	{
+		std::cout << "DeleteHandler" << std::endl;		
+		responseHandler *_deleteHandler = new DeleteHandler(locationHandler);
+		_deleteHandler->handle();
+		delete locationHandler;
+		delete systemResponse;
+		return _deleteHandler;
+	}
 	return (0);
 }
 

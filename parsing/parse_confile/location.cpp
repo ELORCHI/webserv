@@ -151,7 +151,6 @@ void    location::set_client_max_body_size(long long int client_max_body_size)
 
 location    &location::operator=(location const &rhs)
 {
-    this->_name = rhs._name;
     this->_locations_path = rhs._locations_path;
     this->_allow_methods = rhs._allow_methods;
     this->_root = rhs._root;
