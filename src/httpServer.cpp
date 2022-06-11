@@ -368,7 +368,8 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         if (!run_once && cl->getReadyRequest())
                         {
                             run_once = true;
-                            responseHandler *rh = getResponse(*cl);
+                            std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
+                            responseHandler *rh = getResponse(cl);
                             //cl->setResponseBuffer(rh->getBuffer());
                             
                             std::cout << "zbi: " <<  cl->getResponseBuffer() << std::endl;

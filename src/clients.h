@@ -44,6 +44,7 @@ class client {
 
         };
         ~client();
+        client(const client& other);
 
         sockaddr_in getClientAddr()
         {
@@ -61,7 +62,7 @@ class client {
 		// void appendToReadBodyFile(const char *buffer, size_t size);
 		// std::fstream &getBodyFile() { return bodyFile; }
         // std::string getHeadersBuffer() {return headersBuffer;}
-        request *getReadyRequest();
+        request *getReadyRequest() const;
         bool isRequestsQueueEmpty();
         bool isThereARequestReady();
 		void setRequest(request *rq);

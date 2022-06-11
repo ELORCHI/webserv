@@ -57,6 +57,27 @@ client& client::operator= (const client& other)
 	return *this;	
 }
 
+//copy constructor for client using deep copy of the request object
+client::client(const client& other)
+{
+	clientFd = other.clientFd;
+	clientAddr = other.clientAddr;
+	is_done_reading_from = other.is_done_reading_from;
+	read_buffer = other.read_buffer;
+	ready_request = new request(this->pr, other.getReadyRequest()->get_server());
+	// isHeadersBufferResidue = other.isHeadersBufferResidue;
+	this->keepAliveData.timeout = other.keepAliveData.timeout;
+	this->keepAliveData.max = other.keepAliveData.max;
+	this->keepAliveData.is_keepAlive = other.keepAliveData.is_keepAlive;
+	this->keepAliveData.is_connection = other.keepAliveData.is_connection;
+	this->keepAliveData.connection_type = other.keepAliveData.connection_type;
+	this->response_buffer = other.response_buffer;
+	// this->resp = NULL;
+	//bodyFileName = other.bodyFileName;
+	//bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
+} 
+
+
 
 
 client::~client() {
@@ -65,7 +86,7 @@ client::~client() {
 	
 }
 
-request *client::getReadyRequest()
+ request *client::getReadyRequest() const
 {
 	return (this->ready_request);
 }

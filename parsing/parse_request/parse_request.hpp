@@ -35,6 +35,7 @@ class parse_request
         size_t                              _my_content_length;
     public:
         parse_request();
+        parse_request(parse_request const&);
         ~parse_request();
         void set_lines(char *buffer);
         std::string set_http_vmp(std::string);    
@@ -67,6 +68,7 @@ class parse_request
         std::string gen_random(const int len);
         std::vector<std::string> tokenize(std::string s, std::string del);
         bool        get_request_stat()const {return _is_request_complete;};
+        parse_request                       &operator=(parse_request const & rhs);
 };
 
 

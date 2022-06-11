@@ -1228,11 +1228,11 @@ void PostHandler::buildresponse()
 }
 
 
-responseHandler *getResponse(client  cl)
+responseHandler *getResponse(client *cl)
 {
 	responseHandler *systemResponse = new system_block_response();
 	Locator *locationHandler = new Locator(cl);
-	std::string method = cl.getReadyRequest()->get_request_parsing_data().get_http_method();
+	std::string method = cl->getReadyRequest()->get_request_parsing_data().get_http_method();
 	if (systemResponse->handle())
 	{
 		delete locationHandler;

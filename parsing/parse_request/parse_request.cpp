@@ -19,6 +19,51 @@ parse_request::parse_request():
 {
 }
 
+parse_request::parse_request(parse_request const& rh)
+{
+
+	
+		_http_version = rh._http_version;
+		_http_method = rh._http_method;
+		_http_path = rh._http_path;
+		_http_headers = rh._http_headers;
+		_path_body = rh._path_body;
+		_extention = rh._extention;
+		_code_status = rh._code_status;
+		_data = rh._data;
+		_is_request_complete = rh._is_request_complete;
+		_is_header_complete = rh._is_header_complete;
+		_file_descriptor = rh._file_descriptor;
+		_port_request = rh._port_request;
+		_my_content_length = rh._my_content_length;
+		_chunk_size = rh._chunk_size;
+		_is_file_created = rh._is_file_created;
+	
+}
+
+parse_request                       &parse_request::operator=(parse_request const & rhs)
+{
+	// if (rhs != *this)
+	// {
+		_http_version = rhs._http_version;
+		_http_method = rhs._http_method;
+		_http_path = rhs._http_path;
+		_http_headers = rhs._http_headers;
+		_path_body = rhs._path_body;
+		_extention = rhs._extention;
+		_code_status = rhs._code_status;
+		_data = rhs._data;
+		_is_request_complete = rhs._is_request_complete;
+		_is_header_complete = rhs._is_header_complete;
+		_file_descriptor = rhs._file_descriptor;
+		_port_request = rhs._port_request;
+		_my_content_length = rhs._my_content_length;
+		_chunk_size = rhs._chunk_size;
+		_is_file_created = rhs._is_file_created;
+
+		return *this;
+	// }
+}
 
 parse_request::~parse_request()
 {
