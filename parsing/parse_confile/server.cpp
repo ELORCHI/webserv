@@ -361,6 +361,23 @@ unsigned int server::fill_name(std::vector<std::string> words, unsigned int i)
     return i;
 }
 
+unsigned int server::fill_listen(std::vector<std::string> words, unsigned int i)
+{
+    i++;
+    while (i < words.size() && words[i] != "}" && words[i] != "server" && words[i] != "{" && words[i] != "listen" 
+            && words[i] != "root" && words[i] != "allow_methods"
+            && words[i] != "upload_path" && words[i] != "index" && words[i] != "server_names"
+            && words[i] != "error_page" && words[i] != "autoindex"
+            && words[i] != "redirection" && words[i] != "client_max_body_size"
+            && words[i] != "location" && words[i] != "cgi")
+    {
+        set_listen(words[i]);
+        i++;
+    }
+    i--;
+    return i;
+}
+
 unsigned int server::fill_index(std::vector<std::string> words, unsigned int i)
 {
     i++;

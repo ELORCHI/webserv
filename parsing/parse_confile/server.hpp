@@ -56,6 +56,7 @@ public:
     void                         set_autoindex(bool autoindex);
     std::string                  get_name(int) const;
     std::string                  get_listen_host() const;
+    unsigned int                 fill_listen(std::vector<std::string> words, unsigned int i);
     int                          get_listen_port() const;
     std::string                  get_allowed_methods(int i) const;
     std::vector<std::string>     get_allowed_methods() const;

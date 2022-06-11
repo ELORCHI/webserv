@@ -74,7 +74,7 @@ unsigned int   parse_config::server_parsing(unsigned int &i)
         if (_words[i] == "server_names")
             i = s.fill_name(_words, i);
         else if (_words[i] == "listen")
-            s.set_listen(_words[i + 1]);
+            /*s.set_listen(_words[i + 1]);//*/i = s.fill_listen(_words, i);
         else if (_words[i] == "root")
             s.set_root(_words[i + 1]);
         else if (_words[i] == "allow_methods")

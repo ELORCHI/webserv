@@ -685,7 +685,7 @@ int Locator::HandleCGI()
 	execute_cgi cgiHandler;
 
 	std::cout << "==========================================================" << std::endl;
-	std::cout << "Locator HANDLE CGI" << std::endl;
+	std::cout << "Locator HANDLE CGI ***********************" << std::endl;
 	if (cgiHandler.start_execute_cgi(resourceFullPath, getWorkingLocation()->getCgi()->get_cgi_path(), cl->getReadyRequest()->get_request_parsing_data()) != 1)
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
@@ -1019,7 +1019,7 @@ int GetHandler::handle()
 	{
 		error = NOT_FOUND_CODE;
 	}
-	else if (godFather->getResourceType() == FI)
+	else if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
 	{
 		handleFiles();
 	}
@@ -1128,7 +1128,7 @@ int DeleteHandler::handle()
 	std::cout << "	call to DeleteHandler::handle" << std::endl;
 	if (godFather->getResourceType() == NO)
 		error = NOT_FOUND_CODE;
-	else if (godFather->getResourceType() == FI)
+	else if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
 			handleFiles();
 	else
 		HandleDir();
@@ -1317,7 +1317,7 @@ int PostHandler::handle()
 	}
 	else
 	{
-		if (godFather->getResourceType() == FI)
+		if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
 			handleFiles();
 		else if (godFather->getResourceType() == DIRE)
 			HandleDir();

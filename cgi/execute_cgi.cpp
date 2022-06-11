@@ -89,6 +89,11 @@ std::string execute_cgi::gen_random(const int len) {
 
 int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_path, parse_request request)
 {
+    std::cout << "start_execute_cgi" << std::endl;
+    std::cout << "file_full_path :" << file_full_path << std::endl;
+    std::cout << "cgi_path :" << cgi_path << std::endl;
+    std::cout << "method : " << request.get_http_method() << std::endl;
+    std::cout << "query : " << request.get_http_query() << std::endl;
     pid_t   pid = -1;
     int fd[2] = {-1};
     if (request.get_path_body() != "")
