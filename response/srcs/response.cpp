@@ -221,7 +221,7 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
 	if (it != headersmap.end())
 		headers += "connection " + headersmap["connection"] + std::string("\n");
-	headers += "\r\n";
+	headers += "\n";
 	return headers;
 }
 
@@ -422,7 +422,7 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 	for (int i = 0; i < size; i++)
 	{
 		match = 0;
-		for (int j = 0; j < locations[i].get_locations_path().size(); i++)
+		for (int j = 0; j < locations[i].get_locations_path().size(); j++)
 		{
 			if (locations[i].get_locations_path()[j] == source[j])
 				match++;
@@ -521,7 +521,10 @@ Locator::~Locator()
 
 void Locator::setResourceFullPath()
 {
-	resourceFullPath = Locate->getLocation()->get_root() + cl.getReadyRequest()->get_request_parsing_data().get_http_path();//problem
+	resourceFullPath = Locate->getLocation()->get_root();
+	if (resourceFullPath[resourceFullPath.size() - 1] != '/' &&)
+		resourceFullPath += "/";
+	resourceFullPath += cl.getReadyRequest()->get_request_parsing_data().get_http_path();//problem
 }
 
 std::string Locator::getResourceFullPath(void)
@@ -748,8 +751,11 @@ int Locator::handle()
 	else if (isredirection() != -1)
 		error = MOVED_PERMANENTLY;
 	if (error != 0)
+	{
 		buildresponse();
-	return (1);
+		return (1);	
+	}
+	return (0);
 }
 
 
@@ -991,7 +997,8 @@ int DeleteHandler::deleter(std::string path)
 {
 	if (godFather->getResourceType() == DIRE)
 	{
-		return (rmtree(path.c_str()));	
+		error = rmtree(path.c_str());
+		return (error);
 	}
 	else if (remove(path.c_str()) == 0)
 		return (0);
@@ -1018,12 +1025,18 @@ int DeleteHandler::handleFiles(void)
 
 int DeleteHandler::HandleDir(void)
 {
+	std::string newpath;
+
 	if (!godFather->gedEnd())
 		error = CONFLICT;
-	else if (godFather->isCgi(godFather->getResourceFullPath()))
+	else if (godFather->getWorkingLocation()->getCgi() != NULL)
 	{
 		if (godFather->getIndex())
-			godFather->HandleCGI();
+		{
+			newpath = godFather->getResourceFullPath() + godFather->getindexfile();
+			godFather->setResourceFullPath(newpath);
+			handleFiles();
+		}
 		else
 			error = FORBIDDEN_CODE;
 	}
@@ -1043,8 +1056,8 @@ int DeleteHandler::HandleDir(void)
 
 void DeleteHandler::buildresponse(void)
 {
-	switch (error)
 	{
+	switch (error)
 	case NO_CONTENT:
 		statusLine = getResponseStatusLine(NO_CONTENT, NO_CONTENT_MSG);
 		headers = getResponseHeaders(NO_CONTENT, godFather, 0);
@@ -1131,8 +1144,14 @@ int PostHandler::creator(std::string path)
 
 int PostHandler::handle()
 {
-	if (supportAppload() && creator(godFather->getResourceFullPath()))
-		error = CREATED_CODE;
+	if (supportAppload() && godFather->getResourceType() == FI)
+	{	
+		if (creator(godFather->getResourceFullPath() == 500))
+			error = INTERNAL_SERVER_ERROR_CODE;
+		else
+			error = CREATED_CODE;
+	
+	}
 	else
 	{
 		if (godFather->getResourceType() == FI)

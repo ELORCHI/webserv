@@ -82,15 +82,21 @@ int main(const int argc, char const *argv[])
 
     location test;
 
-    test.set_locations_path("/srcs/");
+    test.set_locations_path("/dfsd");
     test.set_root("response/");
     std::string p = "/s";
+
+    location test1;
+    test1.set_locations_path("/sll");
     workingLocation w;
     vec.push_back(test);
+    vec.push_back(test1);
     location *l = w.searchLocation(vec, p);
     if (l)
     {
         std::cout << "ok" << std::endl;
+        std::cout << l->get_locations_path() << std::endl;
+        std::cout << "walo" << std::endl;
     }
     else
     {
