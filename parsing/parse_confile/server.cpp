@@ -488,6 +488,8 @@ server    &server::operator=(server const &rhs)
     if (this != &rhs)
     {
         _name = rhs._name;
+        _listen_host = rhs._listen_host;
+        _listen_port = rhs._listen_port;
         _index = rhs._index;
         _autoindex = rhs._autoindex;
         _client_max_body_size = rhs._client_max_body_size;
@@ -497,6 +499,7 @@ server    &server::operator=(server const &rhs)
         _redirections = rhs._redirections;
         _upload_path = rhs._upload_path;
         _root = rhs._root;
+        _error_pages = rhs._error_pages;
     }
     return *this;
 }
