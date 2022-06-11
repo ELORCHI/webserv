@@ -16,7 +16,7 @@ response::~response()
 
 }
 
-responseHandler::responseHandler(client _cl): cl(_cl)
+responseHandler::responseHandler(client *_cl): cl(_cl)
 {
 	buffer = "";
 	response_body = "";
@@ -217,7 +217,7 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 	}
 	else if (status == CREATED_CODE)
 		headers += "location: " + info->getResourceFullPath() + std::string("\n");//to be tested
-	std::map<std::string, std::string> headersmap =  info->getClient().getReadyRequest()->get_request_parsing_data().get_http_headers();
+	std::map<std::string, std::string> headersmap =  info->getClient()->getReadyRequest()->get_request_parsing_data().get_http_headers();
 	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
 	if (it != headersmap.end())
 		headers += "connection " + headersmap["connection"] + std::string("\n");
@@ -242,7 +242,7 @@ std::string getResponseHeaders(int status, int body_size)
 	return headers;
 }
 
-client responseHandler::getClient(void)
+client *responseHandler::getClient(void)
 {
 	return cl;
 }
@@ -324,7 +324,7 @@ std::string Locator::getContentType(void)
 }
 
 
-void responseHandler::setClient(client &_cl)
+void responseHandler::setClient(client *_cl)
 {
 	cl = _cl;
 }
@@ -332,11 +332,11 @@ void responseHandler::setClient(client &_cl)
 int system_block_response::handle()
 {
 	int err = 0;
-	if (this->isMethodImplemented(cl.getReadyRequest()->get_request_parsing_data().get_http_method()))
+	if (this->isMethodImplemented(cl->getReadyRequest()->get_request_parsing_data().get_http_method()))
 		err = 1;
-	else if (this->isHttpVersionSupported(cl.getReadyRequest()->get_request_parsing_data().get_http_version()) == 1)
+	else if (this->isHttpVersionSupported(cl->getReadyRequest()->get_request_parsing_data().get_http_version()) == 1)
 		err = 1;
-	else if (cl.getReadyRequest()->get_request_parsing_data().get_code_status() == 500)
+	else if (cl->getReadyRequest()->get_request_parsing_data().get_code_status() == 500)
 	{
 		err = 1;
 		error = INTERNAL_SERVER_ERROR_CODE;
@@ -504,7 +504,7 @@ std::vector<std::vector<std::string> > workingLocation::getRedirections()
 }
 
 
-Locator::Locator(client &_cl): responseHandler(_cl)
+Locator::Locator(client *_cl): responseHandler(_cl)
 {
 	// this->setClient(cl);
 	Locate = new workingLocation;
@@ -524,7 +524,7 @@ void Locator::setResourceFullPath()
 	resourceFullPath = Locate->getLocation()->get_root();
 	if (resourceFullPath[resourceFullPath.size() - 1] != '/')
 		resourceFullPath += "/";
-	resourceFullPath += cl.getReadyRequest()->get_request_parsing_data().get_http_path();//problem
+	resourceFullPath += cl->getReadyRequest()->get_request_parsing_data().get_http_path();//problem
 }
 
 std::string Locator::getResourceFullPath(void)
@@ -532,7 +532,7 @@ std::string Locator::getResourceFullPath(void)
 	return resourceFullPath;
 }
 
-void PostHandler::setClient(client &_cl)
+void PostHandler::setClient(client *_cl)
 {
 	cl = _cl;
 }
@@ -552,17 +552,17 @@ PostHandler::~PostHandler()
 }
 
 
-void GetHandler::setClient(client &_cl)
+void GetHandler::setClient(client *_cl)
 {
 	cl = _cl;
 }
 
-void DeleteHandler::setClient(client &_cl)
+void DeleteHandler::setClient(client *_cl)
 {
 	cl = _cl;
 }
 
-void Locator::setClient(client &_cl)
+void Locator::setClient(client *_cl)
 {
 	cl = _cl;
 }
@@ -571,7 +571,7 @@ void Locator::setClient(client &_cl)
 void Locator::checker(void)
 {
 	struct stat s;
-	std::string path = cl.getReadyRequest()->get_request_parsing_data().get_http_path();
+	std::string path = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
 	setworkingLocation();
 	setResourceFullPath();
 	setAutoIndex();
@@ -600,7 +600,7 @@ int Locator::HandleCGI()
 {
 	execute_cgi cgiHandler;
 
-	if (cgiHandler.start_execute_cgi(resourceFullPath, getWorkingLocation()->getCgi()->get_cgi_path(), cl.getReadyRequest()->get_request_parsing_data()) != 1)
+	if (cgiHandler.start_execute_cgi(resourceFullPath, getWorkingLocation()->getCgi()->get_cgi_path(), cl->getReadyRequest()->get_request_parsing_data()) != 1)
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
 		statusLine = getResponseStatusLine(200, OK_MSG);
@@ -630,7 +630,7 @@ std::string Locator::getindexfile(void)
 
 void Locator::setworkingLocation(void)
 {
-	this->Locate->setlocation(cl.getReadyRequest());
+	this->Locate->setlocation(cl->getReadyRequest());
 }
 
 
@@ -687,11 +687,11 @@ int Locator::getResourceType(void)
 	return (resourceType);
 }
 
-std::string getErroBody(int erroCode, std::string definebody, client &cl)
+std::string getErroBody(int erroCode, std::string definebody, client *cl)
 {
 	if (erroCode < 400)
 		return (definebody);
-	std::vector<std::vector<std::string> > defaultError = cl.getReadyRequest()->get_server()->get_error_pages();
+	std::vector<std::vector<std::string> > defaultError = cl->getReadyRequest()->get_server()->get_error_pages();
 	int size;
 	std::string errorstring;
 	std::stringstream stream;
@@ -735,7 +735,7 @@ int Locator::isredirection()
 	for (int i = 0; i < size; i++)
 	{
 		std::vector<std::string> it = redirections[i];
-		if (it[0] == cl.getReadyRequest()->get_request_parsing_data().get_http_path())
+		if (it[0] == cl->getReadyRequest()->get_request_parsing_data().get_http_path())
 			return (i);
 	}
 	return (-1);
@@ -744,9 +744,9 @@ int Locator::isredirection()
 int Locator::handle()
 {
 	error = 0;
-	if (!isMethodAllowd(cl.getReadyRequest()->get_request_parsing_data().get_http_method()))
+	if (!isMethodAllowd(cl->getReadyRequest()->get_request_parsing_data().get_http_method()))
 		error = NOT_ALLOWED_CODE;
-	else if (cl.getReadyRequest()->get_request_parsing_data().get_code_status() == 400)
+	else if (cl->getReadyRequest()->get_request_parsing_data().get_code_status() == 400)
 		error = RESPONSE_BAD_REQUEST;
 	else if (isredirection() != -1)
 		error = MOVED_PERMANENTLY;
@@ -763,7 +763,7 @@ bool Locator::isCgi(std::string path)
 {
 	if (Locate->getCgi() == NULL)
 		return (false);
-	if (cl.getReadyRequest()->get_request_parsing_data().get_http_path().find_last_of(".php"))
+	if (cl->getReadyRequest()->get_request_parsing_data().get_http_path().find_last_of(".php"))
 		return true;
 	return false;
 }
@@ -822,12 +822,12 @@ GetHandler::GetHandler(Locator *_godFather): responseHandler(_godFather->getClie
 }
 
 
-void system_block_response::setClient(client &_cl)
+void system_block_response::setClient(client *_cl)
 {
 	cl = _cl;
 }
 
-client system_block_response::getClient(void)
+client *system_block_response::getClient(void)
 {
 	return (cl);
 }
@@ -843,8 +843,8 @@ std::string getLink(std::string const &dirEntry, std::string const &dirName, std
 std::string GetHandler::setAutoindexResponse(void)
 {
 	std::string path	= godFather->getResourceFullPath();
-	std::string host	= cl.getReadyRequest()->get_server()->get_listen_host();
-	int port			= cl.getReadyRequest()->get_server()->get_listen_port();
+	std::string host	= cl->getReadyRequest()->get_server()->get_listen_host();
+	int port			= cl->getReadyRequest()->get_server()->get_listen_port();
 
     std::string dirName(path);
     DIR *dir = opendir(path.c_str());
@@ -1101,7 +1101,7 @@ bool PostHandler::supportAppload()
 	return false;
 }
 
-client PostHandler::getClient(void)
+client *PostHandler::getClient(void)
 {
 	return (cl);
 }
@@ -1117,10 +1117,10 @@ int PostHandler::creator(std::string path)
 	newf += godFather->getWorkingLocation()->getUpload();
 	if (newf.find_last_of("/") != newf.size() - 1)
 		newf += "/";
-	newf += getClient().getReadyRequest()->get_request_parsing_data().get_path_body();
+	newf += getClient()->getReadyRequest()->get_request_parsing_data().get_path_body();
 	
 	int new_fd = open(newf.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
-	int old_fd = open(getClient().getReadyRequest()->get_request_parsing_data().get_path_body().c_str(), O_RDONLY, 0644);
+	int old_fd = open(getClient()->getReadyRequest()->get_request_parsing_data().get_path_body().c_str(), O_RDONLY, 0644);
 	char buffer[2000] = {0};
 	int ret = 1;
 
@@ -1138,8 +1138,8 @@ int PostHandler::creator(std::string path)
 	}
 	close(new_fd);
 	close(old_fd);
-	unlink(getClient().getReadyRequest()->get_request_parsing_data().get_path_body().c_str());
-	remove(getClient().getReadyRequest()->get_request_parsing_data().get_path_body().c_str());
+	unlink(getClient()->getReadyRequest()->get_request_parsing_data().get_path_body().c_str());
+	remove(getClient()->getReadyRequest()->get_request_parsing_data().get_path_body().c_str());
 	return (1);
 }
 
@@ -1228,7 +1228,7 @@ void PostHandler::buildresponse()
 }
 
 
-responseHandler *getResponse(client *cl)
+responseHandler *getResponse(client  *cl)
 {
 	responseHandler *systemResponse = new system_block_response();
 	Locator *locationHandler = new Locator(cl);

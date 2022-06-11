@@ -84,13 +84,13 @@ class response
 class responseHandler : public response// abstract class
 {
 	public:
-		responseHandler(client _cl);
+		responseHandler(client *_cl);
 		responseHandler();
 		virtual ~responseHandler();
 		virtual int handle() = 0;
 		virtual void buildresponse() = 0;
-		virtual void setClient(client &_cl);
-		virtual client getClient(void);
+		virtual void setClient(client *_cl);
+		virtual client *getClient(void);
 		// std::string setexten(std::string path);
 		std::string getBuffer(void);
 	protected:
@@ -99,7 +99,7 @@ class responseHandler : public response// abstract class
 		std::string statusLine;
 		std::string headers;
 		int error;
-		client cl;
+		client *cl;
 };
 
 
@@ -116,8 +116,8 @@ class system_block_response : public responseHandler
 		void buildresponse();
 		int isMethodImplemented(std::string method);
 		int isHttpVersionSupported(std::string http_version);
-		void setClient(client &_cl);
-		client getClient(void);
+		void setClient(client *cl);
+		client *getClient(void);
 	protected:
 };
 
@@ -155,7 +155,7 @@ class Locator : public responseHandler
 {
 	public:
 		Locator();
-		Locator(client &_cl);
+		Locator(client *_cl);
 		~Locator();
 		int				handle();
 		int				getResourceType(void);
@@ -173,7 +173,7 @@ class Locator : public responseHandler
 		void			checker(void);
 		void			setIndex(void);
 		void			setAutoIndex(void);
-		void			setClient(client &_cl);
+		void			setClient(client *_cl);
 		std::string		getResourceFullPath(void);
 		std::string		readBody(std::string path);
 		workingLocation *getWorkingLocation(void);
@@ -200,7 +200,7 @@ class GetHandler : public responseHandler
 		int handleFiles(void);
 		int HandleDir(void);
 		void buildresponse(void);
-		void setClient(client &_cl);
+		void setClient(client *_cl);
 		void setGodFather(Locator *_godFather);
 		std::string setAutoindexResponse(void);
 	private:
@@ -214,7 +214,7 @@ class DeleteHandler : public responseHandler
 		~DeleteHandler();
 		int handle();
 		void buildresponse();
-		void setClient(client &_cl);
+		void setClient(client *_cl);
 		void setGodFather(Locator *_godFather);
 		int handleFiles(void);
 		int HandleDir(void);
@@ -236,8 +236,8 @@ class PostHandler : public responseHandler
 		int HandleDir(void);
 		int creator(std::string path);
 		bool supportAppload();
-		void setClient(client &_cl);
-		client getClient(void);
+		void setClient(client *_cl);
+		client *getClient(void);
 	private:
 		Locator *godFather;
 };
@@ -261,6 +261,7 @@ std::string getResponseBody(int status, std::string bodyMsg, Locator *info);
 std::string    formatted_time(void);
 std::string getResponseHeaders(int status, Locator *info, int body_size);
 std::string readBody(std::string path);
-std::string getErroBody(int erroCode, std::string definebody, client &cl);
+
 responseHandler *getResponse(client  *cl);
+std::string getErroBody(int erroCode, std::string definebody, client *cl);
 
