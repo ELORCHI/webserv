@@ -152,7 +152,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
                 break ;
             }
         }
-        sleep(1);
+        // sleep(1);
         if (timeout)
         {
             remove(_file_full_path.c_str());
