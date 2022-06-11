@@ -78,29 +78,42 @@
 // test WorkingLocation::searchLocation()
 int main(const int argc, char const *argv[])
 {
-    std::vector<location> vec;
+    // std::vector<location> vec;
 
-    location test;
+    // location test;
 
-    test.set_locations_path("/dfsd");
-    test.set_root("response/");
-    std::string p = "/s";
+    // test.set_locations_path("/dfsd");
+    // test.set_root("response/");
+    // std::string p = "/s";
 
-    location test1;
-    test1.set_locations_path("/sll");
-    workingLocation w;
-    vec.push_back(test);
-    vec.push_back(test1);
-    location *l = w.searchLocation(vec, p);
-    if (l)
+    // location test1;
+    // test1.set_locations_path("/sll");
+    // workingLocation w;
+    // vec.push_back(test);
+    // vec.push_back(test1);
+    // location *l = w.searchLocation(vec, p);
+    // if (l)
+    // {
+    //     std::cout << "ok" << std::endl;
+    //     std::cout << l->get_locations_path() << std::endl;
+    //     std::cout << "walo" << std::endl;
+    // }
+    // else
+    // {
+    //     std::cout << "9WADA" << std::endl;
+    // }
+    std::string path = "/dsfds/fdffd/";
+    // std::cout << path[path.find_last_of("/")] << std::endl;
+    int last = path.find_last_of("/");
+    std::cout << last << std::endl;
+
+    if (last != -1)
     {
-        std::cout << "ok" << std::endl;
-        std::cout << l->get_locations_path() << std::endl;
-        std::cout << "walo" << std::endl;
+        path.erase(last);
     }
-    else
-    {
-        std::cout << "9WADA" << std::endl;
-    }
+    // std::cout << path << std::endl;
+    last = path.find_last_of("/");
+    if (last != -1)
+        std::cout << path.substr(last + 1) << std::endl;
     return 0;
 }

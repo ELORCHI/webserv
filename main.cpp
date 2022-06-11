@@ -8,6 +8,8 @@
 #include <sstream>
 #include <string>
 #include <streambuf>
+#include <sys/types.h>
+#include <dirent.h>
 // #include "servers.hpp"
 
 
@@ -24,6 +26,18 @@ int main(int argc, char *argv[])
     }
 	httpServers srvrs(argc, argv);
 	srvrs.httpServers_repl();
+    // struct stat s;
+    // if (stat("./root/hangover-master/", &s) == 0)
+    // {
+    //     if (s.st_mode & S_IFDIR)
+    //     {
+    //         std::cout << "is a directory" << std::endl;
+    //     }
+    // }
+    // else
+    // {
+    //     std::cout << "is not a directory" << std::endl;
+    // }
     // server s(4200);
     // s.start();
     // s.run();

@@ -126,13 +126,14 @@ class workingLocation
 {
 	public:
 		workingLocation();
-		location		*searchLocation(std::vector<location> locations, std::string source);
+		location		*searchLocation(std::vector<location> locations, std::string source, server *server);
 		location		*defaultLocation(server *server);
 		void			setRedirections(server *server);
 		void			setDefaultError(server *server);
 		void			setlocation(request *request);
 		void			setUpload(std::string path);
 		void			setCgi(cgi cgi);
+		void			checkLocation(server *server);
 		workingLocation(const workingLocation &other);
 		std::string		getUpload(void);
 		std::vector<std::vector<std::string> >	getRedirections(void);
@@ -177,6 +178,7 @@ class Locator : public responseHandler
 		std::string		getResourceFullPath(void);
 		std::string		readBody(std::string path);
 		workingLocation *getWorkingLocation(void);
+		std::string		setindexfile(void);
 		std::string		getindexfile(void);
 		std::string		getContentType(void);
 
@@ -185,6 +187,7 @@ class Locator : public responseHandler
 		workingLocation *Locate;//free
 		std::string		resourceFullPath;
 		int				resourceType;
+		std::string		indexfile;
 		bool			endwithslash;
 		bool			hasIndex;
 		bool			autoindex;
@@ -261,7 +264,9 @@ std::string getResponseBody(int status, std::string bodyMsg, Locator *info);
 std::string    formatted_time(void);
 std::string getResponseHeaders(int status, Locator *info, int body_size);
 std::string readBody(std::string path);
-
+bool endsWith(std::string const &str, std::string const &suffix);
 responseHandler *getResponse(client  *cl);
 std::string getErroBody(int erroCode, std::string definebody, client *cl);
 
+// this filter function will be to filter the requested resource by removing things before the last slash
+std::string filter(std::string path);
