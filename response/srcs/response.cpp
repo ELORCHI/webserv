@@ -16,8 +16,9 @@ response::~response()
 
 }
 
-responseHandler::responseHandler(client *_cl): cl(_cl)
+responseHandler::responseHandler(client *_cl)
 {
+	cl=	_cl;
 	buffer = "";
 	response_body = "";
 	headers = "";
@@ -88,10 +89,9 @@ void workingLocation::setUpload(std::string path)
 }
 
 
-system_block_response::system_block_response(): responseHandler()
+system_block_response::system_block_response(client *cl): responseHandler(cl)
 {
 }
-
 
 
 int rmtree(const char path[])
@@ -332,7 +332,7 @@ void responseHandler::setClient(client *_cl)
 int system_block_response::handle()
 {
 	int err = 0;
-	if (this->isMethodImplemented(cl->getReadyRequest()->get_request_parsing_data().get_http_method()))
+ 	if (this->isMethodImplemented(cl->getReadyRequest()->get_request_parsing_data().get_http_method()))
 		err = 1;
 	else if (this->isHttpVersionSupported(cl->getReadyRequest()->get_request_parsing_data().get_http_version()) == 1)
 		err = 1;
@@ -445,7 +445,10 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 
 void workingLocation::setlocation(request *request)
 {
+	std::cout << "request " << request << std::endl;
+	std::cout << "server " << request->get_server()->get_location_size() << std::endl;
 	location *loc = this->searchLocation(request->get_server()->get_location(), request->get_request_parsing_data().get_http_path());
+	std::cout << "herrlfrfsdf2" << std::endl;
 	if (loc == NULL)
 	{
 		loc = this->defaultLocation(request->get_server());
@@ -521,7 +524,7 @@ Locator::~Locator()
 
 void Locator::setResourceFullPath()
 {
-	resourceFullPath = Locate->getLocation()->get_root();
+	resourceFullPath = Locate->getLocation()->get_root();5
 	if (resourceFullPath[resourceFullPath.size() - 1] != '/')
 		resourceFullPath += "/";
 	resourceFullPath += cl->getReadyRequest()->get_request_parsing_data().get_http_path();//problem
@@ -572,6 +575,8 @@ void Locator::checker(void)
 {
 	struct stat s;
 	std::string path = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
+	std::cout << "path response " << path << std::endl;
+		
 	setworkingLocation();
 	setResourceFullPath();
 	setAutoIndex();
@@ -589,8 +594,11 @@ void Locator::checker(void)
 	}
 	else
 		resourceType = NO;
-	if (*(path.rbegin()) == 92)
+	if (path[path.size() - 1] == '/')
+	{
+		std::cout << "no index" << std::endl;
 		endwithslash = true;
+	}
 	else
 		endwithslash = false;
 }
@@ -892,12 +900,23 @@ void GetHandler::setGodFather(Locator *_godFather)
 
 int GetHandler::handle()
 {
+		std::cout << "main" << std::endl;
+
 	if (godFather->getResourceType() == NO)
+	{
+		std::cout << "NO" << std::endl;
 		error = NOT_FOUND_CODE;
+	}
 	else if (godFather->getResourceType() == FI)
+	{
+		std::cout << "hi" << std::endl;
 			handleFiles();
+	}
 	else
+	{
+		std::cout << "else" << std::endl;
 		HandleDir();
+	}
 	buildresponse();
 	return (1);
 };
@@ -908,12 +927,15 @@ int GetHandler::HandleDir(void)
 
 	if (!godFather->gedEnd())
 	{
+		std::cout << "no slash" << std::endl;
+
 		newpath = godFather->getResourceFullPath() + "/";
 		godFather->setResourceFullPath(newpath);
 		error = MOVED_PERMANENTLY;
 	}
 	else if (!godFather->getIndex())
 	{
+		std::cout << "no index" << std::endl;
 		if (godFather->getAutoIndex())
 			error = AUTOINDEX_CODE;
 		else
@@ -921,7 +943,9 @@ int GetHandler::HandleDir(void)
 	}
 	else
 	{
+		std::cout << "index" << std::endl;
 		newpath = godFather->getResourceFullPath() + godFather->getindexfile();
+		std::cout << "newpath" << newpath << std::endl;
 		godFather->setResourceFullPath(newpath);
 		handleFiles();
 	}
@@ -1230,11 +1254,13 @@ void PostHandler::buildresponse()
 
 responseHandler *getResponse(client  *cl)
 {
-	responseHandler *systemResponse = new system_block_response();
+	responseHandler *systemResponse = new system_block_response(cl);
 	Locator *locationHandler = new Locator(cl);
 	std::string method = cl->getReadyRequest()->get_request_parsing_data().get_http_method();
+
 	if (systemResponse->handle())
 	{
+		std::cout << "Z4:  " << std::endl;
 		delete locationHandler;
 		return (systemResponse);
 	}
@@ -1242,11 +1268,15 @@ responseHandler *getResponse(client  *cl)
 		locationHandler->checker();
 	if (locationHandler->handle())
 	{
+		std::cout << "Z5:  " << std::endl;
+
 		delete systemResponse;
 		return locationHandler;
 	}
 	if (method == std::string("POST"))
 	{
+		std::cout << "Z6:  " << std::endl;
+
 		responseHandler *_postHandler = new PostHandler(locationHandler);
 		_postHandler->handle();
 		delete locationHandler;
@@ -1263,6 +1293,8 @@ responseHandler *getResponse(client  *cl)
 	}
 	else
 	{
+		std::cout << "Z8:  " << std::endl;
+
 		responseHandler *_deleteHandler = new DeleteHandler(locationHandler);
 		_deleteHandler->handle();
 		delete locationHandler;

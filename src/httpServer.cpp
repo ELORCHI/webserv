@@ -336,8 +336,10 @@ void httpServer::run(int num_events, struct kevent *_eventList)
 					read_from_client(cl, _eventList[i].data);	
                     if (cl->is_reading_complete())
                     {
-                        server spd = getServerParsedData();
-                        request *r = new request(cl->get_pr(), &spd);
+                        server *spd = getServerParsedData();
+                        std::cout << "zzzzzz1 " << spd->get_name(0) << std::endl;
+                        request *r = new request(cl->get_pr(), spd);
+                        std::cout << "Z2:  " << r->get_server()->get_name(0) << std::endl;
                         // if (doesHttpRequestBelongs(r))
                         //     cl->setRequest(r);
                         // else
@@ -346,7 +348,9 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         //     disconnectClient(cl, true);
                         //     continue;
                         // }
+                        std::cout << "r: " << r << std::endl;
                         cl->setRequest(r);
+                        std::cout << "Z3:  " << cl->getReadyRequest()->get_server()->get_name(0) << std::endl;
                         // std::cout << "req complete" << std::endl;
                         EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
                         kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
@@ -372,7 +376,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                             responseHandler *rh = getResponse(cl);
                             //cl->setResponseBuffer(rh->getBuffer());
                             
-                            std::cout << "zbi: " <<  cl->getResponseBuffer() << std::endl;
+                            // std::cout << "zbi: " <<  cl->getResponseBuffer() << std::endl;
                         }
 						// std::cout << "request complete" << std::endl;
                         EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);

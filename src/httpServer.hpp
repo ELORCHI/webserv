@@ -72,7 +72,11 @@ class httpServer
         void read_from_client(client *c, long data_length);
         bool doesHttpRequestBelongs(request *rq);
         int getServerFd();
-        server getServerParsedData() { return server_parsed_data; };
+        server *getServerParsedData() { 
+            server *s = new server;
+            *s = server_parsed_data;
+            return s; 
+        };
     //handeling multiple servers interface
     public:
         static std::vector<httpServer> servers;

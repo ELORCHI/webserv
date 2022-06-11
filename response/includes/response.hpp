@@ -110,7 +110,7 @@ class responseHandler : public response// abstract class
 class system_block_response : public responseHandler
 {
 	public:
-		system_block_response();
+		system_block_response(client *cl);
 		~system_block_response();
 		int handle();
 		void buildresponse();

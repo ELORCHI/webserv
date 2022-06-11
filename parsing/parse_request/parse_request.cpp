@@ -304,6 +304,8 @@ int    parse_request::start_parsing(char *buff, size_t size)
 					set_http_headers(header);
 				if (get_http_method() != "POST" || _code_status)
 				{
+					std::cout << "Path: " << get_http_path() << std::endl;
+
 					if (!_code_status)
 						_code_status = 200;
 					//if !_code_status then _code_status = 200
@@ -338,10 +340,10 @@ int    parse_request::start_parsing(char *buff, size_t size)
 		close(_file_descriptor);
 		_code_status = 200;
 	}
+	// std::cout << "Path: " << get_http_path() << std::endl;
 	return _is_request_complete;
 	// std::cout << "Method: " << get_http_method() << std::endl;
 	// std::cout << "Version: " << get_http_version() << std::endl;
-	// std::cout << "Path: " << get_http_path() << std::endl;
 	// std::cout << "Query: " << get_http_query() << std::endl;
 	// std::cout << "Fragment: " << _http_path["fragment"] << std::endl;
 	// std::cout << "Headers: " << std::endl;
