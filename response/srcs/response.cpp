@@ -522,7 +522,7 @@ Locator::~Locator()
 void Locator::setResourceFullPath()
 {
 	resourceFullPath = Locate->getLocation()->get_root();
-	if (resourceFullPath[resourceFullPath.size() - 1] != '/' &&)
+	if (resourceFullPath[resourceFullPath.size() - 1] != '/')
 		resourceFullPath += "/";
 	resourceFullPath += cl.getReadyRequest()->get_request_parsing_data().get_http_path();//problem
 }
@@ -1056,8 +1056,9 @@ int DeleteHandler::HandleDir(void)
 
 void DeleteHandler::buildresponse(void)
 {
-	{
+	
 	switch (error)
+	{
 	case NO_CONTENT:
 		statusLine = getResponseStatusLine(NO_CONTENT, NO_CONTENT_MSG);
 		headers = getResponseHeaders(NO_CONTENT, godFather, 0);
@@ -1146,7 +1147,7 @@ int PostHandler::handle()
 {
 	if (supportAppload() && godFather->getResourceType() == FI)
 	{	
-		if (creator(godFather->getResourceFullPath() == 500))
+		if (creator(godFather->getResourceFullPath()) == 500)
 			error = INTERNAL_SERVER_ERROR_CODE;
 		else
 			error = CREATED_CODE;
@@ -1227,7 +1228,7 @@ void PostHandler::buildresponse()
 }
 
 
-responseHandler *getResponse(client  &cl)
+responseHandler *getResponse(client  cl)
 {
 	responseHandler *systemResponse = new system_block_response();
 	Locator *locationHandler = new Locator(cl);

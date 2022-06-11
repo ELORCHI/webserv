@@ -16,7 +16,7 @@ class request {
     parse_request request_parsing_data;
     server *server_parsed_data;
     public:
-        request(std::string request_text, int port, server *server_parsed_data);
+        request(parse_request &pr, server *server_parsed_data);
         ~request() {}
         parse_request get_request_parsing_data();
         std::string getHost();
@@ -30,7 +30,7 @@ class request {
 
     // static int get_content_length(std::string astring);
     public:
-        int get_port();
+        //int get_port();
         static int get_content_length(std::string astring);
         static bool is_chunked_request_complete(std::fstream &body);
 		static bool is_requestHeaderComplete(std::string buffer);

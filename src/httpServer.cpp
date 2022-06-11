@@ -39,10 +39,19 @@ bool httpServer::doesHttpRequestBelongs(request *rq)
     for (int i = 0; i < server_parsed_data.get_name_size(); i++)
     {
         if (server_parsed_data.get_name(i) == rq->getHost())
+        {
             doesRequestHostBelong = true;
+            std::cout << "Host: " << rq->getHost() << " belongs to server" << std::endl;
+            std::cout << "server host: " << server_parsed_data.get_name(i) << std::endl;
+            std::cout << "server port: " << this->listenServerPort << std::endl;
+        }
+   // std::cout << "request port: " << rq->getPort() << std::endl;
     }
     if (server_parsed_data.get_listen_port() == rq->getPort())
+    {
         doesRequestPortBelong = true;
+        std::cout << "Port: " << rq->getPort() << " belongs to server" << std::endl;
+    }
     if (doesRequestHostBelong && doesRequestPortBelong)
         return true;
     return false;
@@ -173,7 +182,8 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     kevent(serverKqFd, &_kEvent, 1, NULL, 0, NULL);
     // std::cout << "daaaah" << std::endl;
     canRun = true;
-	run_once = 0;
+	run_once = false;
+
     //return true;
 }
 
@@ -279,6 +289,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
     //int num_events = 0;
     client *cl;
     struct kevent kEv;
+    bool run_once = false;
 
     if (canRun)
     {
@@ -325,6 +336,17 @@ void httpServer::run(int num_events, struct kevent *_eventList)
 					read_from_client(cl, _eventList[i].data);	
                     if (cl->is_reading_complete())
                     {
+                        server spd = getServerParsedData();
+                        request *r = new request(cl->get_pr(), &spd);
+                        // if (doesHttpRequestBelongs(r))
+                        //     cl->setRequest(r);
+                        // else
+                        // {
+                        //     delete r;
+                        //     disconnectClient(cl, true);
+                        //     continue;
+                        // }
+                        cl->setRequest(r);
                         // std::cout << "req complete" << std::endl;
                         EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
                         kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
@@ -343,6 +365,14 @@ void httpServer::run(int num_events, struct kevent *_eventList)
 					{
 						std::string rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 37\r\n\r\n<html><body><h2>ok</h2></body></html>";
 						int s = send(cl->getClientFd(), rep.c_str(), rep.length(), 0);
+                        if (!run_once && cl->getReadyRequest())
+                        {
+                            run_once = true;
+                            responseHandler *rh = getResponse(*cl);
+                            //cl->setResponseBuffer(rh->getBuffer());
+                            
+                            std::cout << "zbi: " <<  cl->getResponseBuffer() << std::endl;
+                        }
 						// std::cout << "request complete" << std::endl;
                         EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
                         kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);

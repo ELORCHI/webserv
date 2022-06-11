@@ -48,6 +48,7 @@ httpServers::httpServers(int argc, char **argv)
 void httpServers::httpServers_repl()
 {
     int num_events = 0;
+
     while (1)
     {
         for (int i = 0; i < _servers.size(); i++)

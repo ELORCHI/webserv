@@ -31,6 +31,7 @@
 #include <unordered_set>
 #include <set>
 #include <fstream>
+#include "../response/includes/response.hpp"
 //#include "servers.hpp"
 
 
@@ -55,7 +56,7 @@ class httpServer
     int serverKqFd;
     bool canRun;
    // struct kevent _eventList[MAX_EVENTS];
-    std::unordered_map<int, client*>clientmap;
+    std::map<int, client*>clientmap;
     bool is_shared_port;
     server server_parsed_data;
 	int run_once;
@@ -71,6 +72,7 @@ class httpServer
         void read_from_client(client *c, long data_length);
         bool doesHttpRequestBelongs(request *rq);
         int getServerFd();
+        server getServerParsedData() { return server_parsed_data; };
     //handeling multiple servers interface
     public:
         static std::vector<httpServer> servers;

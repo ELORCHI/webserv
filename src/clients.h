@@ -7,6 +7,7 @@
 #include "request.hpp"
 #include <fstream>
 #include <sstream>
+// #include "../response/includes/response.hpp"
 
 
 class client {
@@ -22,7 +23,10 @@ class client {
 	// std::string bodyFileName;
 	// std::fstream bodyFile;
 	request* ready_request;
+    // responseHandler *resp;
+
     parse_request pr;
+    
     typedef struct {
         int timeout;
         int max;
@@ -31,6 +35,7 @@ class client {
         bool is_connection; 
     } keepAlive;
     keepAlive keepAliveData;
+    std::string response_buffer;
     public:
     client& operator= (const client& other);
         client(int fd, struct sockaddr_in addr);
@@ -66,4 +71,7 @@ class client {
         keepAlive getKeepAliveInfo() { return this->keepAliveData; };
         void setKeepAliveInfo(std::string _kad);
         void setConnectionType(std::string connectionType);
+        void setResponseBuffer(std::string response_buffer) { this->response_buffer = response_buffer; }
+        std::string getResponseBuffer() { return response_buffer; }
+        // void setResponseHand(responseHandler *resp);
 };
