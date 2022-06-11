@@ -569,13 +569,17 @@ void Locator::setResourceFullPath()
 	//=================================//
 	std::string tmp = Locate->getUpload();
 	if (tmp[0] == '.')
-		tmp.erase(0);
-	if (cl->getReadyRequest()->get_request_parsing_data().get_http_path().find(tmp) != std::string::npos)
+		tmp.erase(0, 1);
+	std::cout << "tmp: " << tmp << std::endl;
+	std::cout << cl->getReadyRequest()->get_request_parsing_data().get_http_path().find(tmp) << std::endl;
+	std::cout << cl->getReadyRequest()->get_request_parsing_data().get_http_path() << std::endl;
+	if (cl->getReadyRequest()->get_request_parsing_data().get_http_path().find(tmp) != -1)
 	{
+		std::cout << "upload path found" << std::endl;
 		resourceFullPath = cl->getReadyRequest()->get_server()->get_root() + Locate->getUpload();
 		resourceFullPath += filter(cl->getReadyRequest()->get_request_parsing_data().get_http_path());
+		//=================================//
 	}
-	//=================================//
 	else
 	{
 		resourceFullPath = Locate->getLocation()->get_root();
