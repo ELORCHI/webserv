@@ -495,6 +495,7 @@ server    &server::operator=(server const &rhs)
         _location = rhs._location;
         _cgi = rhs._cgi;
         _redirections = rhs._redirections;
+        _upload_path = rhs._upload_path;
         _root = rhs._root;
     }
     return *this;

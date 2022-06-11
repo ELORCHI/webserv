@@ -486,7 +486,7 @@ void workingLocation::setlocation(request *request)
 	}
 	serverlocation = loc;
 	setUpload(request->get_server()->get_upload_path());
-	// testting if setUpload is working
+	// testing if setUpload is working
 	std::cout << "testing if setUpload is working" << std::endl;
 	std::cout << "upload path: " << upload << std::endl;
 	setRedirections(request->get_server());

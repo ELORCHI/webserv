@@ -337,6 +337,8 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                     if (cl->is_reading_complete())
                     {
                         server *spd = getServerParsedData();
+                        std::cout << "testiiiiiiin" << std::endl;
+                        std::cout << spd->get_upload_path() << std::endl;
                         request *r = new request(cl->get_pr(), spd);
                         // if (doesHttpRequestBelongs(r))
                         //     cl->setRequest(r);
