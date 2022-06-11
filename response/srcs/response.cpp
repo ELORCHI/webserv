@@ -271,6 +271,8 @@ std::string Locator::getContentType(void)
 	std::cout << "==========================================================" << std::endl;
 	std::cout << "getContentType: " << resourceFullPath << std::endl;
 
+	if (error >= 400)
+		return ("text/html");
 	if (i != std::string::npos)
 	{
 	   res = resourceFullPath.substr(i + 1, resourceFullPath.length() - i);
@@ -1458,15 +1460,22 @@ bool endsWith(std::string const &str, std::string const &suffix) {
 
 std::string filter(std::string path)
 {
+	int flag = 0;
+
 	if (path == std::string("/"))
 		return (path);
 	if (endsWith(path, "/"))
+	{
+		flag = 1;
 		path.erase(path.size() - 1);
+	}
 	int last = path.find_last_of("/");
 	if (last != -1)
 	{
 		path = path.substr(last + 1);
 	}
+	if (flag)
+		path += "/";
 	return (path);
 }
 

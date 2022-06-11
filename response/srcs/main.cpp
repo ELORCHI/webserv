@@ -102,7 +102,7 @@ int main(const int argc, char const *argv[])
     // {
     //     std::cout << "9WADA" << std::endl;
     // }
-    std::string path = "/dsfds/fdffd/";
+    std::string path = "fdffd/";
     // std::cout << path[path.find_last_of("/")] << std::endl;
     int last = path.find_last_of("/");
     std::cout << last << std::endl;
@@ -111,7 +111,7 @@ int main(const int argc, char const *argv[])
     {
         path.erase(last);
     }
-    // std::cout << path << std::endl;
+    std::cout << path << std::endl;
     last = path.find_last_of("/");
     if (last != -1)
         std::cout << path.substr(last + 1) << std::endl;
