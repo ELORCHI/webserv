@@ -564,17 +564,32 @@ void Locator::setResourceFullPath()
 {
 	std::cout << "==========================================================" << std::endl;
 	std::cout << "Locator SET RESOURCE FULL PATH" << std::endl;
-	resourceFullPath = Locate->getLocation()->get_root();
-	std::cout << "resourceFullPath befor : " << resourceFullPath << std::endl;
-	if (resourceFullPath[resourceFullPath.size() - 1] != '/')
+	
+
+	//=================================//
+	std::string tmp = Locate->getUpload();
+	if (tmp[0] == '.')
+		tmp.erase(0);
+	if (cl->getReadyRequest()->get_request_parsing_data().get_http_path().find(tmp) != std::string::npos)
 	{
-		std::cout << "append slaches" << std::endl;
-		resourceFullPath += "/";
-	}
-	if (filter(cl->getReadyRequest()->get_request_parsing_data().get_http_path())[0] != '/')
+		resourceFullPath = cl->getReadyRequest()->get_server()->get_root() + Locate->getUpload();
 		resourceFullPath += filter(cl->getReadyRequest()->get_request_parsing_data().get_http_path());
-	std::cout << "set resource full path: " << resourceFullPath << std::endl;
-	std::cout << "==========================================================" << std::endl;
+	}
+	//=================================//
+	else
+	{
+		resourceFullPath = Locate->getLocation()->get_root();
+		std::cout << "resourceFullPath befor : " << resourceFullPath << std::endl;
+		if (resourceFullPath[resourceFullPath.size() - 1] != '/')
+		{
+			std::cout << "append slaches" << std::endl;
+			resourceFullPath += "/";
+		}
+		if (filter(cl->getReadyRequest()->get_request_parsing_data().get_http_path())[0] != '/')
+			resourceFullPath += filter(cl->getReadyRequest()->get_request_parsing_data().get_http_path());
+		std::cout << "set resource full path: " << resourceFullPath << std::endl;
+		std::cout << "==========================================================" << std::endl;
+	}
 }
 
 std::string Locator::getResourceFullPath(void)
@@ -628,6 +643,7 @@ void Locator::checker(void)
 	setResourceFullPath();
 	setAutoIndex();
 	std::cout << resourceFullPath << std::endl;
+
 	if (isCgi(resourceFullPath))
 	{
 		std::cout << "file is cgi" << std::endl;
@@ -1492,3 +1508,5 @@ void workingLocation::checkLocation(server *server)
 	// if (serverlocation->get_methods().size() == 0)
 	// 	serverlocation->fill_allowed_methods(server->get_allowed_methods(), 0);
 }
+
+// this function checks to be geted is already in uploads or not
