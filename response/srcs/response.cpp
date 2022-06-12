@@ -724,17 +724,17 @@ int Locator::HandleCGI()
 	if (cgiHandler.start_execute_cgi(resourceFullPath, getWorkingLocation()->getCgi()->get_cgi_path(), cl->getReadyRequest()->get_request_parsing_data()) != 1)
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
+	{
+		// std::map<std::string, std::string> 
 		statusLine = getResponseStatusLine(200, OK_MSG);
-	//std::cout << "cgi full path "<< cgiHandler.get_file_body_path() << std::endl;
+	}
 	response_body = readBody(cgiHandler.get_file_body_path());
-	//std::cout <<  " response dyal cgi dzebbi \n "<< response_body <<  std::endl;
-	//std::cout << "==========================================================" << std::endl;
 	std::map <std::string, std::string> tmp = cgiHandler.get_headers();
 	for(std::map <std::string, std::string>::iterator it = tmp.begin(); it!=tmp.end(); ++it)
 		headers += it->first + ": " + it->second + "\r\n";
-	// std::cout << "headers :" << headers << std::endl;
+	headers += "\r\n";
 	error = -1337;
-	return (error);// if error is -1337 then cgi is executed
+	return (error);//check this 
 }
 
 std::string Locator::getindexfile()
@@ -1080,10 +1080,11 @@ void GetHandler::setGodFather(Locator *_godFather)
 int GetHandler::handle()
 {
 
-	//std::cout << "==========================================================" << std::endl;
-	//std::cout << "	call to handle from gethandler" << std::endl;
+	std::cout << "==========================================================" << std::endl;
+	std::cout << "	call to handle from gethandler" << std::endl;
 	if (godFather->getResourceType() == NO)
 	{
+		std::cout << "NOT FOUND" << std::endl;
 		error = NOT_FOUND_CODE;
 	}
 	else if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
@@ -1173,7 +1174,7 @@ void GetHandler::buildresponse()
 		break;
 	case NOT_FOUND_CODE:
 		response_body = getResponseBody(NOT_FOUND_CODE, NOT_FOUND_RESPONSE_MSG, godFather);
-		statusLine = getResponseStatusLine(NOT_FOUND_CODE, FORBIDDEN_MSG);
+		statusLine = getResponseStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
 		headers = getResponseHeaders(NOT_FOUND_CODE, godFather, response_body.size());
 		break;
 	default:
@@ -1515,7 +1516,7 @@ responseHandler *getResponse(client  *cl)
 		locationHandler->checker();	
 	if (locationHandler->handle())
 	{
-		//std::cout << "location handler" << std::endl;
+		std::cout << "location handler" << std::endl;
 		//std::cout << locationHandler->getBuffer() << std::endl;
 		delete systemResponse;
 		return locationHandler;
@@ -1532,7 +1533,7 @@ responseHandler *getResponse(client  *cl)
 	}
 	if (method == std::string("GET"))
 	{
-		//std::cout << "GetHandler" << std::endl;
+		std::cout << "GetHandler" << std::endl;
 		responseHandler *_getHandler = new GetHandler(locationHandler);
 		_getHandler->handle();
 		//std::cout << "check if buffer is empty:" <<  _getHandler->getBuffer() << std::endl;
