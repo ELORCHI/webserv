@@ -51,7 +51,15 @@ public:
     void                        set_client_max_body_size(std::string client_max_body_size);
     void                        set_index(std::string index);
     unsigned int                 fill_allowed_methods(std::vector<std::string>, unsigned int);
+    void                         fill_allowed_methodes(std::vector<std::string> methods)
+    {
+        this->_allow_methods = methods;
+    }
     unsigned int                 fill_index(std::vector<std::string>, unsigned int);
+    void                         fill_indexs(std::vector<std::string> index)
+    {
+        _index = index;
+    }
     unsigned int                 fill_autoindex(std::vector<std::string>, unsigned int);
     bool                         is_number(const std::string &str);
     bool                         not_predefined(std::string &) const;

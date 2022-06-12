@@ -50,7 +50,7 @@ std::string getResponseStatusLine(int status, std::string status_line)
 {
 	std::string buffer;
 
-	buffer = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\n");
+	buffer = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\r\n");
 	return buffer;
 }
 
@@ -215,28 +215,28 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 	//std::cout << "From getResponseHeaders" << std::endl;
 	
 	if (status != NO_CONTENT)
-		headers += "content-length: " + std::string(ss) + std::string("\n");
-	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
-	headers += "date: " + formatted_time() + std::string("\n");
-	if (status >= 400)
-		headers += "content-type: " + std::string("text/html") + std::string("\n");
+		headers += "content-length: " + std::string(ss) + std::string("\r\n");
+	headers += "Server: " + std::string("420 SERVER") + std::string("\r\n");
+	headers += "date: " + formatted_time() + std::string("\r\n");
+	if (status >= 400 || status == MOVED_PERMANENTLY)
+		headers += "content-type: " + std::string("text/html") + std::string("\r\n");
 	else
-		headers += "content-type: " + info->getContentType() + std::string("\n");
+		headers += "content-type: " + info->getContentType() + std::string("\r\n");
 	if (status == MOVED_PERMANENTLY)
 	{
 		int i = info->isredirection();
 		if (i != -1)
-			headers += "location: " + info->getWorkingLocation()->getRedirections()[i][1] + std::string("\n");
+			headers += "location: " + info->getWorkingLocation()->getRedirections()[i][1] + std::string("\r\n");
 		else
-			headers += "location: " + info->getResourceFullPath() + std::string("\n");
+			headers += "location: " + info->getResourceFullPath() + std::string("\r\n");
 	}
 	else if (status == CREATED_CODE)
-		headers += "location: " + info->getResourceFullPath() + std::string("\n");//to be tested
+		headers += "location: " + info->getResourceFullPath() + std::string("\r\n");//to be tested
 	std::map<std::string, std::string> headersmap =  info->getClient()->getReadyRequest()->get_request_parsing_data().get_http_headers();
 	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
 	if (it != headersmap.end())
-		headers += "connection " + it->second + std::string("\n");
-	headers += "\n";
+		headers += "connection " + it->second + std::string("\r\n");
+	headers += "\r\n";
 	return headers;
 }
 
@@ -444,36 +444,43 @@ workingLocation::~workingLocation()
 
 location* workingLocation::searchLocation(std::vector<location> locations, std::string source, server *server)
 {
-	int max_match_length = 0;
-	location *loc = new location();
-	int	match;
+
+	std::vector<location> match;
 	int size = locations.size();
-	//std::cout << "==========================================================" << std::endl;
-	//std::cout << "workingLocation SEARCH" << std::endl;
+	location *loc = new location;
 	for (int i = 0; i < size; i++)
 	{
-		match = 0;
-		for (int j = 0; j < locations[i].get_locations_path().size(); j++)
+		if (source.find(locations[i].get_locations_path()) != std::string::npos)
 		{
-			if (locations[i].get_locations_path()[j] == source[j])
-				match++;
-			else
-				break;
-		}
-		if (match > max_match_length)
-		{
-			max_match_length = match;
-			*loc = locations[i];
+			match.push_back(locations[i]);
 		}
 	}
-	if (max_match_length == 0)
+	if (match.size() == 0)
 	{
-		//std::cout << "working location not found" << std::endl;
+		std::cout << "no match" << std::endl;
 		delete loc;
-		return (NULL);
+		return NULL;
 	}
-	longest_match = max_match_length;
-	checkLocation(server);
+	else if (match.size() == 1)
+	{
+		*loc = match[0];
+		return loc;
+	}
+	else
+	{
+		int max = 0;
+		int index = 0;
+		for (int i = 0; i < match.size(); i++)
+		{
+			if (match[i].get_locations_path().size() > max)
+			{
+				max = match[i].get_locations_path().size();
+				index = i;
+			}
+		}
+		*loc = match[index];
+		return loc;
+	}
 	return loc;
 }
 
@@ -481,13 +488,15 @@ void workingLocation::setlocation(request *request)
 {
 
 	location *loc = this->searchLocation(request->get_server()->get_location(), request->get_request_parsing_data().get_http_path(), request->get_server());
-
 	//std::cout << "==========================================================" << std::endl;
 	//std::cout << "workingLocation SET" << std::endl;
 	if (loc == NULL)
 	{
+		std::cout << "no match" << std::endl;
+		std::cout << "defautl location" << std::endl;
 		loc = this->defaultLocation(request->get_server());
 	}
+	std::cout << "selected location is " << loc->get_locations_path() <<std::endl;
 	serverlocation = loc;
 	setUpload(request->get_server()->get_upload_path());
 	// testing if setUpload is working
@@ -515,15 +524,15 @@ void workingLocation::setRedirections(server *server)
 location *workingLocation::defaultLocation(server *server)
 {
 	//std::cout << "==========================================================" << std::endl;
-	//std::cout << "workingLocation DEFAULT" << std::endl;
-	//std::cout << "default location" << std::endl;
-	location *loc = new location();
+	std::cout << "workingLocation DEFAULT" << std::endl;
+	std::cout << "default location" << std::endl;
+	location *loc = new location;
 	loc->set_root(server->get_root());
 	loc->set_client_max_body_size(server->get_client_max_body_size());
-	// loc->set_index(server->get_index());
-	loc->fill_index(server->get_index(), 0);
+	loc->fill_indexs(server->get_index());
 	loc->set_autoindex(server->get_autoindex());
-	loc->fill_allowed_methods(server->get_allowed_methods(), 0);
+	loc->fill_allowed_methodes(server->get_allowed_methods());
+	std::cout << "default Location is " << loc->get_locations_path() << std::endl;
 	return loc;
 }
 
@@ -566,7 +575,8 @@ void Locator::setResourceFullPath()
 {
 	//std::cout << "==========================================================" << std::endl;
 	//std::cout << "Locator SET RESOURCE FULL PATH" << std::endl;
-	std:: string p = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
+	std::string p = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
+	std::string rmlink;
 	int i;
 	//=================================//
 	std::string tmp = Locate->getUpload();
@@ -588,11 +598,16 @@ void Locator::setResourceFullPath()
 	{
 		resourceFullPath = Locate->getLocation()->get_root();
 		//std::cout << "resourceFullPath befor : " << resourceFullPath << std::endl;
-		std::string loc = Locate->getLocation()->get_locations_path();
-		p.erase(0, Locate->getLongest_match());
-		if (p[0] == '/')
-			p.erase(0, 1);
-		resourceFullPath += p;
+		std::string loc_path = Locate->getLocation()->get_locations_path();
+		rmlink = p.erase(0, loc_path.size());
+		// avoid to slashes when concatenating resourceFullPath and rmlink
+		resourceFullPath += rmlink;
+		// rm two consecutive slashes
+		while (resourceFullPath.find("//") != -1)
+		{
+			resourceFullPath.erase(resourceFullPath.find("//"), 1);
+		}
+		std::cout << "resourceFullPath after : " << resourceFullPath << std::endl;
 	}
 }
 
