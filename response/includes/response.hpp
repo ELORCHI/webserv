@@ -1,4 +1,3 @@
-
 #pragma once
 #include "../../includes/webserv.hpp"
 #include <stdlib.h>
@@ -190,6 +189,14 @@ class Locator : public responseHandler
 		std::string		setindexfile(void);
 		std::string		getindexfile(void);
 		std::string		getContentType(void);
+		void			setAutoIndexResponse(bool autoindexResponse)
+		{
+			this->autoindexResponse = autoindexResponse;
+		}
+		bool			getAutoindexResponse(void)
+		{
+			return autoindexResponse;
+		}
 		std::string		getLine(void)
 		{
 			return statusLine;
@@ -212,6 +219,7 @@ class Locator : public responseHandler
 		bool			endwithslash;
 		bool			hasIndex;
 		bool			autoindex;
+		bool			autoindexResponse;
 };
 
 class GetHandler : public responseHandler
