@@ -26,6 +26,18 @@ std::string execute_cgi::GetPortFromHeaders(parse_request request)
     return port;
 }
 
+std::string execute_cgi::upper_fun(std::string blan , bool set_http)
+{
+    std::string tmp = "";
+    if (set_http)
+        tmp = "HTTP_";
+    for (int i = 0; i < blan.size(); i++)
+    {
+        tmp += toupper(blan[i]);
+    }
+    return tmp;
+}
+
 void execute_cgi::set_environement(parse_request request, std::string file_full_path)
 {
     setenv( "GATEWAY_INTERFACE", "CGI/1.1",1);
@@ -50,6 +62,11 @@ void execute_cgi::set_environement(parse_request request, std::string file_full_
         setenv( "CONTENT_TYPE","text/html; charset=UTF-8" ,1);
         setenv( "CONTENT_LENGTH", "0" ,1);
     }
+    // for(std::map <std::string, std::string>::iterator it = request.get_http_headers().begin(); it!=request.get_http_headers().end(); it++)
+    // {
+    //     setenv( upper_fun(it->first, 1).c_str() ,it->second.c_str() ,1);
+    //     std::cout << upper_fun(it->first, 1) << " : " << it->second << std::endl;
+    // }
 }
 
 void    execute_cgi::set_headers(std::string &line)
@@ -94,6 +111,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
     std::cout << "cgi_path :" << cgi_path << std::endl;
     std::cout << "method : " << request.get_http_method() << std::endl;
     std::cout << "query : " << request.get_http_query() << std::endl;
+    std::cout << "path : " << request.get_path_body() << std::endl;
     pid_t   pid = -1;
     int fd[2] = {-1};
     int last_fd = -1;
@@ -125,6 +143,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
         set_environement(request, file_full_path);
         if (fd[0] > 0)
         {
+            std::cout << "***** fd[0] :" << fd[0] << std::endl;
             dup2(fd[0], 0);
             close(fd[0]); 
         }
@@ -184,9 +203,10 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
                 if (output.find("\r\n\r\n") != std::string::npos && !headers_done)
                 {
                     headers = output.substr(0, output.find("\r\n\r\n"));
+                    std::cout << "headers : " << headers << std::endl;
                     output = output.erase(0, output.find("\r\n\r\n") + 4);
                     headers_done = true;
-                    set_headers(output);
+                    set_headers(headers);
                 }
                 if (headers_done)
                 {
@@ -204,10 +224,10 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
             // remove(_file_full_path.c_str());
             close(fd[1]);
             close(last_fd);
-            // for(std::map <std::string, std::string>::iterator it =_headers.begin(); it!=_headers.end(); ++it)
-            // {
-            //    std::cout << it->first << " => " << it->second << '\n';
-            // }
+            for(std::map <std::string, std::string>::iterator it =_headers.begin(); it!=_headers.end(); ++it)
+            {
+               std::cout << it->first << " => " << it->second << '\n';
+            }
         }
         return 1;
     }

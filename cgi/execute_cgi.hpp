@@ -34,6 +34,8 @@ class execute_cgi
         void set_environement(parse_request request, std::string file_full_path);
         std::string GetPortFromHeaders(parse_request request);
         void    set_headers(std::string &line);
+        std::string upper_fun(std::string blan , bool set_http);
+
 
 };
 
