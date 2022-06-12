@@ -102,18 +102,21 @@ int main(const int argc, char const *argv[])
     // {
     //     std::cout << "9WADA" << std::endl;
     // }
-    std::string path = "fdffd/";
-    // std::cout << path[path.find_last_of("/")] << std::endl;
-    int last = path.find_last_of("/");
-    std::cout << last << std::endl;
+    // std::string path = "fdffd/";
+    // // std::cout << path[path.find_last_of("/")] << std::endl;
+    // int last = path.find_last_of("/");
+    // std::cout << last << std::endl;
 
-    if (last != -1)
-    {
-        path.erase(last);
-    }
-    std::cout << path << std::endl;
-    last = path.find_last_of("/");
-    if (last != -1)
-        std::cout << path.substr(last + 1) << std::endl;
+    // if (last != -1)
+    // {
+    //     path.erase(last);
+    // }
+    // std::cout << path << std::endl;
+    // last = path.find_last_of("/");
+    // if (last != -1)
+    //     std::cout << path.substr(last + 1) << std::endl;
+
+    execute_cgi cgiHandler;
+    
     return 0;
 }

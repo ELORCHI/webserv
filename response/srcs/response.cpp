@@ -710,7 +710,8 @@ int Locator::HandleCGI()
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
 		statusLine = getResponseStatusLine(200, OK_MSG);
-	response_body = readBody(cgiHandler.get_file_full_path());
+	std::cout << "cgi full path "<< cgiHandler.get_file_body_path() << std::endl;
+	response_body = readBody(cgiHandler.get_file_body_path());
 	error = -1337;
 	return (error);
 }
@@ -829,23 +830,37 @@ std::string getErroBody(int erroCode, std::string definebody, client *cl)
 
 std::string Locator::readBody(std::string path)
 {
-	std::fstream in_file(path);
-	std::string body = "";
-	struct stat sb;
+	// std::cout << "==========================================================" << path << std::endl;
+	// struct stat sb;
+	// std::string body;
 
-	std::cout << "call to readBody CHECKER" << std::endl;
-	std::cout << "path to error file" << path << std::endl;
-    FILE* input_file = fopen(path.c_str(), "r");
-	std::cout << strerror(errno) << std::endl;
-    if (input_file == nullptr) {
-		std::cout <<"%%%%%%%%%%%%%%%%9%%%" << std::endl;
-		return (body);
+    // FILE* input_file = fopen(path.c_str(), "r");
+	// std::cout << strerror(errno) << std::endl;
+    // if (input_file == nullptr) {
+	// 	std::cout <<"%%%%%%%%%%%%%%%%%%%" << std::endl;
+	// 	return (body);
+    // }
+	// stat(path.c_str(), &sb);
+    // body.resize(sb.st_size);
+    // fread(const_cast<char*>(body.data()), sb.st_size, 1, input_file);
+    // fclose(input_file);
+
+ 	struct stat sb;
+    std::string res;
+
+    int fd = open(path.c_str(), O_RDONLY);
+    if (fd < 0) {
+        perror("open\n");
     }
-	stat(path.c_str(), &sb);
-    body.resize(sb.st_size);
-    fread(const_cast<char*>(body.data()), sb.st_size, 1, input_file);
-    fclose(input_file);
-    return body;
+    fstat(fd, &sb);
+	std::cout << sb.st_size << std::endl;
+    res.resize(sb.st_size);
+    read(fd, (char*)(res.data()), sb.st_size);
+    close(fd);
+    return res;
+	// int fd = open(path.c_str(), O_RDONLY);
+	// if (fd == -1)
+	// 	std::cout << strerror(errno) << std::endl;
 }
 
 int Locator::isredirection()
