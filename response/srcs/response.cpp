@@ -1457,6 +1457,7 @@ responseHandler *getResponse(client  *cl)
 		std::cout << "GetHandler" << std::endl;
 		responseHandler *_getHandler = new GetHandler(locationHandler);
 		_getHandler->handle();
+		std::cout << _getHandler->getBuffer() << std::endl;
 		delete locationHandler;
 		delete systemResponse;
 		return (_getHandler);

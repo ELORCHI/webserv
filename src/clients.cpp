@@ -32,6 +32,8 @@ client::client(int fd, struct sockaddr_in addr)
 	this->keepAliveData.connection_type = "close";
 	this->response_buffer.resize(8000);
 	this->response_buffer = "";
+	this->send_offset = 0;
+	this->is_done_sending_to = false;
 	// this->resp = NULL;
 	//bodyFileName = std::string("/tmp/") +  getRandomName();
 	//bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
@@ -51,6 +53,8 @@ client& client::operator= (const client& other)
 	this->keepAliveData.is_connection = other.keepAliveData.is_connection;
 	this->keepAliveData.connection_type = other.keepAliveData.connection_type;
 	this->response_buffer = other.response_buffer;
+	this->send_offset = other.send_offset;
+	this->is_done_sending_to = other.is_done_sending_to;
 	// this->resp = NULL;
 	//bodyFileName = other.bodyFileName;
 	//bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);
@@ -72,6 +76,8 @@ client::client(const client& other)
 	this->keepAliveData.is_connection = other.keepAliveData.is_connection;
 	this->keepAliveData.connection_type = other.keepAliveData.connection_type;
 	this->response_buffer = other.response_buffer;
+	this->send_offset = other.send_offset;
+	this->is_done_sending_to = other.is_done_sending_to;
 	// this->resp = NULL;
 	//bodyFileName = other.bodyFileName;
 	//bodyFile.open(bodyFileName.c_str(), std::ios::out | std::ios::binary | std::ios::app);

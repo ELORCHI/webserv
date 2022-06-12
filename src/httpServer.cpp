@@ -284,6 +284,29 @@ void httpServer::read_from_client(client *c, long data_length)
     delete[] c_buffer;
 }
 
+void httpServer::write_to_client(client *cl, long data_length, std::string response_buffer)
+{
+    if (!cl)
+        return ;
+    int bytes_sent = 0; // number of bytes sent as returned by the send sys call
+    int remaining_bytes = 0; // bytes that remain to be sent
+    int attempt_to_send_bytes = 0; // number of bytes to be sent in the current send attempt
+
+    remaining_bytes = response_buffer.size() - cl->get_send_offset();
+    attempt_to_send_bytes = remaining_bytes > data_length ? data_length : remaining_bytes;
+    bytes_sent = send(cl->getClientFd(), response_buffer.c_str() + cl->get_send_offset(), attempt_to_send_bytes, 0);
+    if (bytes_sent == -1)
+    {
+        disconnectClient(cl, true);
+        return ;
+    }
+    cl->set_send_offset(cl->get_send_offset() + bytes_sent);
+    if (cl->get_send_offset() >= response_buffer.size())
+    {
+        cl->set_sendin_status(true);
+    }
+}
+
 void httpServer::run(int num_events, struct kevent *_eventList)
 {
     //int num_events = 0;
@@ -331,14 +354,14 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                 //     disconnectClient(cl, true);
                 //     continue;
                 // }
-                if (_eventList[i].filter == EVFILT_READ)
+                if (_eventList[i].filter == EVFILT_READ && cl)
                 { 
 					read_from_client(cl, _eventList[i].data);	
                     if (cl->is_reading_complete())
                     {
                         server *spd = getServerParsedData();
-                        std::cout << "testiiiiiiin" << std::endl;
-                        std::cout << spd->get_upload_path() << std::endl;
+                        // std::cout << "testiiiiiiin" << std::endl;
+                        // std::cout << spd->get_upload_path() << std::endl;
                         request *r = new request(cl->get_pr(), spd);
                         // if (doesHttpRequestBelongs(r))
                         //     cl->setRequest(r);
@@ -361,27 +384,33 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         
 
 	            }
-                else if (_eventList[i].filter == EVFILT_WRITE)
+                else if (_eventList[i].filter == EVFILT_WRITE && cl)
                 {
                     if (cl->is_reading_complete())
 					{
 						std::string rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 37\r\n\r\n<html><body><h2>ok</h2></body></html>";
-						int s = send(cl->getClientFd(), rep.c_str(), rep.length(), 0);
-                        if (!run_once && cl->getReadyRequest())
+						// int s = send(cl->getClientFd(), rep.c_str(), rep.length(), 0);
+                        //responseHandler *rh = NULL;
+                        if (cl->is_sending_to_complete() == false)
                         {
                             run_once = true;
-                            std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
+                            // std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
                             responseHandler *rh = getResponse(cl);
-                            // cl->setResponseBuffer(rh->getBuffer());
-                            
-                            // std::cout << "zbi: " <<  cl->getResponseBuffer() << std::endl;
+                            //std::cerr <<  rh->getBuffer() << std::endl;
+                           write_to_client(cl,  _eventList[i].data, rh->getBuffer());
                         }
+                        if (cl->is_sending_to_complete())
+                        {
+                            //std::cout << "hold on bruh" << std::endl;
+                            disconnectClient(cl, true);
+                        }
+                       // if (rh)
 						// std::cout << "request complete" << std::endl;
-                        EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
-                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                        EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
-                        kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-                        cl->set_reading_status(false);
+                        // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
+                        // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
+                        // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+                        // cl->set_reading_status(false);
                         // if (cl->get_pr().get_http_headers().count("Keep-Alive") > 0)
                         // {
                         //     //get timeout and from keep-alive string
@@ -400,7 +429,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         //         disconnectClient(cl, true);
                         //     }
                         // }
-    					disconnectClient(cl, true);
+    					// disconnectClient(cl, true);
                         // else
                         // {
                         // }
