@@ -6,6 +6,9 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <cctype>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 
 #define GET std::string("GET")
@@ -141,9 +144,14 @@ class workingLocation
 		std::string								getDefaultError(int erroCode);
 		location		*getLocation(void);
 		cgi				*getCgi(void);
+		int				getLongest_match(void)
+		{
+			return longest_match;
+		}
 		~workingLocation();
 	private:
 		location *serverlocation;//free
+		int		longest_match;
 		std::string upload;
 		std::vector<std::vector<std::string> >  redirections;
 		std::vector<std::vector<std::string> >  defaultError;
@@ -264,7 +272,7 @@ std::string getResponseBody(int status, std::string bodyMsg, Locator *info);
 std::string    formatted_time(void);
 std::string getResponseHeaders(int status, Locator *info, int body_size);
 std::string readBody(std::string path);
-bool endsWith(std::string const &str, std::string const &suffix);
+bool endsWith(std::string const str, std::string const suffix);
 responseHandler *getResponse(client  *cl);
 std::string getErroBody(int erroCode, std::string definebody, client *cl);
 

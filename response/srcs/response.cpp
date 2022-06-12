@@ -32,16 +32,16 @@ std::string workingLocation::getDefaultError(int erroCode)
 	int size;
 	std::string errorstring;
 	std::stringstream stream;
-
-	std::cout << "==========================================================" << std::endl;
-	std::cout << "getDefaultError: " << erroCode << std::endl;
 	stream << erroCode;
 	stream >> errorstring;
 	size = defaultError.size();
 	for (int i = 0; i < size; i++)
 	{
-		if (defaultError[i][0] == errorstring)
-			return (defaultError[i][1]);
+		if (defaultError[i][1] == errorstring)
+		{
+			std::cout << defaultError[i][0] << std::endl;
+			return (defaultError[i][0]);
+		}
 	}
 	return ("");
 }
@@ -194,14 +194,12 @@ std::string getDefaultError(int status, Locator *info)
 {
 	std::string body = "";
 	std::string path;
-	std::cout << "==========================================================" << std::endl;
 	std::cout << "getDefaultError:returns full erro body page " << status << std::endl;
 	if (status >= 400)
 	{
 		path = info->getWorkingLocation()->getDefaultError(status);
 		if (path != std::string(""))
 			body = info->readBody(path);
-		std::cout << "getDefaultError:returns full erro body page " << body << std::endl;
 	}
 	return (body);
 }
@@ -220,7 +218,10 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 		headers += "content-length: " + std::string(ss) + std::string("\n");
 	headers += "Server: " + std::string("420 SERVER") + std::string("\n");
 	headers += "date: " + formatted_time() + std::string("\n");
-	headers += "content-type: " + info->getContentType() + std::string("\n");
+	if (status >= 400)
+		headers += "content-type: " + std::string("text/html") + std::string("\n");
+	else
+		headers += "content-type: " + info->getContentType() + std::string("\n");
 	if (status == MOVED_PERMANENTLY)
 	{
 		int i = info->isredirection();
@@ -267,7 +268,7 @@ client *responseHandler::getClient(void)
 std::string Locator::getContentType(void)
 {
 	std::string res = "";
-	size_t i = resourceFullPath.rfind('.', resourceFullPath.length());
+	size_t i = resourceFullPath.find_last_of('.');
 	std::cout << "==========================================================" << std::endl;
 	std::cout << "getContentType: " << resourceFullPath << std::endl;
 
@@ -275,7 +276,7 @@ std::string Locator::getContentType(void)
 		return ("text/html");
 	if (i != std::string::npos)
 	{
-	   res = resourceFullPath.substr(i + 1, resourceFullPath.length() - i);
+		res = resourceFullPath.substr(i, resourceFullPath.length() - i);
 		std::cout << res << std::endl;
 	}
     if (!res.empty())
@@ -471,6 +472,7 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 		delete loc;
 		return (NULL);
 	}
+	longest_match = max_match_length;
 	checkLocation(server);
 	return loc;
 }
@@ -564,35 +566,33 @@ void Locator::setResourceFullPath()
 {
 	std::cout << "==========================================================" << std::endl;
 	std::cout << "Locator SET RESOURCE FULL PATH" << std::endl;
-	
-
+	std:: string p = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
+	int i;
 	//=================================//
 	std::string tmp = Locate->getUpload();
-	if (tmp[0] == '.')
-		tmp.erase(0, 1);
-	std::cout << "tmp: " << tmp << std::endl;
-	std::cout << cl->getReadyRequest()->get_request_parsing_data().get_http_path().find(tmp) << std::endl;
-	std::cout << cl->getReadyRequest()->get_request_parsing_data().get_http_path() << std::endl;
-	if (cl->getReadyRequest()->get_request_parsing_data().get_http_path().find(tmp) != -1)
+	if (tmp != "" && tmp[0] == '.')
 	{
-		std::cout << "upload path found" << std::endl;
-		resourceFullPath = cl->getReadyRequest()->get_server()->get_root() + Locate->getUpload();
-		resourceFullPath += filter(cl->getReadyRequest()->get_request_parsing_data().get_http_path());
-		//=================================//
+		tmp.erase(0, 1);
+		std::cout << "tmp: " << tmp << std::endl;
+		std::cout << p.find(tmp) << std::endl;
+		std::cout << p << std::endl;
+		if (p.find(tmp) != -1)
+		{
+			std::cout << "upload path found" << std::endl;
+			resourceFullPath = cl->getReadyRequest()->get_server()->get_root() + Locate->getUpload();
+			resourceFullPath += filter(p);
+			//=================================//
+		}
 	}
 	else
 	{
 		resourceFullPath = Locate->getLocation()->get_root();
 		std::cout << "resourceFullPath befor : " << resourceFullPath << std::endl;
-		if (resourceFullPath[resourceFullPath.size() - 1] != '/')
-		{
-			std::cout << "append slaches" << std::endl;
-			resourceFullPath += "/";
-		}
-		if (filter(cl->getReadyRequest()->get_request_parsing_data().get_http_path())[0] != '/')
-			resourceFullPath += filter(cl->getReadyRequest()->get_request_parsing_data().get_http_path());
-		std::cout << "set resource full path: " << resourceFullPath << std::endl;
-		std::cout << "==========================================================" << std::endl;
+		std::string loc = Locate->getLocation()->get_locations_path();
+		p.erase(0, Locate->getLongest_match());
+		if (p[0] == '/')
+			p.erase(0, 1);
+		resourceFullPath += p;
 	}
 }
 
@@ -710,7 +710,8 @@ int Locator::HandleCGI()
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
 		statusLine = getResponseStatusLine(200, OK_MSG);
-	response_body = readBody(cgiHandler.get_file_full_path());
+	std::cout << "cgi full path "<< cgiHandler.get_file_body_path() << std::endl;
+	response_body = readBody(cgiHandler.get_file_body_path());
 	error = -1337;
 	return (error);
 }
@@ -829,21 +830,37 @@ std::string getErroBody(int erroCode, std::string definebody, client *cl)
 
 std::string Locator::readBody(std::string path)
 {
-	std::fstream in_file(path);
-	std::string body = "";
-	struct stat sb;
+	// std::cout << "==========================================================" << path << std::endl;
+	// struct stat sb;
+	// std::string body;
 
-	std::cout << "call to readBody CHECKER" << std::endl;
-    FILE* input_file = fopen(path.c_str(), "r");
-    if (input_file == nullptr) {
-		return (body);
+    // FILE* input_file = fopen(path.c_str(), "r");
+	// std::cout << strerror(errno) << std::endl;
+    // if (input_file == nullptr) {
+	// 	std::cout <<"%%%%%%%%%%%%%%%%%%%" << std::endl;
+	// 	return (body);
+    // }
+	// stat(path.c_str(), &sb);
+    // body.resize(sb.st_size);
+    // fread(const_cast<char*>(body.data()), sb.st_size, 1, input_file);
+    // fclose(input_file);
+
+ 	struct stat sb;
+    std::string res;
+
+    int fd = open(path.c_str(), O_RDONLY);
+    if (fd < 0) {
+        perror("open\n");
     }
-	stat(path.c_str(), &sb);
-    body.resize(sb.st_size);
-    fread(const_cast<char*>(body.data()), sb.st_size, 1, input_file);
-    fclose(input_file);
-
-    return body;
+    fstat(fd, &sb);
+	std::cout << sb.st_size << std::endl;
+    res.resize(sb.st_size);
+    read(fd, (char*)(res.data()), sb.st_size);
+    close(fd);
+    return res;
+	// int fd = open(path.c_str(), O_RDONLY);
+	// if (fd == -1)
+	// 	std::cout << strerror(errno) << std::endl;
 }
 
 int Locator::isredirection()
@@ -855,8 +872,11 @@ int Locator::isredirection()
 	for (int i = 0; i < size; i++)
 	{
 		std::vector<std::string> it = redirections[i];
-		if (it[0] == cl->getReadyRequest()->get_request_parsing_data().get_http_path())// need update
+		if (it[0] == cl->getReadyRequest()->get_request_parsing_data().get_http_path())
+		{// need update
+			std::cout << it[0] << std::endl;
 			return (i);
+		}
 	}
 	std::cout << "		return -1" << std::endl;
 	return (-1);
@@ -885,9 +905,15 @@ int Locator::handle()
 bool Locator::isCgi(std::string path)
 {
 	if (Locate->getCgi() == NULL)
+	{
 		return (false);
-	if (endsWith(cl->getReadyRequest()->get_request_parsing_data().get_http_path(), ".php"))
+	}
+	// std::cout << "inside isCgi" << cl->getReadyRequest()->get_request_parsing_data().get_http_path() << std::endl;
+	if (endsWith(path, ".php")) //cl->getReadyRequest()->get_request_parsing_data().get_http_path()
+	{
+		std::cout << "==========================================================9999" << std::endl;
 		return true;
+	}	
 	return false;
 }
 
@@ -1118,6 +1144,7 @@ void GetHandler::buildresponse()
 		response_body = getResponseBody(FORBIDDEN_CODE, FORBIDDEN_RESPONSE_MSG, godFather);
 		statusLine = getResponseStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
 		headers = getResponseHeaders(FORBIDDEN_CODE, godFather, response_body.size());
+		break;
 	case NOT_FOUND_CODE:
 		response_body = getResponseBody(NOT_FOUND_CODE, NOT_FOUND_RESPONSE_MSG, godFather);
 		statusLine = getResponseStatusLine(NOT_FOUND_CODE, FORBIDDEN_MSG);
@@ -1165,10 +1192,13 @@ int DeleteHandler::deleter(std::string path)
 		error = rmtree(path.c_str());
 		return (error);
 	}
-	else if (remove(path.c_str()) == 0)
+	else if (access(path.c_str(), W_OK) == 0)
+	{
+		remove(path.c_str());
 		return (0);
+	}
 	else
-		return (1);
+		return ((error = 2));
 }
 
 int DeleteHandler::handleFiles(void)
@@ -1181,6 +1211,8 @@ int DeleteHandler::handleFiles(void)
 	{
 		if (deleter(godFather->getResourceFullPath()) == 0)
 			error = NO_CONTENT;
+		else if (error == 2)
+			error = FORBIDDEN_CODE;
 		else
 			error = INTERNAL_SERVER_ERROR_CODE;//check this
 			// not allowed or server error ? 
@@ -1327,6 +1359,7 @@ int PostHandler::handle()
 {
 	std::cout << "==========================================================" << std::endl;
 	std::cout << "	call to PostHandler::handle" << std::endl;
+	std::cout << "support upload " << supportAppload() << std::endl;
 	if (supportAppload())
 	{	
 		if (creator(godFather->getResourceFullPath()) == 500)
@@ -1353,7 +1386,10 @@ int PostHandler::handleFiles(void)
 	std::cout << "==========================================================" << std::endl;
 	std::cout << "	call to PostHandler::handleFiles" << std::endl;
 	if (godFather->isCgi(godFather->getResourceFullPath()))
+	{
+		std::cout << "		is cgi" << std::endl;
 		godFather->HandleCGI();
+	}
 	else
 		error = FORBIDDEN_CODE;
 	return (1);
@@ -1368,12 +1404,17 @@ int PostHandler::HandleDir(void)
 	{
 		if (godFather->getIndex())
 		{
+			std::cout << "index" << std::endl;
 			newpath = godFather->getResourceFullPath() + godFather->getindexfile();
+			std::cout << "newpath: " << newpath << std::endl;
 			godFather->setResourceFullPath(newpath);
 			handleFiles();
 		}
 		else
+		{
+			std::cout << "no index files" << std::endl;
 			error = FORBIDDEN_CODE;
+		}
 	}
 	else
 	{
@@ -1439,6 +1480,7 @@ responseHandler *getResponse(client  *cl)
 	if (locationHandler->handle())
 	{
 		std::cout << "location handler" << std::endl;
+		std::cout << locationHandler->getBuffer() << std::endl;
 		delete systemResponse;
 		return locationHandler;
 	}
@@ -1474,7 +1516,8 @@ responseHandler *getResponse(client  *cl)
 	return (0);
 }
 
-bool endsWith(std::string const &str, std::string const &suffix) {
+bool endsWith(std::string const str, std::string const suffix)
+{
     if (str.length() < suffix.length()) {
         return false;
     }

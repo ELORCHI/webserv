@@ -96,12 +96,19 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
     std::cout << "query : " << request.get_http_query() << std::endl;
     pid_t   pid = -1;
     int fd[2] = {-1};
+    int last_fd = -1;
     if (request.get_path_body() != "")
         fd[0] = open(request.get_path_body().c_str(), O_RDONLY);
     if (_file_full_path == "")
+    {
         _file_full_path = "/tmp/" + gen_random(10) + ".html";
+        _file_body_path = "/tmp/" + gen_random(11) + ".html";
+    }
+    std::cout << "***** file_full_path :" << _file_full_path << std::endl;
+    std::cout << "***** file_body_path :" << _file_body_path << std::endl;
     fd[1] = open(_file_full_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
-    if ((fd[0] == -1 && request.get_path_body() != "") || fd[1] == -1)
+    last_fd = open(_file_body_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
+    if ((fd[0] == -1 && request.get_path_body() != "") || fd[1] == -1 || last_fd == -1)
         return 500;
     pid = fork();
     if (pid == -1)
@@ -130,20 +137,20 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
         int ret = execvp(tmp[0], tmp);
         std::cout << "execve failed: " << strerror(errno) << std::endl;
         remove(_file_full_path.c_str());
-        exit(ret);
+        exit(ret);// IHAVE TO RETURN BAD GATEWAY
         //dup to 1 && (dup to 0 if body is here)
     }
     else
     {
-        time_t t(NULL);
+        time_t t = time(NULL);
         close(fd[1]);
         if (fd[0] > 0)
             close(fd[0]); 
         int status, stats, timeout;
         timeout = 0;
-        while (difftime(time(NULL),  t) <= 5)
+        while (difftime(time(NULL),  t) <= 60)
         {
-            status = waitpid(pid ,&stats, 0);
+            status = waitpid(pid ,&stats, WNOHANG);
             if (status == 0)
                 timeout = 1;
             else
@@ -152,33 +159,51 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
                 break ;
             }
         }
-        // sleep(1);
         if (timeout)
         {
-            remove(_file_full_path.c_str());
+            // remove(_file_full_path.c_str());
             kill(pid, SIGKILL);
             return 408;
         }
         else
         {
             fd[1] = open(_file_full_path.c_str(), O_RDWR, 0644);
+            if (fd[1] == -1)
+                return 500;
             char buffer[2000] = {0};
             std::string output;
+            std::string headers;
 		    int ret = 1;
             lseek(fd[1], 0, SEEK_SET);
+            bool headers_done = false;
             while (ret > 0)
             {
                 memset(buffer, 0, 2000);
                 ret = read(fd[1], buffer, 2000 - 1);
                 output += buffer;
-                if (output.find("\r\n\r\n") != std::string::npos)
+                if (output.find("\r\n\r\n") != std::string::npos && !headers_done)
                 {
-                    output = output.substr(0, output.find("\r\n\r\n"));
+                    headers = output.substr(0, output.find("\r\n\r\n"));
+                    output = output.erase(0, output.find("\r\n\r\n") + 4);
+                    headers_done = true;
                     set_headers(output);
-                    break;
+                }
+                if (headers_done)
+                {
+                    int t = write(last_fd, output.c_str(), output.size());
+                    output.clear();
+                    if (t == -1)
+                    {
+                        // remove(_file_full_path.c_str());
+                        close(fd[1]);
+                        close(last_fd);
+                        return 500;
+                    }
                 }
             }
+            // remove(_file_full_path.c_str());
             close(fd[1]);
+            close(last_fd);
             // for(std::map <std::string, std::string>::iterator it =_headers.begin(); it!=_headers.end(); ++it)
             // {
             //    std::cout << it->first << " => " << it->second << '\n';
