@@ -729,8 +729,10 @@ int Locator::HandleCGI()
 	response_body = readBody(cgiHandler.get_file_body_path());
 	//std::cout <<  " response dyal cgi dzebbi \n "<< response_body <<  std::endl;
 	//std::cout << "==========================================================" << std::endl;
-	std::string tmp;
-	
+	std::map <std::string, std::string> tmp = cgiHandler.get_headers();
+	for(std::map <std::string, std::string>::iterator it = tmp.begin(); it!=tmp.end(); ++it)
+		headers += it->first + ": " + it->second + "\r\n";
+	// std::cout << "headers :" << headers << std::endl;
 	error = -1337;
 	return (error);// if error is -1337 then cgi is executed
 }

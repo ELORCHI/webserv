@@ -89,6 +89,12 @@ socket_data *httpServer::create_listening_socket(int port, std::string host)
 
     // inet_pton(AF_INET, host.c_str(), &(sd->listeningServAddr.sin_addr));
     sd->listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
+    int wahd = 1;
+    if (setsockopt(sd->listenServerFd, SOL_SOCKET, SO_REUSEADDR, &wahd, sizeof(wahd)) == -1)
+    {
+        std::cerr << "setsockopt failed" << std::endl;
+        exit(1);
+    }
     if (sd->listenServerFd == INVALID_SOCKET)
         throw MyException("failed at creating the server socket!");
     int bind_r = bind(sd->listenServerFd, (struct sockaddr*)&(sd->listeningServAddr), sizeof(sd->listeningServAddr));
@@ -175,7 +181,6 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     listeningServAddr = (*sd).listeningServAddr;
     //set server listening socket as non blockin
     fcntl(listenServerFd, F_SETFL, O_NONBLOCK);
-
     //add event read event to kqueue
     struct kevent _kEvent;
     EV_SET(&_kEvent, listenServerFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
