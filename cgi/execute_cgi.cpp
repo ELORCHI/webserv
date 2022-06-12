@@ -62,11 +62,12 @@ void execute_cgi::set_environement(parse_request request, std::string file_full_
         setenv( "CONTENT_TYPE","text/html; charset=UTF-8" ,1);
         setenv( "CONTENT_LENGTH", "0" ,1);
     }
-    // for(std::map <std::string, std::string>::iterator it = request.get_http_headers().begin(); it!=request.get_http_headers().end(); it++)
-    // {
-    //     setenv( upper_fun(it->first, 1).c_str() ,it->second.c_str() ,1);
-    //     std::cout << upper_fun(it->first, 1) << " : " << it->second << std::endl;
-    // }
+    if (request.get_http_headers().size() > 0)
+    {
+        std::map <std::string, std::string> tmp = request.get_http_headers();
+        for(std::map <std::string, std::string>::iterator it = tmp.begin(); it!=tmp.end(); ++it)
+            setenv( upper_fun(it->first, 1).c_str() ,it->second.c_str() ,1);
+    }
 }
 
 void    execute_cgi::set_headers(std::string &line)
@@ -224,10 +225,10 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
             // remove(_file_full_path.c_str());
             close(fd[1]);
             close(last_fd);
-            for(std::map <std::string, std::string>::iterator it =_headers.begin(); it!=_headers.end(); ++it)
-            {
-               std::cout << it->first << " => " << it->second << '\n';
-            }
+            // for(std::map <std::string, std::string>::iterator it =_headers.begin(); it!=_headers.end(); ++it)
+            // {
+            //    std::cout << it->first << " => " << it->second << '\n';
+            // }
         }
         return 1;
     }

@@ -396,7 +396,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                             run_once = true;
                             // std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
                             responseHandler *rh = getResponse(cl);
-                            //std::cerr <<  rh->getBuffer() << std::endl;
+                            std::cout <<  rh->getBuffer() << std::endl;
                            write_to_client(cl,  _eventList[i].data, rh->getBuffer());
                         }
                         if (cl->is_sending_to_complete())
