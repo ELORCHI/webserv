@@ -107,12 +107,12 @@ std::string execute_cgi::gen_random(const int len) {
 
 int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_path, parse_request request)
 {
-    std::cout << "start_execute_cgi" << std::endl;
-    std::cout << "file_full_path :" << file_full_path << std::endl;
-    std::cout << "cgi_path :" << cgi_path << std::endl;
-    std::cout << "method : " << request.get_http_method() << std::endl;
-    std::cout << "query : " << request.get_http_query() << std::endl;
-    std::cout << "path : " << request.get_path_body() << std::endl;
+    // std::cout << "start_execute_cgi" << std::endl;
+    // std::cout << "file_full_path :" << file_full_path << std::endl;
+    // std::cout << "cgi_path :" << cgi_path << std::endl;
+    // std::cout << "method : " << request.get_http_method() << std::endl;
+    // std::cout << "query : " << request.get_http_query() << std::endl;
+    // std::cout << "path : " << request.get_path_body() << std::endl;
     pid_t   pid = -1;
     int fd[2] = {-1};
     int last_fd = -1;
@@ -123,8 +123,8 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
         _file_full_path = "/tmp/" + gen_random(10) + ".html";
         _file_body_path = "/tmp/" + gen_random(11) + ".html";
     }
-    std::cout << "***** file_full_path :" << _file_full_path << std::endl;
-    std::cout << "***** file_body_path :" << _file_body_path << std::endl;
+    // std::cout << "***** file_full_path :" << _file_full_path << std::endl;
+    // std::cout << "***** file_body_path :" << _file_body_path << std::endl;
     fd[1] = open(_file_full_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
     last_fd = open(_file_body_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
     if ((fd[0] == -1 && request.get_path_body() != "") || fd[1] == -1 || last_fd == -1)
@@ -144,7 +144,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
         set_environement(request, file_full_path);
         if (fd[0] > 0)
         {
-            std::cout << "***** fd[0] :" << fd[0] << std::endl;
+            // std::cout << "***** fd[0] :" << fd[0] << std::endl;
             dup2(fd[0], 0);
             close(fd[0]); 
         }
@@ -204,7 +204,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
                 if (output.find("\r\n\r\n") != std::string::npos && !headers_done)
                 {
                     headers = output.substr(0, output.find("\r\n\r\n"));
-                    std::cout << "headers : " << headers << std::endl;
+                    // std::cout << "headers : " << headers << std::endl;
                     output = output.erase(0, output.find("\r\n\r\n") + 4);
                     headers_done = true;
                     set_headers(headers);

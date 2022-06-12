@@ -189,10 +189,22 @@ class Locator : public responseHandler
 		std::string		setindexfile(void);
 		std::string		getindexfile(void);
 		std::string		getContentType(void);
+		std::string		getLine(void)
+		{
+			return statusLine;
+		}
+		std::string		getHeaders(void)
+		{
+			return headers;
+		}
+		std::string  	getBody()
+		{
+			return response_body;
+		}
 
 		int				HandleCGI();
 	protected:
-		workingLocation *Locate;//free
+		workingLocation *Locate;
 		std::string		resourceFullPath;
 		int				resourceType;
 		std::string		indexfile;

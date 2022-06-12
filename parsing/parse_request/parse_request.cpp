@@ -304,7 +304,7 @@ int    parse_request::start_parsing(char *buff, size_t size)
 					set_http_headers(header);
 				if (get_http_method() != "POST" || _code_status)
 				{
-					std::cout << "Path: " << get_http_path() << std::endl;
+					// std::cout << "Path: " << get_http_path() << std::endl;
 
 					if (!_code_status)
 						_code_status = 200;
