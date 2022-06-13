@@ -405,15 +405,15 @@ int system_block_response::handle()
 		err = 1;
 		error = INTERNAL_SERVER_ERROR_CODE;
 	}
-	else if (load > cl->getReadyRequest()->get_server()->get_client_max_body_size())
-	{
-		err = 1;
-		error = PAYLOAD_TOO_LARGE_CODE;
-	}
 	else
 		return (0);
 	if (err == 1)
 		this->buildresponse();
+	// else if (load > cl->getReadyRequest()->get_server()->get_client_max_body_size())
+	// {
+	// 	err = 1;
+	// 	error = PAYLOAD_TOO_LARGE_CODE;
+	// }
 	return 1;
 }
 
