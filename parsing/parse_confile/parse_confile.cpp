@@ -254,6 +254,7 @@ void    parse_config::read_server()
         {
             location t = this->_servers[i].get_location(j);
             std::cout << "location_path: "<< t.get_locations_path() << std::endl;
+            std::cout << "upload_path: " << t.get_upload_path() << std::endl;
             std::cout << "max_body_size: "<< t.get_client_max_body_size() << std::endl;
             unsigned int k = 0;
             std::cout << "root: "<< t.get_root() << std::endl;

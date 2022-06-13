@@ -31,6 +31,7 @@ std::vector<std::string>    location::get_index() const { return this->_index; }
 std::string                 location::get_root() const { return this->_root; }
 bool                        location::get_autoindex() const { return this->_autoindex; }
 long long int               location::get_client_max_body_size() const { return this->_client_max_body_size; }
+std::string                 location::get_upload_path() const{return _upload_path; }
 
 /*
 * SETTERS
@@ -70,6 +71,15 @@ void    location::set_client_max_body_size(std::string client_max_body_size)
     else
         throw std::runtime_error("Error: client max body size should be number");
 }
+
+void    location::set_upload_path(std::string upload_path)
+{
+    if (not_predefined(upload_path))
+        _upload_path = upload_path;
+    else
+        throw std::runtime_error("Error: upload_path is empty");
+}
+
 /*
 * methods
 */
