@@ -15,7 +15,8 @@ parse_request::parse_request():
 	_port_request(0),
 	_my_content_length(0),
 	_chunk_size(-1),
-	_is_file_created(false)
+	_is_file_created(false),
+	_my_body_size(0)
 {
 }
 
@@ -157,6 +158,7 @@ void	parse_request::set_chunked_http_body()
 			if (_data.size() > _chunk_size + 2)
 			{
 				write(_file_descriptor, _data.c_str(), _chunk_size);
+				_my_body_size += _chunk_size;
 				_data.erase(0, _chunk_size + 2);
 				_chunk_size = -1;
 			}
@@ -190,8 +192,8 @@ void	parse_request::set_unchunked_http_body()
 		std::cout << "Error: bad content length" << std::endl;
 		_code_status = 400;
 	}
+    _my_body_size = _my_content_length;
 	close(_file_descriptor);
-	// std::cout << _path_body << std::endl;
 }
 
 void	parse_request::set_http_body()

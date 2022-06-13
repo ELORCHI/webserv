@@ -33,6 +33,7 @@ class parse_request
         std::map<std::string, std::string>	_http_path;
         std::map<std::string, std::string>	_http_headers;
         size_t                              _my_content_length;
+        long long                           _my_body_size;
     public:
         parse_request();
         parse_request(parse_request const&);
@@ -48,6 +49,10 @@ class parse_request
         void set_extention();
         void eraseAllSubStr(std::string&, const std::string&);
         size_t hex_to_dec(std::string num);
+        long long get_body_size()
+        {
+            return _my_body_size;
+        }
 
 
         //getters
