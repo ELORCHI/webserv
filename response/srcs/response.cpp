@@ -204,7 +204,8 @@ std::string getDefaultError(int status, Locator *info)
 	return (body);
 }
 
-std::string getResponseHeaders(int status, Locator *info, int body_size)
+std::string 
+getResponseHeaders(int status, Locator *info, int body_size)
 {
 	std::string headers;
 	std::stringstream s;
@@ -1392,7 +1393,10 @@ int PostHandler::creator(std::string path)
 	if (new_fd == -1 || old_fd == -1)
 	{
 		if (new_fd == -1)
+		{
 			std::cout << "new_fd: " << new_fd << std::endl;
+			std::cout << "new_fd: " << strerror(errno) << std::endl;
+		}
 		if (old_fd == -1)
 			std::cout << "old_fd: " << old_fd << std::endl;
 		std::cout << "error in openning file" << std::endl;
