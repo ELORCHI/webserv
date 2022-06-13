@@ -272,14 +272,9 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 			debug("getResponseHeaders", "headers " + headers);
 			debug("getResponseHeaders", "redirection: " + info->getWorkingLocation()->getRedirections()[i][1]);
 		}
-		else
-		{
-			headers += "Location: " + info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body() + std::string("\r\n");
-			debug("getResponseHeaders", "Location: " + info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body());
-		}
 	}
 	else if (status == CREATED_CODE)
-		headers += "Location: " + info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body() + std::string("\r\n");//to be tested
+		headers += "Location: " + info->getWorkingLocation()->getLocation()->get_locations_path() + info->getWorkingLocation()->getLocation()->get_upload_path() +  info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body() + std::string("\r\n");//to be tested
 	std::map<std::string, std::string> headersmap =  info->getClient()->getReadyRequest()->get_request_parsing_data().get_http_headers();
 	std::map<std::string, std::string>::iterator it = headersmap.find("Connection"); 
 	if (it != headersmap.end())
@@ -1142,7 +1137,8 @@ int GetHandler::HandleDir(void)
 	{
 		//std::cout << "no slash" << std::endl;
 		debug("GetHandler::HandleDir", "HandleDir Ending " + std::string("MOVED_PERMANENTLY"));
-		newpath = godFather->getResourceFullPath() + "/";
+		//newpath = godFather->getResourceFullPath() + "/";
+		newpath = cl->getReadyRequest()->get_request_parsing_data().get_http_path() + "/";
 		godFather->setResourceFullPath(newpath);
 		error = MOVED_PERMANENTLY;
 	}
@@ -1197,9 +1193,8 @@ void GetHandler::buildresponse()
 	case MOVED_PERMANENTLY:
 		response_body = getResponseBody(MOVED_PERMANENTLY, MOVED_PERMANENTLY_RESPONSE_MSG, godFather);
 		statusLine = getResponseStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
-		debug("buildresponse::handle", godFather->getClient()->getReadyRequest()->get_request_parsing_data().get_http_path());
 		headers = getResponseHeaders(MOVED_PERMANENTLY, getGodFather(), response_body.size());
-		debug("buildresponse::handle", godFather->getClient()->getReadyRequest()->get_request_parsing_data().get_http_path());
+		headers.insert(headers.size()-2, "Location: " + godFather->getResourceFullPath() + "\r\n");
 		break;
 	case 200:
 		response_body = getResponseBody(200, godFather->readBody(godFather->getResourceFullPath()), godFather);
@@ -1529,6 +1524,7 @@ void PostHandler::buildresponse()
 		response_body = getResponseBody(CREATED_CODE, CREATED_RESPONSE_MSG, godFather);
 		statusLine = getResponseStatusLine(CREATED_CODE, CREATED_MSG);
 		headers = getResponseHeaders(CREATED_CODE, godFather, response_body.size());
+		// hedear.insert(headers.size() -3, "Location: " + cl->getReadyRequest()->get_request_parsing_data().get_path_body() + "\r\n");
 		break;
 	case NOT_FOUND_CODE:
 		response_body = getResponseBody(NOT_FOUND_CODE, NOT_FOUND_RESPONSE_MSG, godFather);
