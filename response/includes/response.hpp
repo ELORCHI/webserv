@@ -185,6 +185,10 @@ class Locator : public responseHandler
 		void			setIndex(void);
 		void			setAutoIndex(void);
 		void			setClient(client *_cl);
+		client *getClient(void)
+		{
+			return cl;
+		};
 		std::string		getResourceFullPath(void);
 		std::string		readBody(std::string path);
 		workingLocation *getWorkingLocation(void);
@@ -236,6 +240,10 @@ class GetHandler : public responseHandler
 		void buildresponse(void);
 		void setClient(client *_cl);
 		void setGodFather(Locator *_godFather);
+		Locator *getGodFather(void)
+		{
+			return godFather;
+		}
 		std::string setAutoindexResponse(void);
 	private:
 		Locator *godFather;
