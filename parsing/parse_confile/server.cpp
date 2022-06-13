@@ -426,6 +426,8 @@ unsigned int server::fill_location(std::vector<std::string> words, unsigned int 
             i = l.fill_autoindex(words, i);
         else if (words[i] == "client_max_body_size")
             l.set_client_max_body_size(words[i + 1]);
+        else if (words[i] == "upload_path")
+            l.set_upload_path(words[i + 1]);
         else if (words[i] == "cgi")
         {
             throw std::runtime_error("Error: No cgi inside location");

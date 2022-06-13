@@ -22,17 +22,19 @@ class location
 {
     
 protected:
-    std::string           _name;
+    std::string                 _name;
     std::string                 _locations_path;
     std::vector<std::string>    _allow_methods;
     std::string                 _root;
-    long long int                 _client_max_body_size;
+    long long int               _client_max_body_size;
     std::vector<std::string>    _index;
     bool                        _autoindex;
+    std::string                 _upload_path;
 public:
     location();
     ~location();
-
+    void                        set_upload_path(std::string upload_path);
+    std::string                 get_upload_path() const;
     std::string                 get_locations_path() const;
     std::vector<std::string>    get_methods() const;
     std::string                 get_root() const;
@@ -50,8 +52,8 @@ public:
     void                        set_autoindex(bool autoindex);
     void                        set_client_max_body_size(std::string client_max_body_size);
     void                        set_index(std::string index);
-    unsigned int                 fill_allowed_methods(std::vector<std::string>, unsigned int);
-    void                         fill_allowed_methodes(std::vector<std::string> methods)
+    unsigned int                fill_allowed_methods(std::vector<std::string>, unsigned int);
+    void                        fill_allowed_methodes(std::vector<std::string> methods)
     {
         this->_allow_methods = methods;
     }
