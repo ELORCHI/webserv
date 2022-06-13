@@ -365,6 +365,11 @@ int system_block_response::handle()
 		err = 1;
 		error = INTERNAL_SERVER_ERROR_CODE;
 	}
+	else if (cl->getReadyRequest()->get_request_parsing_data().get_code_status() == 413)
+	{
+		err = 1;
+		error = PAYLOAD_TOO_LARGE_CODE;
+	}
 	else
 		return (0);
 	if (err == 1)
@@ -407,6 +412,11 @@ void system_block_response::buildresponse()
 		case INTERNAL_SERVER_ERROR_CODE:
 			response_body = getErroBody(error, INTERNAL_SERVER_ERROR_RESPONSE_MSG, cl);
 			statusLine = getResponseStatusLine(error, INTERNAL_SERVER_ERROR_MSG);		
+			headers = 	getResponseHeaders(error, response_body.size());
+			break;
+		case PAYLOAD_TOO_LARGE_CODE:
+			response_body = getErroBody(error, PAYLOAD_TOO_LARGE_RESPONSE_MSG, cl);
+			statusLine = getResponseStatusLine(error, PLAYLOAD_TOO_LARGE_MSG);
 			headers = 	getResponseHeaders(error, response_body.size());
 			break;
 		default:

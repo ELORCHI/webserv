@@ -32,6 +32,7 @@
 #define NO_CONTENT_MSG std::string("204 No Content")
 #define CONFLICT_MSG std::string("409 Conflict")
 #define CREATED_MSG std::string("201 Created")
+#define PLAYLOAD_TOO_LARGE_MSG std::string("413 Payload Too Large")
 
 #define FORBIDDEN_CODE 403
 #define NOT_FOUND_CODE 404
@@ -48,6 +49,7 @@
 #define NO_CONTENT 204
 #define CONFLICT 409
 #define CREATED_CODE 201
+#define PAYLOAD_TOO_LARGE_CODE 413
 
 #define GET_RESPONSE 0
 #define POST_RESPONSE 1
@@ -74,7 +76,7 @@
 #define MOVED_PERMANENTLY_RESPONSE_MSG std::string("<html><head><title>Moved Permanently</title></head><body><h1>Moved Permanently</h1></body></html>")
 #define NO_CONTENT_RESPONSE_MSG std::string("<html><head><title>No Content</title></head><body><h1>Moved Permanently</h1></body></html>")
 #define CREATED_RESPONSE_MSG std::string("<html><head><title>Created</title></head><body><h1>CREATED</h1></body></html>")
-
+#define PAYLOAD_TOO_LARGE_RESPONSE_MSG std::string("<html><head><title>Payload Too Large</title></head><body><h1>Payload Too Large</h1></body></html>")
 
 class response
 {
