@@ -1534,7 +1534,7 @@ responseHandler *getResponse(client  *cl)
 	Locator *locationHandler = new Locator(cl);
 	std::string method = cl->getReadyRequest()->get_request_parsing_data().get_http_method();
 	std::cout << "Hello from getResponse" << std::endl;
-	// std::cout << "playload: " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
+	std::cout << "playload: " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
 	if (systemResponse->handle())
 	{
 		//std::cout << "system response handle" << std::endl;
