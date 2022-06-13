@@ -5,6 +5,29 @@
 // if the handle method returns 0 the request will be handled by the calling object
 
 
+//debug function to print usful information
+
+void debug(std::string fun, std::string msg)
+{
+	std::cout << "===========================" << std::endl;
+	std::cout << "[" << fun << "] " << msg << std::endl;
+}
+
+
+void printLocation(location loc)
+{
+	std::cout << "location:" << loc.get_locations_path() << std::endl;
+	std::vector<std::string> indexes = loc.get_locations_indexes();
+	// pring indexes
+	std::cout << "location indexes: " << 
+	for (int i = 0; i < indexes.size(); i++)
+	{
+		std::cout << "index:" << indexes[i] << " ";
+	}
+	std::cout << std::endl;
+	std::cout << "location root" << loc.get_root << std::endl;
+	std::cout << "location upload path" << loc.get
+}
 
 response::response()
 {
@@ -39,7 +62,7 @@ std::string workingLocation::getDefaultError(int erroCode)
 	{
 		if (defaultError[i][1] == errorstring)
 		{
-			//std::cout << defaultError[i][0] << std::endl;
+			std::cout << debug("workingLocation::getDefaultError", defaultError[i][0]);
 			return (defaultError[i][0]);
 		}
 	}
@@ -185,8 +208,12 @@ std::string getResponseBody(int status, std::string bodyMsg, Locator *info)
 	{
 		defaultEr = getDefaultError(status, info);
 		if (defaultEr != "")
+		{
+			debug("getResponseBody", "default error");
 			return (defaultEr);
+		}
 	}
+	debug("getResponseBody", "status: " + std::to_string(status));
 	return (bodyMsg);
 }
 
@@ -199,8 +226,12 @@ std::string getDefaultError(int status, Locator *info)
 	{
 		path = info->getWorkingLocation()->getDefaultError(status);
 		if (path != std::string(""))
+		{
+			debug("getDefaultError", "status: " + std::to_string(status));
 			body = info->readBody(path);
+		}
 	}
+	debug("getDefaultError", "status: " + std::to_string(status));
 	return (body);
 }
 
@@ -468,12 +499,13 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 	}
 	if (match.size() == 0)
 	{
-		std::cout << "no match" << std::endl;
+		debug("workingLocation::searchLocation:" , "no match found");
 		delete loc;
 		return NULL;
 	}
 	else if (match.size() == 1)
 	{
+		debug("workingLocation::searchLocation:" , "match foud: " + match[0].get_locations_path());
 		*loc = match[0];
 		return loc;
 	}
@@ -489,6 +521,7 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 				index = i;
 			}
 		}
+		debug("workingLocation::searchLocation:" , "match foud: " + match[index].get_locations_path());
 		*loc = match[index];
 		return loc;
 	}
@@ -499,12 +532,8 @@ void workingLocation::setlocation(request *request)
 {
 
 	location *loc = this->searchLocation(request->get_server()->get_location(), request->get_request_parsing_data().get_http_path(), request->get_server());
-	//std::cout << "==========================================================" << std::endl;
-	//std::cout << "workingLocation SET" << std::endl;
 	if (loc == NULL)
 	{
-		std::cout << "no match" << std::endl;
-		std::cout << "defautl location" << std::endl;
 		loc = this->defaultLocation(request->get_server());
 	}
 	std::cout << "selected location is " << loc->get_locations_path() <<std::endl;
