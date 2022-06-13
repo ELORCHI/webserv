@@ -1026,15 +1026,14 @@ client *system_block_response::getClient(void)
 std::string getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port) 
 {
     std::stringstream   ss;
-    ss << "\t\t<p><a href=\"http://" + host + ":" <<\
-        port << dirName + "/" + dirEntry + "\">" + dirEntry + "</a></p>\n";
+    ss << "\t\t<p><a href=\"" + dirName + dirEntry << "\">" + dirEntry + "</a></p>\n";
     return ss.str();
 }
 
 std::string GetHandler::setAutoindexResponse(void)
 {
 	//std::cout << "==========================================================" << std::endl;
-	
+	std::string oldpath = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
 	std::cout << "	call to setAutoindexResponse" << std::endl;
 	std::string path	= godFather->getResourceFullPath();
 	std::string host	= cl->getReadyRequest()->get_server()->get_listen_host();
@@ -1060,8 +1059,9 @@ std::string GetHandler::setAutoindexResponse(void)
     if (dirName[0] != '/')
         dirName = "/" + dirName;
     for (struct dirent *dirEntry = readdir(dir); dirEntry; dirEntry = readdir(dir)) {
-        page += getLink(std::string(dirEntry->d_name), dirName, host, port);
-    }
+        // page += getLink(std::string(dirEntry->d_name), dirName, host, port);
+		page += getLink(std::string(dirEntry->d_name), oldpath, host, port);
+	}
     page +="\
     </p>\n\
     </body>\n\
