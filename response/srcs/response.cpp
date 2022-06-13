@@ -26,7 +26,7 @@ void printLocation(location *loc)
 	std::vector<std::string> indexes = loc->get_index();
 	// pring indexes
 	std::cout << "location indexes: ";
-	for (int i = 0; i < indexes.size(); i++)
+	for (size_t i = 0; i < indexes.size(); i++)
 	{
 		std::cout << "index:" << indexes[i] << " ";
 	}
@@ -36,7 +36,7 @@ void printLocation(location *loc)
 	std::vector<std::string> methods = loc->get_methods();
 	// print methods
 	std::cout << "location methods: ";
-	for (int i = 0; i < methods.size(); i++)
+	for (size_t i = 0; i < methods.size(); i++)
 	{
 		std::cout << "method:" << methods[i] << " ";
 	}
@@ -86,8 +86,9 @@ std::string workingLocation::getDefaultError(int erroCode)
 std::string getResponseStatusLine(int status, std::string status_line)
 {
 	std::string buffer;
-
+	int t = status;
 	buffer = HTTP_VERSION_1_1 + std::string(" ") + status_line + std::string("\r\n");
+	t++;
 	return buffer;
 }
 
@@ -492,7 +493,7 @@ workingLocation::~workingLocation()
 
 location* workingLocation::searchLocation(std::vector<location> locations, std::string source, server *server)
 {
-
+	std::string ee = server->get_listen_host();
 	std::vector<location> match;
 	int size = locations.size();
 	location *loc = new location;
@@ -517,9 +518,9 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 	}
 	else
 	{
-		int max = 0;
+		unsigned long max = 0;
 		int index = 0;
-		for (int i = 0; i < match.size(); i++)
+		for (unsigned long i = 0; i < match.size(); i++)
 		{
 			if (match[i].get_locations_path().size() > max)
 			{
@@ -621,7 +622,7 @@ void Locator::setResourceFullPath()
 	std::string rmlink = "";
 	resourceFullPath = Locate->getLocation()->get_root();
 	std::string loc_path = Locate->getLocation()->get_locations_path();
-	int i = p.find_first_of(loc_path);
+	size_t i = p.find_first_of(loc_path);
 	std::cout << "p before: " << p << std::endl;
 	std::cout << "loc_path: " << loc_path << std::endl;
 	if (i != std::string::npos)
@@ -630,7 +631,7 @@ void Locator::setResourceFullPath()
 		std::cout << "p == " +  p << " rmlink == " + rmlink << std::endl;
 	}
 	resourceFullPath += p;
-	while (resourceFullPath.find("//") != -1)
+	while (resourceFullPath.find("//") != std::string::npos)
 	{
 		resourceFullPath.erase(resourceFullPath.find("//"), 1);
 	}
@@ -735,7 +736,6 @@ int Locator::HandleCGI()
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
 	{
-		std::map<std::string, std::string>::iterator it = cgiHandler.get_headers().find("Status");
 		// std::map<std::string, std::string> map =  cgiHandler.get_headers();
 		// //iterate over map
 		// for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it)
@@ -807,7 +807,7 @@ void Locator::setworkingLocation(void)
 bool Locator::isMethodAllowd(std::string method)
 {
 	std::vector<std::string> it = Locate->getLocation()->get_methods();
-	for (int i = 0; i < it.size(); i++)
+	for (size_t i = 0; i < it.size(); i++)
 	{
 		if (method == it[i])
 			return (true);
@@ -1037,6 +1037,9 @@ client *system_block_response::getClient(void)
 
 std::string getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port) 
 {
+	std::string hostt = host;
+	int portt = port;
+	portt +=port;
     std::stringstream   ss;
     ss << "\t\t<p><a href=\"" + dirName + dirEntry << "\">" + dirEntry + "</a></p>\n";
     return ss.str();
@@ -1392,6 +1395,8 @@ client *PostHandler::getClient(void)
 
 int PostHandler::creator(std::string path)
 {
+	std::string we = path;
+
 	debug("PostHandler::creator", "Starting");
 	std::string newf = godFather->getWorkingLocation()->getLocation()->get_root() +  godFather->getWorkingLocation()->getLocation()->get_upload_path();	
 	if (newf.find_last_of("/") != newf.size() - 1)
@@ -1649,16 +1654,16 @@ std::string filter(std::string path)
 
 // this function checks if a location field is empty or not
 // if empty it fills it with the server field
-void workingLocation::checkLocation(server *server)
-{
-	// if (serverlocation->get_client_max_body_size() == -1)
-	// 	serverlocation->set_client_max_body_size(server->get_client_max_body_size());
-	// if (serverlocation->get_root() == std::string(""))
-	// 	serverlocation->set_root(server->get_root());
-	// if (serverlocation->get_index().size() == 0)
-	// 	serverlocation->fill_index(server->get_index(), 0);
-	// if (serverlocation->get_methods().size() == 0)
-	// 	serverlocation->fill_allowed_methods(server->get_allowed_methods(), 0);
-}
+// void workingLocation::checkLocation(server *server)
+// {
+// 	// if (serverlocation->get_client_max_body_size() == -1)
+// 	// 	serverlocation->set_client_max_body_size(server->get_client_max_body_size());
+// 	// if (serverlocation->get_root() == std::string(""))
+// 	// 	serverlocation->set_root(server->get_root());
+// 	// if (serverlocation->get_index().size() == 0)
+// 	// 	serverlocation->fill_index(server->get_index(), 0);
+// 	// if (serverlocation->get_methods().size() == 0)
+// 	// 	serverlocation->fill_allowed_methods(server->get_allowed_methods(), 0);
+// }
 
 // this function checks to be geted is already in uploads or not
