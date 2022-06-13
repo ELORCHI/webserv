@@ -886,6 +886,7 @@ std::string Locator::readBody(std::string path)
     int fd = open(path.c_str(), O_RDONLY);
     if (fd < 0) {
         perror("open\n");
+		std::cout << "yoooow" << std::endl;
     }
     fstat(fd, &sb);
 	//std::cout << sb.st_size << std::endl;
@@ -1032,7 +1033,8 @@ std::string getLink(std::string const &dirEntry, std::string const &dirName, std
 std::string GetHandler::setAutoindexResponse(void)
 {
 	//std::cout << "==========================================================" << std::endl;
-	//std::cout << "	call to setAutoindexResponse" << std::endl;
+	
+	std::cout << "	call to setAutoindexResponse" << std::endl;
 	std::string path	= godFather->getResourceFullPath();
 	std::string host	= cl->getReadyRequest()->get_server()->get_listen_host();
 	int port			= cl->getReadyRequest()->get_server()->get_listen_port();
@@ -1064,7 +1066,6 @@ std::string GetHandler::setAutoindexResponse(void)
     </body>\n\
     </html>\n";
     closedir(dir);
-
 	return page;
 }
 
@@ -1077,7 +1078,7 @@ void	Locator::setIndex(void)
 	if (Locate->getLocation()->get_index().size() > 0)
 	{
 		indexfile = setindexfile();
-		if (index == std::string("NON"))
+		if (indexfile == std::string("NON"))
 			hasIndex = false;
 		else
 			hasIndex = true;
@@ -1096,6 +1097,8 @@ int GetHandler::handle()
 
 	std::cout << "==========================================================" << std::endl;
 	std::cout << "	call to handle from gethandler" << std::endl;
+
+
 	if (godFather->getResourceType() == NO)
 	{
 		std::cout << "NOT FOUND" << std::endl;
@@ -1103,6 +1106,7 @@ int GetHandler::handle()
 	}
 	else if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
 	{
+		std::cout << "GET HANDLER" << std::endl;
 		handleFiles();
 	}
 	else
@@ -1117,7 +1121,7 @@ int GetHandler::HandleDir(void)
 {
 	std::string newpath;
 	//std::cout << "==========================================================" << std::endl;
-	//std::cout << "	call to GetHandler::HandleDir" << std::endl;
+	std::cout << "	call to GetHandler::HandleDir" << std::endl;
 	if (!godFather->gedEnd())
 	{
 		//std::cout << "no slash" << std::endl;
@@ -1127,7 +1131,7 @@ int GetHandler::HandleDir(void)
 	}
 	else if (!godFather->getIndex())
 	{
-		//std::cout << "no index" << std::endl;
+		std::cout << "no index" << std::endl;
 		if (godFather->getAutoIndex())
 			error = AUTOINDEX_CODE;
 		else
@@ -1136,7 +1140,7 @@ int GetHandler::HandleDir(void)
 	else
 	{
 		newpath = godFather->getResourceFullPath() + godFather->getindexfile();
-		//std::cout << "newpath" << newpath << std::endl;
+		std::cout << "newpath" << newpath << std::endl;
 		godFather->setResourceFullPath(newpath);
 		handleFiles();
 	}
@@ -1528,7 +1532,7 @@ void PostHandler::buildresponse()
 }
 
 
-responseHandler *getResponse(client  *cl)
+responseHandler *get(client  *cl)
 {
 	responseHandler *systemResponse = new system_block_response(cl);
 	Locator *locationHandler = new Locator(cl);
@@ -1581,6 +1585,11 @@ responseHandler *getResponse(client  *cl)
 		return _deleteHandler;
 	}
 	return (0);
+}
+responseHandler *getResponse(client  *cl)
+{
+	responseHandler *res = get(cl);
+	return (res);
 }
 
 bool endsWith(std::string const str, std::string const suffix)
