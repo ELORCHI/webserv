@@ -359,6 +359,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
             if (_eventList[i].ident == listenServerFd) //a client is waiting to connect
 			{
                 acceptConnection();
+                //std::cerr << "bruuuuuuuuuuuuuh" << std::endl;
 			}
             else //a client fd triggered an event
             {
@@ -428,16 +429,16 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                             // std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
                             std::cout << "************************" << cl->get_pr().get_body_size() << std::endl;
                             responseHandler *rh = getResponse(cl);
-                            std::cout <<  rh->getBuffer() << std::endl;
+                            std::cerr <<  rh->getBuffer() << std::endl;
 	                        // std::cout << "playload: " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
                            
                            write_to_client(cl,  _eventList[i].data, rh->getBuffer());
                         }
-                        // if (cl->is_sending_to_complete())
-                        // {
-                        //     std::cout << "hold on bruh" << std::endl;
-                        //     disconnectClient(cl, true);
-                        // }
+                        if (cl->is_sending_to_complete())
+                        {
+                            std::cerr << "hold on bruh" << std::endl;
+                            disconnectClient(cl, true);
+                        }
                        // if (rh)
 						// std::cout << "request complete" << std::endl;
                         // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
@@ -454,25 +455,26 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         //     // cl->setConnectionType(con);
 
                         // }
-                        if (cl && cl->is_sending_to_complete() && cl->get_pr().get_http_headers().count("Connection") > 0)
-                        {
-                            std::string con = cl->get_pr().get_http_headers()["Connection"];
-                            cl->setConnectionType(con);
-                            if (con == "close")
-                            {
-                                disconnectClient(cl, true);
-                            }
-                            else if(con == "keep-alive")
-                            {
-                                std::cerr << "DBG_02" << std::endl;
-                                resetClient(cl);
-                            }
 
-                        }
-                        else if (cl && cl->is_sending_to_complete() && cl->get_pr().get_http_headers().count("Connection") == 0)
-                        {
-                            disconnectClient(cl, true);
-                        }
+                        // if (cl && cl->is_sending_to_complete() && cl->get_pr().get_http_headers().count("Connection") > 0)
+                        // {
+                        //     std::string con = cl->get_pr().get_http_headers()["Connection"];
+                        //     cl->setConnectionType(con);
+                        //     if (con == "close")
+                        //     {
+                        //         disconnectClient(cl, true);
+                        //     }
+                        //     else if(con == "keep-alive")
+                        //     {
+                        //         std::cerr << "DBG_02" << std::endl;
+                        //         resetClient(cl);
+                        //     }
+
+                        // }
+                        // else if (cl && cl->is_sending_to_complete() && cl->get_pr().get_http_headers().count("Connection") == 0)
+                        // {
+                        //     disconnectClient(cl, true);
+                        // }
     					// disconnectClient(cl, true);
                         // else
                         // {
@@ -482,7 +484,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                     // if (cl->isThereARequestReady() == true)
 					// {
 						// std::fstream fs("test.txt", std::fstream::in | std::fstream::out);
-						// fs << cl->getReadBuffer();
+						// fs << cl->getReadBxxuffer();
 						//std::cout << cl->getReadBuffer();
 						
 						// std::cout << "bro" << std::endl;

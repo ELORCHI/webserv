@@ -1,262 +1,42 @@
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec500130
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
-cl: 0x7f94ec501720
-DBG_02
+open
+: No such file or directory
+HTTP/1.1 404 Not Found
+content-length: 89
+Server: 420 SERVER
+date: Mon,13 Jun 2022 08:22:12 +01
+content-type: text/html
+
+<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>
+hold on bruh
+HTTP/1.1 200 OK
+content-length: 293
+Server: 420 SERVER
+date: Mon,13 Jun 2022 08:22:31 +01
+content-type: text/html
+
+<!DOCTYPE html>
+    <html>
+    <head>
+            <title>./root/roxy-master/</title>
+    </head>
+    <body>
+    <h1>INDEX</h1>
+    <p>
+		<p><a href="/PATH01/.">.</a></p>
+		<p><a href="/PATH01/..">..</a></p>
+		<p><a href="/PATH01/index.html">index.html</a></p>
+    </p>
+    </body>
+    </html>
+
+hold on bruh
+open
+: No such file or directory
+HTTP/1.1 404 Not Found
+content-length: 89
+Server: 420 SERVER
+date: Mon,13 Jun 2022 08:22:56 +01
+content-type: text/html
+
+<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>
+hold on bruh
