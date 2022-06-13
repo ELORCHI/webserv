@@ -265,10 +265,10 @@ void httpServer::resetClient(client *c)
     kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
     EV_SET(&kEv, c->getClientFd(), EVFILT_WRITE, EV_ADD | EV_DISABLE, 0, 0, NULL);
     kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-
-   // c->set_is_connected(false);
-    c->set_sendin_status(false);
-    c->set_reading_status(false);
+    
+//    // c->set_is_connected(false);
+//     c->set_sendin_status(false);
+//     c->set_reading_status(false);
     
 }
 
@@ -462,7 +462,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                             else if(con == "keep-alive")
                             {
                                 std::cerr << "DBG_02" << std::endl;
-                                //resetClient(cl);
+                                resetClient(cl);
                             }
 
                         }
