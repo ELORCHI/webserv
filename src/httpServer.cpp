@@ -255,6 +255,23 @@ void httpServer::disconnectClient(client *c, bool is_delete)
     delete c;
 }
 
+void httpServer::resetClient(client *c)
+{
+    struct kevent kEv;
+
+    if (!c)
+        return ;
+    EV_SET(&kEv, c->getClientFd(), EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+    kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+    EV_SET(&kEv, c->getClientFd(), EVFILT_WRITE, EV_ADD | EV_DISABLE, 0, 0, NULL);
+    kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+
+   // c->set_is_connected(false);
+    c->set_sendin_status(false);
+    c->set_reading_status(false);
+    
+}
+
 //will read from client and write to file then get the headers store then into a buffer
 // set the headers buffer then store the rest of the body in a file 
 void httpServer::read_from_client(client *c, long data_length)
@@ -284,6 +301,7 @@ void httpServer::read_from_client(client *c, long data_length)
         }
         else if (c->isConnectionType() && c->getConnectionType() == "keep-alive")
         {
+            std::cerr << "DBG_01" << std::endl;
             disconnectClient(c, false);
         } 
     } 
@@ -396,8 +414,6 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         //keep alive header
 						// disconnectClient(cl, true);	
                     }
-                        
-
 	            }
                 else if (_eventList[i].filter == EVFILT_WRITE && cl)
                 {
@@ -416,8 +432,8 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         }
                         // if (cl->is_sending_to_complete())
                         // {
-                            //std::cout << "hold on bruh" << std::endl;
-                            //disconnectClient(cl, true);
+                        //     std::cout << "hold on bruh" << std::endl;
+                        //     disconnectClient(cl, true);
                         // }
                        // if (rh)
 						// std::cout << "request complete" << std::endl;
@@ -435,7 +451,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         //     // cl->setConnectionType(con);
 
                         // }
-                        if (cl && cl->get_pr().get_http_headers().count("Connection") > 0)
+                        if (cl && cl->is_sending_to_complete() && cl->get_pr().get_http_headers().count("Connection") > 0)
                         {
                             std::string con = cl->get_pr().get_http_headers()["Connection"];
                             cl->setConnectionType(con);
@@ -443,6 +459,16 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                             {
                                 disconnectClient(cl, true);
                             }
+                            else if(con == "keep-alive")
+                            {
+                                std::cerr << "DBG_02" << std::endl;
+                                //resetClient(cl);
+                            }
+
+                        }
+                        else if (cl && cl->is_sending_to_complete() && cl->get_pr().get_http_headers().count("Connection") == 0)
+                        {
+                            disconnectClient(cl, true);
                         }
     					// disconnectClient(cl, true);
                         // else
