@@ -427,9 +427,9 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         {
                             run_once = true;
                             // std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
-                            std::cout << "************************" << cl->get_pr().get_body_size() << std::endl;
+                            // std::cout << "************************" << cl->get_pr().get_body_size() << std::endl;
                             responseHandler *rh = getResponse(cl);
-                            std::cerr <<  rh->getBuffer() << std::endl;
+                            // std::cerr <<  rh->getBuffer() << std::endl;
 	                        // std::cout << "playload: " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
                            
                            write_to_client(cl,  _eventList[i].data, rh->getBuffer());
