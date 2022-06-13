@@ -265,7 +265,7 @@ void httpServer::resetClient(client *c)
     kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
     EV_SET(&kEv, c->getClientFd(), EVFILT_WRITE, EV_ADD | EV_DISABLE, 0, 0, NULL);
     kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
-    
+    *c = client(c->getClientFd(), c->getClientAddr());
 //    // c->set_is_connected(false);
 //     c->set_sendin_status(false);
 //     c->set_reading_status(false);
