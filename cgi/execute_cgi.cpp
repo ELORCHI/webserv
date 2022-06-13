@@ -31,7 +31,7 @@ std::string execute_cgi::upper_fun(std::string blan , bool set_http)
     std::string tmp = "";
     if (set_http)
         tmp = "HTTP_";
-    for (int i = 0; i < blan.size(); i++)
+    for (size_t i = 0; i < blan.size(); i++)
     {
         tmp += toupper(blan[i]);
     }

@@ -1,21 +1,21 @@
 #include "parse_request.hpp"
 
 parse_request::parse_request():
+	_is_request_complete(false),
+	_is_file_created(false),
+	_is_header_complete(false),
+	_code_status(0),
+	_chunk_size(-1),
+	_data(""),
     _http_version(),
     _http_method(),
-    _http_path(),
-    _http_headers(),
 	_path_body(""),
 	_extention(),
-	_code_status(0),
-	_data(""),
-	_is_request_complete(false),
-	_is_header_complete(false),
 	_file_descriptor(0),
 	_port_request(0),
+    _http_path(),
+    _http_headers(),
 	_my_content_length(0),
-	_chunk_size(-1),
-	_is_file_created(false),
 	_my_body_size(0)
 {
 }
@@ -61,7 +61,7 @@ parse_request                       &parse_request::operator=(parse_request cons
 		_my_content_length = rhs._my_content_length;
 		_chunk_size = rhs._chunk_size;
 		_is_file_created = rhs._is_file_created;
-
+		_my_body_size = rhs._my_body_size;
 		return *this;
 	// }
 }
@@ -155,7 +155,7 @@ void	parse_request::set_chunked_http_body()
 		}
 		if (_chunk_size != -1)
 		{
-			if (_data.size() > _chunk_size + 2)
+			if ((int)_data.size() > _chunk_size + 2)
 			{
 				write(_file_descriptor, _data.c_str(), _chunk_size);
 				_my_body_size += _chunk_size;
@@ -184,6 +184,7 @@ void	parse_request::set_unchunked_http_body()
 	}
 	write(_file_descriptor, _data.data(), _data.size());
 	_my_content_length += _data.size();
+	_my_body_size += _data.size();
 	if (_my_content_length >= content_length)
 		_is_request_complete = true;
 	_data = "";
@@ -192,7 +193,6 @@ void	parse_request::set_unchunked_http_body()
 		std::cout << "Error: bad content length" << std::endl;
 		_code_status = 400;
 	}
-    _my_body_size = _my_content_length;
 	close(_file_descriptor);
 }
 
@@ -345,6 +345,8 @@ int    parse_request::start_parsing(char *buff, size_t size)
 		close(_file_descriptor);
 		_code_status = 200;
 	}
+	if (_is_request_complete)
+		std::cout << "body_size: " << get_body_size() << std::endl;
 	// std::cout << "Path: " << get_http_path() << std::endl;
 	return _is_request_complete;
 	// std::cout << "Method: " << get_http_method() << std::endl;
