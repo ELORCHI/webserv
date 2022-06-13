@@ -433,7 +433,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         }
                         if (cl->is_sending_to_complete())
                         {
-                            std::cerr << "hold on bruh" << std::endl;
+                            //std::cerr << "hold on bruh" << std::endl;
                             disconnectClient(cl, true);
                         }
                        // if (rh)

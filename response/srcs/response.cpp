@@ -740,11 +740,30 @@ int Locator::HandleCGI()
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
 	{
-		std::map<std::string, std::string>::iterator it = cgiHandler.get_headers().find("status-code");
-		if (it != cgiHandler.get_headers().end())
-			statusLine = it->second;
-		else
+		std::map<std::string, std::string>::iterator it = cgiHandler.get_headers().find("Status");
+		// std::map<std::string, std::string> map =  cgiHandler.get_headers();
+		// //iterate over map
+		// for (std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it)
+		// {
+		// 	std::string key = it->first;
+		// 	std::string value = it->second;
+		// 	std::cerr << "key: " << key << " value: " << value << std::endl;
+		// }
+		// while (it != cgiHandler.get_headers().cend())
+		// {
+		// 	std::cout << it->first << ": " << it->second << std::endl;
+		// 	it++;
+		// }
+		
+		// if (it != cgiHandler.get_headers().end())
+		// {
+		// 	std::cout << "cgi returned status code: " << it->second << std::endl;
+		// 	statusLine = it->second;
+		// }
+		// else
 			statusLine = getResponseStatusLine(200, OK_MSG);
+		std::cout <<"------------------------------------------------------------" << std::endl;
+		std::cout << "statusLine: " << statusLine << std::endl;
 	}
 	response_body = readBody(cgiHandler.get_file_body_path());
 	std::map <std::string, std::string> tmp = cgiHandler.get_headers();
@@ -1201,6 +1220,7 @@ void GetHandler::buildresponse()
 	default:
 		break;
 	}
+	std::cout << "==========================================================" << std::endl;
 	std::cout << "response buffer" << std::endl;
 	std::cout << this->getBuffer()	<< std::endl;
 }
