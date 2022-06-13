@@ -249,7 +249,9 @@ void httpServer::disconnectClient(client *c, bool is_delete)
     kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
     close(c->getClientFd());
     if (is_delete)
+    {
         clientmap.erase(c->getClientFd());
+    }
     delete c;
 }
 
@@ -257,7 +259,8 @@ void httpServer::disconnectClient(client *c, bool is_delete)
 // set the headers buffer then store the rest of the body in a file 
 void httpServer::read_from_client(client *c, long data_length)
 {
-    
+    if (!c)
+        return ;
 	// static long long size = 0;
     // if (!c || request::is_request_complete(c->getHeadersBuffer(), c->getBodyFile()))
 	// {
@@ -274,9 +277,16 @@ void httpServer::read_from_client(client *c, long data_length)
     
 
 	if (bytesRead <= 0)
-	{
-       disconnectClient(c, true);
-	}
+    {
+        if ((c->isConnectionType() && c->getConnectionType() == "close") || (!c->isConnectionType()))
+        {
+            disconnectClient(c, true);
+        }
+        else if (c->isConnectionType() && c->getConnectionType() == "keep-alive")
+        {
+            disconnectClient(c, false);
+        } 
+    } 
 	else
     {
 
@@ -341,7 +351,6 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                 else
 				{
                     cl = clientmap[_eventList[i].ident];
-
 				}
                 if (cl == NULL)
                 {	
@@ -361,8 +370,9 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                 // }
                 if (_eventList[i].filter == EVFILT_READ && cl)
                 { 
-					read_from_client(cl, _eventList[i].data);	
-                    if (cl->is_reading_complete())
+					read_from_client(cl, _eventList[i].data);
+                    std::cerr << "cl: " << cl << std::endl;
+                    if (cl && cl->is_reading_complete())
                     {
                         server *spd = getServerParsedData();
                         // std::cout << "testiiiiiiin" << std::endl;
@@ -404,11 +414,11 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                             std::cout <<  rh->getBuffer() << std::endl;
                            write_to_client(cl,  _eventList[i].data, rh->getBuffer());
                         }
-                        if (cl->is_sending_to_complete())
-                        {
+                        // if (cl->is_sending_to_complete())
+                        // {
                             //std::cout << "hold on bruh" << std::endl;
-                            disconnectClient(cl, true);
-                        }
+                            //disconnectClient(cl, true);
+                        // }
                        // if (rh)
 						// std::cout << "request complete" << std::endl;
                         // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
@@ -425,15 +435,15 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         //     // cl->setConnectionType(con);
 
                         // }
-                        // if (cl->get_pr().get_http_headers().count("Connection") > 0)
-                        // {
-                        //     std::string con = cl->get_pr().get_http_headers()["Connection"];
-                        //     cl->setConnectionType(con);
-                        //     if (con == "close")
-                        //     {
-                        //         disconnectClient(cl, true);
-                        //     }
-                        // }
+                        if (cl && cl->get_pr().get_http_headers().count("Connection") > 0)
+                        {
+                            std::string con = cl->get_pr().get_http_headers()["Connection"];
+                            cl->setConnectionType(con);
+                            if (con == "close")
+                            {
+                                disconnectClient(cl, true);
+                            }
+                        }
     					// disconnectClient(cl, true);
                         // else
                         // {

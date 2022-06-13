@@ -1358,19 +1358,27 @@ int PostHandler::creator(std::string path)
 	// 	newf += "/";
 	// else if ((newf.find_last_of("/") != newf.size() - 1) && (godFather->getWorkingLocation()->getUpload().find_first_of("/") != 0))
 	// 	newf.pop_back();
-	std::string newf = godFather->getWorkingLocation()->getUpload();
+	std::string newf = godFather->getWorkingLocation()->getLocation()->get_root() +  godFather->getWorkingLocation()->getUpload();
 	//std::cout << "newf 00: " << newf << std::endl;	
 	if (newf.find_last_of("/") != newf.size() - 1)
 		newf += "/";
 	newf += getClient()->getReadyRequest()->get_request_parsing_data().get_path_body();
-	//std::cout << "newf 01: " << newf << std::endl;	
+	std::cout << "==================================" << std::endl;
+	std::cout << "newf 01: " << newf << std::endl;	
 	int new_fd = open(newf.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
 	int old_fd = open(getClient()->getReadyRequest()->get_request_parsing_data().get_path_body().c_str(), O_RDONLY, 0644);
 	char buffer[2000] = {0};
 	int ret = 1;
 
 	if (new_fd == -1 || old_fd == -1)
+	{
+		if (new_fd == -1)
+			std::cout << "new_fd: " << new_fd << std::endl;
+		if (old_fd == -1)
+			std::cout << "old_fd: " << old_fd << std::endl;
+		std::cout << "error in openning file" << std::endl;
 		return (500);
+	}
 	lseek(old_fd, 0, SEEK_SET);
     while (ret > 0)
 	{
@@ -1379,7 +1387,10 @@ int PostHandler::creator(std::string path)
 		if (ret >= 0)
 			write(new_fd, buffer, ret);
         else
+		{
+			std::cout << "error in reading file" << std::endl;
             return 500;
+		}
 	}
 	godFather->setResourceFullPath(newf);
 	close(new_fd);
@@ -1396,6 +1407,7 @@ int PostHandler::handle()
 	//std::cout << "support upload " << supportAppload() << std::endl;
 	if (supportAppload())
 	{	
+		std::cout << "support upload " << supportAppload() << std::endl;
 		if (creator(godFather->getResourceFullPath()) == 500)
 			error = INTERNAL_SERVER_ERROR_CODE;
 		else
@@ -1404,6 +1416,7 @@ int PostHandler::handle()
 	}
 	else
 	{
+		std::cout << "support upload2222 " << supportAppload() << std::endl;
 		if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
 			handleFiles();
 		else if (godFather->getResourceType() == DIRE)

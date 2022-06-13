@@ -130,14 +130,3 @@ void client::setConnectionType(std::string connectionType)
 	this->keepAliveData.is_connection = true;
 	this->keepAliveData.connection_type = connectionType;
 }
-
-// bool client::is_request_complete(long long recieved_data_size, char *buffer)
-// {
-// 	std::string  = this->headersBuffer;
-// 	if (!request::is_requestHeaderComplete(this->getHeadersBuffer())
-// 		return false;
-	
-// 	if (request::is_chunked_request_complete(this->getHeadersBuffer()))
-// 		return true;
-
-// }

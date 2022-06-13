@@ -75,6 +75,8 @@ class client {
         keepAlive getKeepAliveInfo() { return this->keepAliveData; };
         void setKeepAliveInfo(std::string _kad);
         void setConnectionType(std::string connectionType);
+        std::string getConnectionType() {return this->keepAliveData.connection_type;}
+        bool isConnectionType() {return this->keepAliveData.is_connection; }
         void setResponseBuffer(std::string response_buffer) { this->response_buffer = response_buffer; }
         std::string getResponseBuffer() { return response_buffer; }
         unsigned int get_send_offset() { return send_offset; }

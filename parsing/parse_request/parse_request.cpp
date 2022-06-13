@@ -176,6 +176,9 @@ void	parse_request::set_unchunked_http_body()
 	{
 		std::cout << "Error: bad content length" << std::endl;
 		_code_status = 400;
+		_is_request_complete = true;
+		close(_file_descriptor);
+		return ;
 	}
 	write(_file_descriptor, _data.data(), _data.size());
 	_my_content_length += _data.size();
@@ -188,7 +191,7 @@ void	parse_request::set_unchunked_http_body()
 		_code_status = 400;
 	}
 	close(_file_descriptor);
-	std::cout << _path_body << std::endl;
+	// std::cout << _path_body << std::endl;
 }
 
 void	parse_request::set_http_body()
