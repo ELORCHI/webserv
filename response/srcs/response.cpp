@@ -403,7 +403,7 @@ int system_block_response::handle()
 		err = 1;
 		error = INTERNAL_SERVER_ERROR_CODE;
 	}
-	else if (cl->getReadyRequest()->get_request_parsing_data().get_code_status() == 413)
+	else if (cl->getReadyRequest()->get_request_parsing_data().get_body_size() > cl->getReadyRequest()->get_server()->get_client_max_body_size())
 	{
 		err = 1;
 		error = PAYLOAD_TOO_LARGE_CODE;
