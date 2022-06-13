@@ -184,7 +184,7 @@ void	parse_request::set_unchunked_http_body()
 	}
 	write(_file_descriptor, _data.data(), _data.size());
 	_my_content_length += _data.size();
-	_my_body_size += _data.size();
+	_my_body_size = _my_content_length;
 	if (_my_content_length >= content_length)
 		_is_request_complete = true;
 	_data = "";
@@ -313,8 +313,10 @@ int    parse_request::start_parsing(char *buff, size_t size)
 
 					if (!_code_status)
 						_code_status = 200;
+					_my_body_size = 0;
 					//if !_code_status then _code_status = 200
 					_is_request_complete = true;
+					std::cout << "****************************************body_size: " << get_body_size() << std::endl;
 					return _is_request_complete;
 				}
 			}
@@ -346,7 +348,7 @@ int    parse_request::start_parsing(char *buff, size_t size)
 		_code_status = 200;
 	}
 	if (_is_request_complete)
-		std::cout << "body_size: " << get_body_size() << std::endl;
+		std::cout << "****************************************body_size: " << get_body_size() << std::endl;
 	// std::cout << "Path: " << get_http_path() << std::endl;
 	return _is_request_complete;
 	// std::cout << "Method: " << get_http_method() << std::endl;

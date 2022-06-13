@@ -19,6 +19,10 @@ int main(int argc, char *argv[])
     
     struct stat buffer;
     int i = stat(argv[1], &buffer);
+    signal(SIGPIPE, SIG_IGN);
+
+    // int set = 1;
+// setsockopt(sd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
     if (i == -1)
     {
         std::cout << "Error : file not found" << std::endl;

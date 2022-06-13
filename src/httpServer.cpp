@@ -311,7 +311,7 @@ void httpServer::read_from_client(client *c, long data_length)
         int k = c->get_pr().start_parsing(c_buffer, bytesRead);
         if (k)
             c->set_reading_status(true);
-        // std::cout << "******* ***** *** ** * :"<< c->get_pr().get_body_size() << std::endl;
+        std::cout << "******* ***** *** ** * :"<< c->get_pr().get_body_size() << std::endl;
     }
 	
     delete[] c_buffer;

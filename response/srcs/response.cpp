@@ -393,7 +393,9 @@ void responseHandler::setClient(client *_cl)
 
 int system_block_response::handle()
 {
-
+	std::cout << " body body body :"<< cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
+	long long int size_body = cl->getReadyRequest()->get_request_parsing_data().get_body_size();
+	std::cout << " body body body 9999:"<< cl->getReadyRequest()->get_server()->get_client_max_body_size() << std::endl;
 	int err = 0;
  	if (this->isMethodImplemented(cl->getReadyRequest()->get_request_parsing_data().get_http_method()))
 		err = 1;
@@ -404,7 +406,7 @@ int system_block_response::handle()
 		err = 1;
 		error = INTERNAL_SERVER_ERROR_CODE;
 	}
-	else if (cl->getReadyRequest()->get_request_parsing_data().get_body_size() > cl->getReadyRequest()->get_server()->get_client_max_body_size())
+	else if (size_body > cl->getReadyRequest()->get_server()->get_client_max_body_size())
 	{
 		err = 1;
 		error = PAYLOAD_TOO_LARGE_CODE;
