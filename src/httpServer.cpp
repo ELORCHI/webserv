@@ -311,7 +311,7 @@ void httpServer::read_from_client(client *c, long data_length)
         int k = c->get_pr().start_parsing(c_buffer, bytesRead);
         if (k)
             c->set_reading_status(true);
-        std::cout << k << std::endl;
+        // std::cout << "******* ***** *** ** * :"<< c->get_pr().get_body_size() << std::endl;
     }
 	
     delete[] c_buffer;
@@ -389,7 +389,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                 if (_eventList[i].filter == EVFILT_READ && cl)
                 { 
 					read_from_client(cl, _eventList[i].data);
-                    std::cerr << "cl: " << cl << std::endl;
+                    std::cout << "cl: " << cl << std::endl;
                     if (cl && cl->is_reading_complete())
                     {
                         server *spd = getServerParsedData();
@@ -426,8 +426,11 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         {
                             run_once = true;
                             // std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
+                            std::cout << "************************" << cl->get_pr().get_body_size() << std::endl;
                             responseHandler *rh = getResponse(cl);
                             std::cout <<  rh->getBuffer() << std::endl;
+	                        // std::cout << "playload: " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
+                           
                            write_to_client(cl,  _eventList[i].data, rh->getBuffer());
                         }
                         // if (cl->is_sending_to_complete())

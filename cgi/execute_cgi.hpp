@@ -16,7 +16,6 @@ class execute_cgi
         std::string _file_full_path;
         std::string _file_body_path;
         std::map<std::string, std::string>	_headers;
-
     public:
         execute_cgi();
         ~execute_cgi();
