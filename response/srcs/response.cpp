@@ -272,7 +272,7 @@ std::string Locator::getContentType(void)
 	//std::cout << "==========================================================" << std::endl;
 	//std::cout << "getContentType: " << resourceFullPath << std::endl;
 
-	if (error >= 400)
+	if (error >= 400 || autoindexResponse == true)
 		return ("text/html");
 	if (i != std::string::npos)
 	{
@@ -697,6 +697,7 @@ void Locator::checker(void)
 		//std::cout << "file dose not end with slaches" << std::endl;
 		endwithslash = false;
 	}
+	setAutoIndexResponse(false);
 	// prinf all Locator data
 	//std::cout << "resource type: " << resourceType << std::endl;
 	//std::cout << "resource full path: " << resourceFullPath << std::endl;
@@ -725,8 +726,11 @@ int Locator::HandleCGI()
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
 	{
-		// std::map<std::string, std::string> 
-		statusLine = getResponseStatusLine(200, OK_MSG);
+		std::map<std::string, std::string>::iterator it = cgiHandler.get_headers().find("status-code");
+		if (it != cgiHandler.get_headers().end())
+			statusLine = it->second;
+		else
+			statusLine = getResponseStatusLine(200, OK_MSG);
 	}
 	response_body = readBody(cgiHandler.get_file_body_path());
 	std::map <std::string, std::string> tmp = cgiHandler.get_headers();
@@ -1152,6 +1156,7 @@ void GetHandler::buildresponse()
 	switch (error)
 	{
 	case AUTOINDEX_CODE:
+		godFather->setAutoIndexResponse(true);
 		response_body = getResponseBody(200, setAutoindexResponse(), godFather);
 		statusLine = getResponseStatusLine(AUTOINDEX_CODE, OK_MSG);
 		headers = getResponseHeaders(200, godFather, response_body.size());
