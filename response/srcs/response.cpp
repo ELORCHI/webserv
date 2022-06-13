@@ -20,10 +20,10 @@ void debug(std::string fun, std::string msg)
 }
 
 
-void printLocation(location loc)
+void printLocation(location *loc)
 {
-	std::cout << "location:" << loc.get_locations_path() << std::endl;
-	std::vector<std::string> indexes = loc.get_index();
+	std::cout << "location:" << loc->get_locations_path() << std::endl;
+	std::vector<std::string> indexes = loc->get_index();
 	// pring indexes
 	std::cout << "location indexes: ";
 	for (int i = 0; i < indexes.size(); i++)
@@ -31,9 +31,9 @@ void printLocation(location loc)
 		std::cout << "index:" << indexes[i] << " ";
 	}
 	std::cout << std::endl;
-	std::cout << "location root" << loc.get_root() << std::endl;
-	std::cout << "location upload path" << loc.get_upload_path() << std::endl;
-	std::vector<std::string> methods = loc.get_methods();
+	std::cout << "location root" << loc->get_root() << std::endl;
+	std::cout << "location upload path" << loc->get_upload_path() << std::endl;
+	std::vector<std::string> methods = loc->get_methods();
 	// print methods
 	std::cout << "location methods: ";
 	for (int i = 0; i < methods.size(); i++)
@@ -268,7 +268,6 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 		int i = info->isredirection();
 		if (i != -1)
 		{
-			std::cout << "redirecdsfdfdfdfdsfdfdftion: " << std::endl;
 			headers += "Location: " + info->getWorkingLocation()->getRedirections()[i][1] + std::string("\r\n");
 			debug("getResponseHeaders", "headers " + headers);
 			debug("getResponseHeaders", "redirection: " + info->getWorkingLocation()->getRedirections()[i][1]);
@@ -296,8 +295,6 @@ std::string getResponseHeaders(int status, int body_size)
 	std::string ss;
 	s << body_size;
 	s >> ss;
-	//std::cout << "==========================================================" << std::endl;
-	//std::cout << "getResponseHeaders for errors: " << status << std::endl;
 
 	if (status != NO_CONTENT)
 		headers += "content-length: " + std::string(ss) + std::string("\r\n");
@@ -318,8 +315,6 @@ std::string Locator::getContentType(void)
 {
 	std::string res = "";
 	size_t i = resourceFullPath.find_last_of('.');
-	//std::cout << "==========================================================" << std::endl;
-	//std::cout << "getContentType: " << resourceFullPath << std::endl;
 
 	if (error >= 400 || autoindexResponse == true)
 		return ("text/html");
@@ -554,9 +549,6 @@ void workingLocation::setlocation(request *request)
 	}
 	std::cout << "selected location is " << loc->get_locations_path() <<std::endl;
 	serverlocation = loc;
-	// testing if setUpload is working
-	//std::cout << "testing if setUpload is working" << std::endl;
-	//std::cout << "upload path: " << upload << std::endl;
 	setRedirections(request->get_server());
 	setDefaultError(request->get_server()); 
 	if (request->get_server()->get_cgi_size() != 0)
@@ -579,8 +571,6 @@ void workingLocation::setRedirections(server *server)
 location *workingLocation::defaultLocation(server *server)
 {
 	//std::cout << "==========================================================" << std::endl;
-	std::cout << "workingLocation DEFAULT" << std::endl;
-	std::cout << "default location" << std::endl;
 	location *loc = new location;
 	loc->set_locations_path("");
 	loc->set_root(server->get_root());
@@ -701,6 +691,7 @@ void Locator::checker(void)
 	setworkingLocation();
 	setResourceFullPath();
 	setAutoIndex();
+	printLocation(Locate->getLocation());
 	if (isCgi(resourceFullPath))
 	{
 		resourceType = CG;
@@ -1367,8 +1358,13 @@ void PostHandler::setGodFather(Locator *_godFather)
 
 bool PostHandler::supportAppload()
 {
+	debug("PostHandler::supportAppload", "called");
 	if (godFather->getWorkingLocation()->getUpload() != std::string(""))
+	{
+		debug("PostHandler::supportAppload", "returning true");
 		return true;
+	}
+	debug("PostHandler::supportAppload", "return false");
 	return false;
 }
 
@@ -1422,8 +1418,8 @@ int PostHandler::creator(std::string path)
 int PostHandler::handle()
 {
 	debug("PostHandler::handle", "Starting");	
-	if (supportAppload())
-	{	
+	if (supportAppload() == true)
+	{
 		if (creator(godFather->getResourceFullPath()) == 500)
 			error = INTERNAL_SERVER_ERROR_CODE;
 		else
