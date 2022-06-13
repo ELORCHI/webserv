@@ -255,6 +255,26 @@ void httpServer::disconnectClient(client *c, bool is_delete)
     delete c;
 }
 
+void httpServer::disconnectClientImprv(client **c_, bool is_delete)
+{
+    struct kevent kEv;
+    client *c = *c_;
+
+    if (!c)
+        return ;
+    EV_SET(&kEv, c->getClientFd(), EVFILT_READ, EV_DELETE, 0, 0, NULL);
+    kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+    EV_SET(&kEv, c->getClientFd(), EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+    kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
+    close(c->getClientFd());
+    if (is_delete)
+    {
+        clientmap.erase(c->getClientFd());
+    }
+    delete c;
+    *c_ = NULL;
+}
+
 void httpServer::resetClient(client *c)
 {
     struct kevent kEv;
@@ -274,8 +294,9 @@ void httpServer::resetClient(client *c)
 
 //will read from client and write to file then get the headers store then into a buffer
 // set the headers buffer then store the rest of the body in a file 
-void httpServer::read_from_client(client *c, long data_length)
+void httpServer::read_from_client(client **c_, long data_length)
 {
+    client *c = *c_;
     if (!c)
         return ;
 	// static long long size = 0;
@@ -295,15 +316,8 @@ void httpServer::read_from_client(client *c, long data_length)
 
 	if (bytesRead <= 0)
     {
-        if ((c->isConnectionType() && c->getConnectionType() == "close") || (!c->isConnectionType()))
-        {
-            disconnectClient(c, true);
-        }
-        else if (c->isConnectionType() && c->getConnectionType() == "keep-alive")
-        {
-            // std::cerr << "DBG_01" << std::endl;
-            disconnectClient(c, false);
-        } 
+       
+        disconnectClientImprv(c_, true);
     } 
 	else
     {
@@ -317,8 +331,9 @@ void httpServer::read_from_client(client *c, long data_length)
     delete[] c_buffer;
 }
 
-void httpServer::write_to_client(client *cl, long data_length, std::string response_buffer)
+void httpServer::write_to_client(client **cl_, long data_length, std::string response_buffer)
 {
+    client *cl = *cl_;
     if (!cl)
         return ;
     int bytes_sent = 0; // number of bytes sent as returned by the send sys call
@@ -330,7 +345,7 @@ void httpServer::write_to_client(client *cl, long data_length, std::string respo
     bytes_sent = send(cl->getClientFd(), response_buffer.c_str() + cl->get_send_offset(), attempt_to_send_bytes, 0);
     if (bytes_sent == -1)
     {
-        disconnectClient(cl, true);
+        disconnectClientImprv(cl_, true);
         return ;
     }
     cl->set_send_offset(cl->get_send_offset() + bytes_sent);
@@ -389,7 +404,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                 // }
                 if (_eventList[i].filter == EVFILT_READ && cl)
                 { 
-					read_from_client(cl, _eventList[i].data);
+					read_from_client(&cl, _eventList[i].data);
                     // std::cout << "cl: " << cl << std::endl;
                     if (cl && cl->is_reading_complete())
                     {
@@ -427,11 +442,11 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         {
                             run_once = true;
                             // std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
-                            // std::cout << "************************" << cl->get_pr().get_body_size() << std::endl;
-                            responseHandler *rh = getResponse(cl);
-                           write_to_client(cl,  _eventList[i].data, rh->getBuffer());
+                            std::cout << "************************----------------fdsfsfd" << cl->get_pr().get_body_size() << std::endl;
+                            responseHandler *rh = getResponse(cl, cl->get_pr().get_body_size());
+                           write_to_client(&cl,  _eventList[i].data, rh->getBuffer());
                         }
-                        if (cl->is_sending_to_complete())
+                        if (cl && cl->is_sending_to_complete())
                         {
                             //std::cerr << "hold on bruh" << std::endl;
                             disconnectClient(cl, true);

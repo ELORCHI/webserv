@@ -69,9 +69,10 @@ class httpServer
         void run(int num_events, struct kevent *eventList);
         void acceptConnection();
         void disconnectClient(client *c, bool is_delete);
+        void disconnectClientImprv(client **c, bool is_delete);
         void resetClient(client *c);
-        void read_from_client(client *c, long data_length);
-        void write_to_client(client *cl, long data_length, std::string response_buffer);                         
+        void read_from_client(client **c, long data_length);
+        void write_to_client(client **cl, long data_length, std::string response_buffer);                         
         bool doesHttpRequestBelongs(request *rq);
         int getServerFd();
         server *getServerParsedData() { 

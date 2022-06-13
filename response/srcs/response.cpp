@@ -55,7 +55,7 @@ response::~response()
 
 responseHandler::responseHandler(client *_cl)
 {
-	cl=	_cl;
+	cl =	_cl;
 	buffer = "";
 	response_body = "";
 	headers = "";
@@ -129,8 +129,9 @@ void workingLocation::setUpload(std::string path)
 }
 
 
-system_block_response::system_block_response(client *cl): responseHandler(cl)
+system_block_response::system_block_response(client *cl, long long playload): responseHandler(cl)
 {
+	
 }
 
 
@@ -393,9 +394,7 @@ void responseHandler::setClient(client *_cl)
 
 int system_block_response::handle()
 {
-	std::cout << " body body body :"<< cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
-	long long int size_body = cl->getReadyRequest()->get_request_parsing_data().get_body_size();
-	std::cout << " body body body 9999:"<< cl->getReadyRequest()->get_server()->get_client_max_body_size() << std::endl;
+	std::cout << "Loaddddd :" << load << std::endl;
 	int err = 0;
  	if (this->isMethodImplemented(cl->getReadyRequest()->get_request_parsing_data().get_http_method()))
 		err = 1;
@@ -406,7 +405,7 @@ int system_block_response::handle()
 		err = 1;
 		error = INTERNAL_SERVER_ERROR_CODE;
 	}
-	else if (size_body > cl->getReadyRequest()->get_server()->get_client_max_body_size())
+	else if (load > cl->getReadyRequest()->get_server()->get_client_max_body_size())
 	{
 		err = 1;
 		error = PAYLOAD_TOO_LARGE_CODE;
@@ -1220,9 +1219,9 @@ void GetHandler::buildresponse()
 	default:
 		break;
 	}
-	std::cout << "==========================================================" << std::endl;
-	std::cout << "response buffer" << std::endl;
-	std::cout << this->getBuffer()	<< std::endl;
+	// std::cout << "==========================================================" << std::endl;
+	// std::cout << "response buffer" << std::endl;
+	// std::cout << this->getBuffer()	<< std::endl;
 }
 
 DeleteHandler::DeleteHandler(Locator *_godFather): responseHandler(_godFather->getClient())
@@ -1559,9 +1558,10 @@ void PostHandler::buildresponse()
 }
 
 
-responseHandler *get(client  *cl)
+responseHandler *get(client  *cl, long long playload)
 {
-	responseHandler *systemResponse = new system_block_response(cl);
+	std::cout << "LOAD IS :" << playload << std::endl;
+	responseHandler *systemResponse = new system_block_response(cl, playload);
 	Locator *locationHandler = new Locator(cl);
 	std::string method = cl->getReadyRequest()->get_request_parsing_data().get_http_method();
 	std::cout << "Hello from getResponse" << std::endl;
@@ -1613,9 +1613,9 @@ responseHandler *get(client  *cl)
 	}
 	return (0);
 }
-responseHandler *getResponse(client  *cl)
+responseHandler *getResponse(client  *cl, long long playload)
 {
-	responseHandler *res = get(cl);
+	responseHandler *res = get(cl, playload);
 
 	std::cout << "response Finished" << std::endl;
 	std::cout << "==========================================================" << std::endl;

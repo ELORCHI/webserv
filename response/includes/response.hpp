@@ -115,7 +115,7 @@ class responseHandler : public response// abstract class
 class system_block_response : public responseHandler
 {
 	public:
-		system_block_response(client *cl);
+		system_block_response(client *cl, long long load);
 		~system_block_response();
 		int handle();
 		void buildresponse();
@@ -124,6 +124,7 @@ class system_block_response : public responseHandler
 		void setClient(client *cl);
 		client *getClient(void);
 	protected:
+		long long load;
 };
 
 
@@ -304,7 +305,7 @@ std::string    formatted_time(void);
 std::string getResponseHeaders(int status, Locator *info, int body_size);
 std::string readBody(std::string path);
 bool endsWith(std::string const str, std::string const suffix);
-responseHandler *getResponse(client  *cl);
+responseHandler *getResponse(client  *cl, long long playload);
 std::string getErroBody(int erroCode, std::string definebody, client *cl);
 void printLocation(location *loc);
 // this filter function will be to filter the requested resource by removing things before the last slash
