@@ -258,11 +258,11 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 	if (status != NO_CONTENT)
 		headers += "content-length: " + std::string(ss) + std::string("\r\n");
 	headers += "Server: " + std::string("420 SERVER") + std::string("\r\n");
-	headers += "date: " + formatted_time() + std::string("\r\n");
+	headers += "Date: " + formatted_time() + std::string("\r\n");
 	if (status >= 400 || status == MOVED_PERMANENTLY)
-		headers += "content-type: " + std::string("text/html") + std::string("\r\n");
+		headers += "Content-type: " + std::string("text/html") + std::string("\r\n");
 	else
-		headers += "content-type: " + info->getContentType() + std::string("\r\n");
+		headers += "Content-type: " + info->getContentType() + std::string("\r\n");
 	if (status == MOVED_PERMANENTLY)
 	{
 		int i = info->isredirection();
@@ -274,16 +274,16 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 		}
 		else
 		{
-			headers += "location: " + info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body() + std::string("\r\n");
+			headers += "Location: " + info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body() + std::string("\r\n");
 			debug("getResponseHeaders", "Location: " + info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body());
 		}
 	}
 	else if (status == CREATED_CODE)
-		headers += "location: " + info->getResourceFullPath() + std::string("\r\n");//to be tested
+		headers += "Location: " + info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body() + std::string("\r\n");//to be tested
 	std::map<std::string, std::string> headersmap =  info->getClient()->getReadyRequest()->get_request_parsing_data().get_http_headers();
-	std::map<std::string, std::string>::iterator it = headersmap.find("connection"); 
+	std::map<std::string, std::string>::iterator it = headersmap.find("Connection"); 
 	if (it != headersmap.end())
-		headers += "connection " + it->second + std::string("\r\n");
+		headers += "Connection: " + it->second + std::string("\r\n");
 	headers += "\r\n";
 	return headers;
 }
@@ -549,6 +549,7 @@ void workingLocation::setlocation(request *request)
 	}
 	std::cout << "selected location is " << loc->get_locations_path() <<std::endl;
 	serverlocation = loc;
+	loc->set_upload_path("/somewhere/");
 	setRedirections(request->get_server());
 	setDefaultError(request->get_server()); 
 	if (request->get_server()->get_cgi_size() != 0)
@@ -751,7 +752,6 @@ int Locator::HandleCGI()
 		headers += it->first + ": " + it->second + "\r\n";
 	headers += "\r\n";
 	error = -1337;
-	debug("Locator::HandleCGI", "HandleCGI Ending: return -1337");
 	return (error);//check this 
 }
 
@@ -1359,7 +1359,8 @@ void PostHandler::setGodFather(Locator *_godFather)
 bool PostHandler::supportAppload()
 {
 	debug("PostHandler::supportAppload", "called");
-	if (godFather->getWorkingLocation()->getUpload() != std::string(""))
+	std::cout << godFather->getWorkingLocation()->getLocation()->get_upload_path() << std::endl;
+	if (godFather->getWorkingLocation()->getLocation()->get_upload_path() != std::string(""))
 	{
 		debug("PostHandler::supportAppload", "returning true");
 		return true;
@@ -1377,7 +1378,7 @@ client *PostHandler::getClient(void)
 int PostHandler::creator(std::string path)
 {
 	debug("PostHandler::creator", "Starting");
-	std::string newf = godFather->getWorkingLocation()->getLocation()->get_root() +  godFather->getWorkingLocation()->getUpload();	
+	std::string newf = godFather->getWorkingLocation()->getLocation()->get_root() +  godFather->getWorkingLocation()->getLocation()->get_upload_path();	
 	if (newf.find_last_of("/") != newf.size() - 1)
 		newf += "/";
 	newf += getClient()->getReadyRequest()->get_request_parsing_data().get_path_body();
