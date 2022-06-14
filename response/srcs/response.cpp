@@ -1096,7 +1096,8 @@ std::string getLink(std::string const &dirEntry, std::string const &dirName, std
 	// int portt = port; *************** NOT USED
 	// portt +=port;	(****** NOT USED)
     std::stringstream   ss;
-    ss << "\t\t<p><a href=\"" + dirName + "/" + dirEntry << "\">" + dirEntry + "</a></p>\n";
+	std::cerr << "dirnme: " << dirName << std::endl; 
+    ss << "\t\t<p><a href=\"http://" + host + ":" + std::to_string(port) + dirName + "/" + dirEntry << "\">" + dirEntry + "</a></p>\n";
     return ss.str();
 }
 
