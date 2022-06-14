@@ -35,17 +35,26 @@ httpServers::httpServers(int argc, char **argv, std::vector<std::string> lines)
         if (std::find(sharedPorts.begin(), sharedPorts.end(), port) != sharedPorts.end())
         {
             socket_data *sd = shared_sockets[port];
+            sd->is_shared = true;
             _servers.push_back(httpServer(parsed_servers_data[i], true, sd, KqueueFd, parsed_servers_data));
             // httpServer::httpServer kk(parsed_servers_data[i], true, sd);
         }
         else
             _servers.push_back(httpServer(parsed_servers_data[i], false, NULL, KqueueFd, parsed_servers_data));
     }
+    this->sharedPortsSockets = &shared_sockets;
     //std::vector<int> shared_ports = httpServer::getRepeatedPorts(parsed_servers_data);
     // std::cout << parsed_servers_data.size() << std::endl; 
 
 }
-
+httpServers::~httpServers()
+{
+    //remove sharedPortsSockets
+    for (std::map<int, socket_data *>::iterator it = sharedPortsSockets->begin(); it != sharedPortsSockets->end(); ++it)
+    {
+        delete it->second;
+    }
+}
 void httpServers::httpServers_repl()
 {
     int num_events = 0;

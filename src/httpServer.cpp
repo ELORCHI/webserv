@@ -118,7 +118,8 @@ socket_data *httpServer::create_listening_socket(int port, std::string host)
     if (bind_r != 0)
         throw MyException("binding address to socket failed!");
     if (listen(sd->listenServerFd, 100) != 0) 
-        throw MyException("failed to put socket in listening state!"); 
+        throw MyException("failed to put socket in listening state!");
+    sd->is_shared = false;
     return sd;
 }
 
@@ -211,7 +212,8 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     // //std::cout << "daaaah" << std::endl;
     canRun = true;
 	run_once = false;
-    delete sd;
+    if (sd->is_shared == false)
+        delete sd;
     //return true;
 }
 
@@ -287,7 +289,7 @@ server *httpServer::getRightHTtpRequestServerData(request *rq, client *cl)
           
         if (servers_parsed_data[i].get_name(j) == rq->getHost() && servers_parsed_data[j].get_listen_port() == this->listenServerPort)
         {
-            std::cerr << "$$$$$$$$$$$$#################%%%%%%%%%%%%%%%%%%%found another server" << std::endl;
+            // std::cerr << "$$$$$$$$$$$$#################%%%%%%%%%%%%%%%%%%%found another server" << std::endl;
             *s = servers_parsed_data[i];
             return s;
          }
@@ -456,7 +458,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         request *r = new request(cl->get_pr(), spd);
 
                         server *spd_ = getRightHTtpRequestServerData(r, cl);
-                        delete r->get_server();
+                        delete spd;
                         r->set_server(spd_);
                         int server_index = -1;
                         // if (doesHttpRequestBelongs(r))

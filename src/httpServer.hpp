@@ -45,7 +45,8 @@ class parse_config;
 typedef struct {
     int listenServerFd;
     int listenServerPort;
-    struct sockaddr_in listeningServAddr; 
+    struct sockaddr_in listeningServAddr;
+    bool is_shared;
 } socket_data;
 
 class httpServer
