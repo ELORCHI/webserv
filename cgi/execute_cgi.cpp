@@ -116,18 +116,20 @@ int execute_cgi::start_execute_cgi(std::string to_dup, std::string file_full_pat
 {
     // parse_request tmp_request(request);
 
-    // std::cout << "*****************************************************************************************" << std::endl;
-    // std::cout << "start_execute_cgi" << std::endl;
-    // std::cout << "file_full_path :" << file_full_path << std::endl;
-    // std::cout << "cgi_path :" << cgi_path << std::endl;
-    // std::cout << "method : " << request.get_http_method() << std::endl;
-    // std::cout << "query : " << request.get_http_query() << std::endl;
-    // std::cout << "path : " << request.get_path_body() << std::endl;
-    // std::cout << "to_dup : " << to_dup << std::endl;
-    // std::cout <<  "PATH_INFO : " << request.get_http_path().c_str() << std::endl;
-    // std::cout <<  "SCRIPT_FILENAME : " << file_full_path.c_str() << std::endl; //need full path
-    // std::cout <<  "QUERY_STRING : " << request.get_http_query().c_str() << std::endl;
-    // std::cout <<  "REQUEST_METHOD : " << request.get_http_method().c_str() << std::endl;
+    std::cerr << "*****************************************************************************************" << std::endl;
+    std::cerr << "start_execute_cgi" << std::endl;
+    std::cerr << "file_full_path :" << file_full_path << std::endl;
+    std::cerr << "cgi_path :" << cgi_path << std::endl;
+    std::cerr << "method : " << request.get_http_method() << std::endl;
+    std::cerr << "query : " << request.get_http_query() << std::endl;
+    std::cerr << "path : " << request.get_path_body() << std::endl;
+    std::cerr << "to_dup : " << to_dup << std::endl;
+    std::cerr <<  "PATH_INFO : " << request.get_http_path().c_str() << std::endl;
+    std::cerr <<  "SCRIPT_FILENAME : " << file_full_path.c_str() << std::endl; //need full path
+    std::cerr <<  "QUERY_STRING : " << request.get_http_query().c_str() << std::endl;
+    std::cerr <<  "REQUEST_METHOD : " << request.get_http_method().c_str() << std::endl;
+    std::cerr << "*****************************************************************************************" << std::endl;
+
 
     pid_t   pid = -1;
     int fd[2] = {-1};

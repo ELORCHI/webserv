@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory `/Users/yhebbat/Desktop/without cgi'
+c++ -Wall -Werror -Wextra -std=c++98 main.cpp src/*.cpp parsing/parse_confile/*.cpp parsing/parse_request/main.cpp parsing/parse_request/parse_request.cpp parsing/parse_request/set_extentions.cpp response/srcs/response.cpp cgi/execute_cgi.cpp -o webserver 
+echo "✅✅✅"
+make: Leaving directory `/Users/yhebbat/Desktop/without cgi'
+ 

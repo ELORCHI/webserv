@@ -405,7 +405,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
     //int num_events = 0;
     client *cl;
     struct kevent kEv;
-    bool run_once = false;
+    // bool run_once = false; ****** NOT USED
 
     if (canRun)
     {

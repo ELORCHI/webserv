@@ -746,12 +746,15 @@ void Locator::checker(void)
 int Locator::HandleCGI()
 {
 	execute_cgi cgiHandler;
-	std::string root = Locate->getLocation()->get_root() + cl->getReadyRequest()->get_request_parsing_data().get_http_path();
+	// std::string root = Locate->getLocation()->get_root() + cl->getReadyRequest()->get_request_parsing_data().get_http_path();
+	std::string root = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
+	root = Locate->getLocation()->get_root() + root.substr(root.find(Locate->getLocation()->get_locations_path()) + Locate->getLocation()->get_locations_path().size());
+    std::cout << "root: " << root << std::endl;
 	std::string fullPath = "";
 	if (cl->getReadyRequest()->get_request_parsing_data().get_http_method() == "POST")
 		fullPath = resourceFullPath;
 	//debug("Locator::HandleCGI", "HandleCGI Starting");
-	if (cgiHandler.start_execute_cgi(resourceFullPath, root, getWorkingLocation()->getCgi()->get_cgi_path(), cl->getReadyRequest()->get_request_parsing_data()) != 1)
+	if (cgiHandler.start_execute_cgi(fullPath, root, getWorkingLocation()->getCgi()->get_cgi_path(), cl->getReadyRequest()->get_request_parsing_data()) != 1)
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
 	{
@@ -780,6 +783,8 @@ int Locator::HandleCGI()
 		std::cout << "statusLine: " << statusLine << std::endl;
 	}
 	response_body = readBody(cgiHandler.get_file_body_path());
+	std::cout << "bodyy from cgii" << std::endl;
+	std::cout << response_body << std::endl;
 	std::map <std::string, std::string> tmp = cgiHandler.get_headers();
 	for(std::map <std::string, std::string>::iterator it = tmp.begin(); it!=tmp.end(); ++it)
 		headers += it->first + ": " + it->second + "\r\n";
@@ -1087,10 +1092,11 @@ client *system_block_response::getClient(void)
 std::string getLink(std::string const &dirEntry, std::string const &dirName, std::string const &host, int port) 
 {
 	std::string hostt = host;
-	int portt = port;
-	portt +=port;
+	(void)port;
+	// int portt = port; *************** NOT USED
+	// portt +=port;	(****** NOT USED)
     std::stringstream   ss;
-    ss << "\t\t<p><a href=\"" + dirName + dirEntry << "\">" + dirEntry + "</a></p>\n";
+    ss << "\t\t<p><a href=\"" + dirName + "/" + dirEntry << "\">" + dirEntry + "</a></p>\n";
     return ss.str();
 }
 

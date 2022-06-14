@@ -328,6 +328,7 @@ std::string    parse_request::set_http_vmp(std::string line)
 
 int    parse_request::start_parsing(char *buff, size_t size)
 {
+	write(2, buff, size);
 	_data.append(buff, size);
 	if (!_is_request_complete)
 	{
