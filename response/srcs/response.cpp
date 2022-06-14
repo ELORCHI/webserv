@@ -1501,14 +1501,11 @@ int PostHandler::creator(std::string path)
 int PostHandler::handle()
 {
 	//debug("PostHandler::handle", "Starting");	
-	if (supportAppload() == true)
-	{
-		if (creator(godFather->getResourceFullPath()) == 500)
-			error = INTERNAL_SERVER_ERROR_CODE;
-		else
-			error = CREATED_CODE;
+	if (creator(godFather->getResourceFullPath()) == 500)
+		error = INTERNAL_SERVER_ERROR_CODE;
+	else
+		error = CREATED_CODE;
 		//debug("PostHandler::handle", "Ending " + std::to_string(error));
-	}
 	if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
 	{
 		//debug("PostHandler::handle", "Ending :call to HandlerFiles");
@@ -1542,8 +1539,8 @@ int PostHandler::handleFiles(void)
 	}
 	else if (error == CREATED_CODE)
 		return (CREATED_CODE);
-	else
-		error = FORBIDDEN_CODE;
+	// else
+	// 	error = FORBIDDEN_CODE;
 	return (1);
 }
 
