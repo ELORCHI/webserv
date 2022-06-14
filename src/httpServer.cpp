@@ -281,6 +281,7 @@ void httpServer::disconnectClient(client *c, bool is_delete)
 }
 server *httpServer::getRightHTtpRequestServerData(request *rq, client *cl)
 {
+    (void)cl;  
     server *s = new server;
     for (int i = 0; (unsigned int)i < servers_parsed_data.size(); i++)
     {
@@ -460,7 +461,6 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         server *spd_ = getRightHTtpRequestServerData(r, cl);
                         delete spd;
                         r->set_server(spd_);
-                        int server_index = -1;
                         // if (doesHttpRequestBelongs(r))
                         // {
                         //     cl->setRequest(r);

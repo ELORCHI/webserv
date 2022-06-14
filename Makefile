@@ -10,11 +10,11 @@ OBJECT = $(SRC:.cpp=.o)
 all : $(NAME)
 
 $(NAME):
-	@c++ -g3 $(SRC) -o $(NAME) 
+	@c++ -Wall -Werror -Wextra -std=c++98 $(SRC) -o $(NAME) 
 	@echo "✅✅✅"
 
 debug: 
-	@c++ -g -fsanitize=address -std=c++98 $(SRC) -o $(NAME) 
+	@c++ -g3 -fsanitize=address -std=c++98 $(SRC) -o $(NAME) 
 clean:
 	@rm -f $(OBJECT)
 	@echo "🗑️ 🗑️ 🗑️"

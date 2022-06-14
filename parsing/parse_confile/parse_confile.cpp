@@ -344,6 +344,8 @@ int parse_config::basic_error(std::string error_message, char const *av, std::st
 
 int parse_config::parsing_conf(int ac, char **av, std::vector<std::string> lines)
 {
+    (void)ac;
+    (void)av;
 	set_lines(lines);
 	try
 	{
