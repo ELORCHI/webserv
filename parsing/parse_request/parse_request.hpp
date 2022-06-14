@@ -38,6 +38,7 @@ class parse_request
         
     public:
         parse_request();
+        parse_request(parse_request & rh);
         parse_request(parse_request const&);
         ~parse_request();
         void set_lines(char *buffer);

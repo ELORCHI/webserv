@@ -29,8 +29,8 @@ class execute_cgi
         std::string    get_file_body_path() { return _file_body_path;};
         std::map<std::string, std::string>    get_headers() { return _headers;};
         //methods
-        int start_execute_cgi(std::string, std::string, parse_request );
-        void set_environement(parse_request request, std::string file_full_path);
+        int start_execute_cgi(std::string, std::string, std::string, parse_request );
+        void set_environement(parse_request request, std::string file_full_path, std::string to_dup);
         std::string GetPortFromHeaders(parse_request request);
         void    set_headers(std::string &line);
         std::string upper_fun(std::string blan , bool set_http);

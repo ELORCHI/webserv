@@ -13,7 +13,8 @@ $(NAME):
 	@c++ -std=c++98 $(SRC) -o $(NAME) 
 	@echo "✅✅✅"
 
-
+debug: 
+	@c++ -g -fsanitize=address -std=c++98 $(SRC) -o $(NAME) 
 clean:
 	@rm -f $(OBJECT)
 	@echo "🗑️ 🗑️ 🗑️"

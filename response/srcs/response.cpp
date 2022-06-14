@@ -405,15 +405,15 @@ int system_block_response::handle()
 		err = 1;
 		error = INTERNAL_SERVER_ERROR_CODE;
 	}
+	else if (load > cl->getReadyRequest()->get_server()->get_client_max_body_size())
+	{
+		err = 1;
+		error = PAYLOAD_TOO_LARGE_CODE;
+	}
 	else
 		return (0);
 	if (err == 1)
 		this->buildresponse();
-	// else if (load > cl->getReadyRequest()->get_server()->get_client_max_body_size())
-	// {
-	// 	err = 1;
-	// 	error = PAYLOAD_TOO_LARGE_CODE;
-	// }
 	return 1;
 }
 
@@ -705,7 +705,12 @@ void Locator::checker(void)
 		else
 		{
 			debug("Locator::checker", "is a file");
-			resourceType = FI;
+			if (access(resourceFullPath.c_str(), R_OK) == 0)
+			{
+				resourceType = FI;
+			}
+			else
+				error = FORBIDDEN_CODE;
 		}
 	}
 	else
@@ -731,9 +736,12 @@ void Locator::checker(void)
 int Locator::HandleCGI()
 {
 	execute_cgi cgiHandler;
-
+	std::string root = Locate->getLocation()->get_root() + cl->getReadyRequest()->get_request_parsing_data().get_http_path();
+	std::string fullPath = "";
+	if (cl->getReadyRequest()->get_request_parsing_data().get_http_method() == "POST")
+		fullPath = resourceFullPath;
 	debug("Locator::HandleCGI", "HandleCGI Starting");
-	if (cgiHandler.start_execute_cgi(resourceFullPath, getWorkingLocation()->getCgi()->get_cgi_path(), cl->getReadyRequest()->get_request_parsing_data()) != 1)
+	if (cgiHandler.start_execute_cgi(resourceFullPath, root, getWorkingLocation()->getCgi()->get_cgi_path(), cl->getReadyRequest()->get_request_parsing_data()) != 1)
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
 	{
@@ -937,7 +945,7 @@ int Locator::isredirection()
 
 int Locator::handle()
 {
-	error = 0;
+
 	if (!isMethodAllowd(cl->getReadyRequest()->get_request_parsing_data().get_http_method()))
 		error = NOT_ALLOWED_CODE;
 	else if (cl->getReadyRequest()->get_request_parsing_data().get_code_status() == 400)
@@ -992,6 +1000,11 @@ void Locator::buildresponse()
 		response_body = getResponseBody(MOVED_PERMANENTLY, MOVED_PERMANENTLY_RESPONSE_MSG, this);
 		statusLine = getResponseStatusLine(MOVED_PERMANENTLY, MOVED_PERMANENTLY_MSG);
 		headers = getResponseHeaders(MOVED_PERMANENTLY, this, response_body.size());
+		break;
+	case FORBIDDEN_CODE:
+		response_body = getResponseBody(FORBIDDEN_CODE, FORBIDDEN_RESPONSE_MSG, this);
+		statusLine = getResponseStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
+		headers = getResponseHeaders(FORBIDDEN_CODE, this, response_body.size());
 		break;
 	default:
 		break;
@@ -1448,23 +1461,20 @@ int PostHandler::handle()
 			error = CREATED_CODE;
 		debug("PostHandler::handle", "Ending " + std::to_string(error));
 	}
+	if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
+	{
+		debug("PostHandler::handle", "Ending :call to HandlerFiles");
+		handleFiles();
+	}
+	else if (godFather->getResourceType() == DIRE)
+	{
+		debug("PostHandler::handle", "Ending :call to HandlerDire");
+		HandleDir();
+	}
 	else
 	{
-		if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
-		{
-			debug("PostHandler::handle", "Ending :call to HandlerFiles");
-			handleFiles();
-		}
-		else if (godFather->getResourceType() == DIRE)
-		{
-			debug("PostHandler::handle", "Ending :call to HandlerDire");
-			HandleDir();
-		}
-		else
-		{
-			debug("PostHandler::handle", "Ending :call to NOT_FOUND");
-			error = NOT_FOUND_CODE;
-		}
+		debug("PostHandler::handle", "Ending :call to NOT_FOUND");
+		error = NOT_FOUND_CODE;
 	}
 	buildresponse();
 	return (1);
@@ -1473,19 +1483,19 @@ int PostHandler::handle()
 int PostHandler::handleFiles(void)
 {
 	debug("PostHandler::handleFiles", "Starting");
-	if (godFather->isCgi(godFather->getResourceFullPath()))
+	if (godFather->isCgi(cl->getReadyRequest()->get_request_parsing_data().get_http_path()))
 	{
 		debug("PostHandler::handleFiles", "Ending :call to handleCGI");
 		godFather->HandleCGI();
 		statusLine = godFather->getLine();
 		response_body = godFather->getBody();
 		headers = godFather->getHeaders();
+		error = -1;
 	}
+	else if (error == CREATED_CODE)
+		return (CREATED_CODE);
 	else
-	{
-		debug("PostHandler::handleFiles", "Ending :Forbiden");
 		error = FORBIDDEN_CODE;
-	}
 	return (1);
 }
 

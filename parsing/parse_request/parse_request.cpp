@@ -42,6 +42,28 @@ parse_request::parse_request(parse_request const& rh)
 	
 }
 
+//copy constructor
+parse_request::parse_request(parse_request & rh)
+{
+	std::cout << "copy constructor" << std::endl;
+	_http_version = rh._http_version;
+	_http_method = rh._http_method;
+	_http_path = rh._http_path;
+	_http_headers = rh._http_headers;
+	_path_body = rh._path_body;
+	_extention = rh._extention;
+	_code_status = rh._code_status;
+	_data = rh._data;
+	_is_request_complete = rh._is_request_complete;
+	_is_header_complete = rh._is_header_complete;
+	_file_descriptor = rh._file_descriptor;
+	_port_request = rh._port_request;
+	_my_content_length = rh._my_content_length;
+	_chunk_size = rh._chunk_size;
+	_is_file_created = rh._is_file_created;
+	_my_body_size = rh._my_body_size;
+}
+
 parse_request                       &parse_request::operator=(parse_request const & rhs)
 {
 	// if (rhs != *this)

@@ -38,7 +38,7 @@ std::string execute_cgi::upper_fun(std::string blan , bool set_http)
     return tmp;
 }
 
-void execute_cgi::set_environement(parse_request request, std::string file_full_path)
+void execute_cgi::set_environement(parse_request request, std::string file_full_path, std::string to_dup)
 {
     setenv( "GATEWAY_INTERFACE", "CGI/1.1",1);
     setenv( "SERVER_PROTOCOL", "HTTP/1.1",1);
@@ -54,8 +54,12 @@ void execute_cgi::set_environement(parse_request request, std::string file_full_
     setenv( "REMOTE_PORT" ,"0",1);
     if (request.get_http_headers().find("Content-Lenght") != request.get_http_headers().end()) 
     {
+        struct stat st;
+
+        stat(to_dup.c_str(), &st);
+        std::cout << "___ BODY SIZE = " << st.st_size << "____________ "<< std::endl;
         setenv( "CONTENT_TYPE", request.get_http_headers().find("Content-Type")->second.c_str(),1);
-        setenv( "CONTENT_LENGTH", request.get_http_headers().find("Content-Lenght")->second.c_str(),1);
+        setenv( "CONTENT_LENGTH", std::to_string(st.st_size).c_str(),1);
     }
     else 
     {
@@ -65,8 +69,11 @@ void execute_cgi::set_environement(parse_request request, std::string file_full_
     if (request.get_http_headers().size() > 0)
     {
         std::map <std::string, std::string> tmp = request.get_http_headers();
-        for(std::map <std::string, std::string>::iterator it = tmp.begin(); it!=tmp.end(); ++it)
+        for(std::map <std::string, std::string>::iterator it = tmp.begin(); it!=tmp.end(); it++)
+        {
+            // std::cout << "HEADER = " << std::string(it->first, 0, 1) << " : " << std::string(it->second,0,  1) << std::endl;
             setenv( upper_fun(it->first, 1).c_str() ,it->second.c_str() ,1);
+        }
     }
 }
 
@@ -105,19 +112,28 @@ std::string execute_cgi::gen_random(const int len) {
     return tmp_s;
 }
 
-int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_path, parse_request request)
+int execute_cgi::start_execute_cgi(std::string to_dup, std::string file_full_path, std::string cgi_path, parse_request request)
 {
-    // std::cout << "start_execute_cgi" << std::endl;
-    // std::cout << "file_full_path :" << file_full_path << std::endl;
-    // std::cout << "cgi_path :" << cgi_path << std::endl;
-    // std::cout << "method : " << request.get_http_method() << std::endl;
-    // std::cout << "query : " << request.get_http_query() << std::endl;
-    // std::cout << "path : " << request.get_path_body() << std::endl;
+    // parse_request tmp_request(request);
+
+    std::cout << "*****************************************************************************************" << std::endl;
+    std::cout << "start_execute_cgi" << std::endl;
+    std::cout << "file_full_path :" << file_full_path << std::endl;
+    std::cout << "cgi_path :" << cgi_path << std::endl;
+    std::cout << "method : " << request.get_http_method() << std::endl;
+    std::cout << "query : " << request.get_http_query() << std::endl;
+    std::cout << "path : " << request.get_path_body() << std::endl;
+    std::cout << "to_dup : " << to_dup << std::endl;
+    std::cout <<  "PATH_INFO : " << request.get_http_path().c_str() << std::endl;
+    std::cout <<  "SCRIPT_FILENAME : " << file_full_path.c_str() << std::endl; //need full path
+    std::cout <<  "QUERY_STRING : " << request.get_http_query().c_str() << std::endl;
+    std::cout <<  "REQUEST_METHOD : " << request.get_http_method().c_str() << std::endl;
+
     pid_t   pid = -1;
     int fd[2] = {-1};
     int last_fd = -1;
-    if (request.get_path_body() != "")
-        fd[0] = open(request.get_path_body().c_str(), O_RDONLY);
+    if (to_dup != "")
+        fd[0] = open(to_dup.c_str(), O_RDONLY, 0666);
     if (_file_full_path == "")
     {
         _file_full_path = "/tmp/" + gen_random(10) + ".html";
@@ -127,7 +143,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
     // std::cout << "***** file_body_path :" << _file_body_path << std::endl;
     fd[1] = open(_file_full_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
     last_fd = open(_file_body_path.c_str(), O_RDWR | O_CREAT | O_TRUNC, 0644);
-    if ((fd[0] == -1 && request.get_path_body() != "") || fd[1] == -1 || last_fd == -1)
+    if ((fd[0] == -1 && to_dup != "") || fd[1] == -1 || last_fd == -1)
         return 500;
     pid = fork();
     if (pid == -1)
@@ -141,12 +157,12 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
     }
     if (pid == 0)
     {
-        set_environement(request, file_full_path);
+        set_environement(request, file_full_path, to_dup);
         if (fd[0] > 0)
         {
             // std::cout << "***** fd[0] :" << fd[0] << std::endl;
             dup2(fd[0], 0);
-            close(fd[0]); 
+            // close(fd[0]); 
         }
         dup2(fd[1], 1);
         close(fd[1]);
@@ -170,7 +186,7 @@ int execute_cgi::start_execute_cgi(std::string file_full_path, std::string cgi_p
         timeout = 0;
         while (difftime(time(NULL),  t) <= 60)
         {
-            status = waitpid(pid ,&stats, WNOHANG);
+            status = waitpid(pid ,&status, 0);
             if (status == 0)
                 timeout = 1;
             else
