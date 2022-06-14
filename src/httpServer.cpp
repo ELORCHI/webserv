@@ -188,7 +188,7 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     // std::cout << "daaaah" << std::endl;
     canRun = true;
 	run_once = false;
-
+    delete sd;
     //return true;
 }
 
@@ -445,7 +445,8 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                             // std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
                             std::cout << "************************----------------fdsfsfd" << cl->get_pr().get_body_size() << std::endl;
                             responseHandler *rh = getResponse(cl, cl->get_pr().get_body_size());
-                           write_to_client(&cl,  _eventList[i].data, rh->getBuffer());
+                            write_to_client(&cl,  _eventList[i].data, rh->getBuffer());
+                            delete rh;
                         }
                         if (cl && cl->is_sending_to_complete())
                         {

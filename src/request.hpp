@@ -17,7 +17,7 @@ class request {
     server *server_parsed_data;
     public:
         request(parse_request &pr, server *server_parsed_data);
-        ~request() {};
+        ~request() {delete server_parsed_data;}
         parse_request get_request_parsing_data();
         std::string getHost();
         int getPort();

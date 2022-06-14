@@ -5,7 +5,7 @@
 // if the handle method returns 0 the request will be handled by the calling object
 
 
-//debug function to print usful information
+////debug function to print usful information
 
 void debug(std::string fun, std::string msg)
 {
@@ -76,7 +76,7 @@ std::string workingLocation::getDefaultError(int erroCode)
 	{
 		if (defaultError[i][1] == errorstring)
 		{
-			debug("workingLocation::getDefaultError", defaultError[i][0]);
+			//debug("workingLocation::getDefaultError", defaultError[i][0]);
 			return (defaultError[i][0]);
 		}
 	}
@@ -223,11 +223,11 @@ std::string getResponseBody(int status, std::string bodyMsg, Locator *info)
 		defaultEr = getDefaultError(status, info);
 		if (defaultEr != "")
 		{
-			debug("getResponseBody", defaultEr);
+			//debug("getResponseBody", defaultEr);
 			return (defaultEr);
 		}
 	}
-	debug("getResponseBody", "status: " + std::to_string(status));
+	//debug("getResponseBody", "status: " + std::to_string(status));
 	return (bodyMsg);
 }
 
@@ -240,11 +240,11 @@ std::string getDefaultError(int status, Locator *info)
 		path = info->getWorkingLocation()->getDefaultError(status);
 		if (path != std::string(""))
 		{
-			debug("getDefaultError", "status: " + std::to_string(status));
+			//debug("getDefaultError", "status: " + std::to_string(status));
 			body = info->readBody(path);
 		}
 	}
-	debug("getDefaultError", "status: " + std::to_string(status));
+	//debug("getDefaultError", "status: " + std::to_string(status));
 	return (body);
 }
 
@@ -256,7 +256,7 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 	s << body_size;
 	s >> ss;
 
-	debug("getResponseHeaders", "clinet path: " + info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body());
+	//debug("getResponseHeaders", "clinet path: " + info->getClient()->getReadyRequest()->get_request_parsing_data().get_path_body());
 	if (status != NO_CONTENT)
 		headers += "content-length: " + std::string(ss) + std::string("\r\n");
 	headers += "Server: " + std::string("420 SERVER") + std::string("\r\n");
@@ -271,8 +271,8 @@ std::string getResponseHeaders(int status, Locator *info, int body_size)
 		if (i != -1)
 		{
 			headers += "Location: " + info->getWorkingLocation()->getRedirections()[i][1] + std::string("\r\n");
-			debug("getResponseHeaders", "headers " + headers);
-			debug("getResponseHeaders", "redirection: " + info->getWorkingLocation()->getRedirections()[i][1]);
+			//debug("getResponseHeaders", "headers " + headers);
+			//debug("getResponseHeaders", "redirection: " + info->getWorkingLocation()->getRedirections()[i][1]);
 		}
 	}
 	else if (status == CREATED_CODE)
@@ -507,13 +507,13 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 	}
 	if (match.size() == 0)
 	{
-		debug("workingLocation::searchLocation:" , "no match found");
+		//debug("workingLocation::searchLocation:" , "no match found");
 		delete loc;
 		return NULL;
 	}
 	else if (match.size() == 1)
 	{
-		debug("workingLocation::searchLocation:" , "match foud: " + match[0].get_locations_path());
+		//debug("workingLocation::searchLocation:" , "match foud: " + match[0].get_locations_path());
 		*loc = match[0];
 		return loc;
 	}
@@ -529,7 +529,7 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 				index = i;
 			}
 		}
-		debug("workingLocation::searchLocation:" , "match foud: " + match[index].get_locations_path());
+		//debug("workingLocation::searchLocation:" , "match foud: " + match[index].get_locations_path());
 		*loc = match[index];
 		return loc;
 	}
@@ -636,7 +636,7 @@ void Locator::setResourceFullPath()
 	{
 		resourceFullPath.erase(resourceFullPath.find("//"), 1);
 	}
-	debug("Locator::setResourceFullPath", "resourceFullPath: " + resourceFullPath);
+	//debug("Locator::setResourceFullPath", "resourceFullPath: " + resourceFullPath);
 }
 
 std::string Locator::getResourceFullPath(void)
@@ -685,7 +685,7 @@ void Locator::checker(void)
 	debug("Locator::checker", "checker Starting");
 	struct stat s;
 	std::string path = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
-	//debug("Locator::checker", "path: " + path);
+	////debug("Locator::checker", "path: " + path);
 	setworkingLocation();
 	setResourceFullPath();
 	setAutoIndex();
@@ -698,13 +698,13 @@ void Locator::checker(void)
 	{
 		if (s.st_mode & S_IFDIR)
 		{
-			debug("Locator::checker", "is a directory");
+			//debug("Locator::checker", "is a directory");
 			resourceType = DIRE;
 			setIndex();
 		}
 		else
 		{
-			debug("Locator::checker", "is a file");
+			//debug("Locator::checker", "is a file");
 			if (access(resourceFullPath.c_str(), R_OK) == 0)
 			{
 				resourceType = FI;
@@ -715,21 +715,27 @@ void Locator::checker(void)
 	}
 	else
 	{
-		debug("Locator::checker", "file not found");
+		//debug("Locator::checker", "file not found");
 		resourceType = NO;
 	}
 	if (resourceFullPath[resourceFullPath.size() - 1] == '/')
 	{
-		debug("Locator::checker", "resource ends with slashes");
+		//debug("Locator::checker", "resource ends with slashes");
 		endwithslash = true;
 	}
 	else
 	{
-		debug("Locator::checker", "file does not end with slashes");
+		//debug("Locator::checker", "file does not end with slashes");
 		endwithslash = false;
 	}
 	setAutoIndexResponse(false);
-	debug("Locator::checker", "checker Ending");
+	//debug("Locator::checker", "checker Ending");
+	if (Locate->getLocation()->get_client_max_body_size() < cl->getReadyRequest()->get_request_parsing_data().get_body_size())
+	{
+		debug("Locator::checker", "body size is too big");
+		std::cout << "body size is too big" << std::endl;
+		error = 413;
+	}
 }
 
 
@@ -740,7 +746,7 @@ int Locator::HandleCGI()
 	std::string fullPath = "";
 	if (cl->getReadyRequest()->get_request_parsing_data().get_http_method() == "POST")
 		fullPath = resourceFullPath;
-	debug("Locator::HandleCGI", "HandleCGI Starting");
+	//debug("Locator::HandleCGI", "HandleCGI Starting");
 	if (cgiHandler.start_execute_cgi(resourceFullPath, root, getWorkingLocation()->getCgi()->get_cgi_path(), cl->getReadyRequest()->get_request_parsing_data()) != 1)
 		statusLine = getResponseStatusLine(500, INTERNAL_SERVER_ERROR_MSG);
 	else
@@ -785,7 +791,7 @@ std::string Locator::getindexfile()
 
 std::string Locator::setindexfile(void)
 {
-	debug("Locator::setindexfile", "setindexfile Starting");
+	//debug("Locator::setindexfile", "setindexfile Starting");
 	std::string indexfile;
 	std::vector<std::string> _indexs = getWorkingLocation()->getLocation()->get_index();
 	int size = _indexs.size();
@@ -798,12 +804,12 @@ std::string Locator::setindexfile(void)
 			//std::cout << "indexfile " << indexfile << std::endl;
 			if (!(s.st_mode & S_IFDIR))
 			{
-				debug("Locator::setindexfile", "setindexfile Ending: " + indexfile);
+				//debug("Locator::setindexfile", "setindexfile Ending: " + indexfile);
 				return (_indexs[i]);
 			}
 		}
 	}
-	debug("Locator::setindexfile", "setindexfile Ending: NON");
+	//debug("Locator::setindexfile", "setindexfile Ending: NON");
 	return (std::string("NON"));
 }
 
@@ -853,7 +859,7 @@ std::string readBody(std::string path)
     FILE* input_file = fopen(path.c_str(), "r");
     if (input_file == nullptr) 
 	{
-		debug("readBody", "file not found");
+		//debug("readBody", "file not found");
 		return (body);
     }
 	stat(path.c_str(), &sb);
@@ -873,7 +879,7 @@ std::string getErroBody(int erroCode, std::string definebody, client *cl)
 {
 	//std::cout << "==========================================================" << std::endl;
 	//std::cout << "	call to getErroBody" << std::endl;
-	debug("getErroBody", "getErroBody Starting");
+	//debug("getErroBody", "getErroBody Starting");
 	if (erroCode < 400)
 		return (definebody);
 	std::vector<std::vector<std::string> > defaultError = cl->getReadyRequest()->get_server()->get_error_pages();
@@ -892,7 +898,7 @@ std::string getErroBody(int erroCode, std::string definebody, client *cl)
 	}
 	if (path != std::string(""))
 	{
-		debug("getErroBody", "getErroBody Ending: " + path);
+		//debug("getErroBody", "getErroBody Ending: " + path);
 		return (readBody(path));
 	}
 	return (definebody); 
@@ -900,25 +906,25 @@ std::string getErroBody(int erroCode, std::string definebody, client *cl)
 
 std::string Locator::readBody(std::string path)
 {
-	debug("Locator::readBody", "readBody Starting");
+	//debug("Locator::readBody", "readBody Starting");
  	struct stat sb;
     std::string res;
 
     int fd = open(path.c_str(), O_RDONLY);
     if (fd < 0) 
 	{
-        debug("Locator::readBody", "file not found" + path);
+        //debug("Locator::readBody", "file not found" + path);
 		std::cout << "yoooow" << std::endl;
 		return "";
     }
 	std::cout << "yoooow 2" << std::endl;
-	debug("Locator::readBody", "readBody Ending body file opened and read");
+	//debug("Locator::readBody", "readBody Ending body file opened and read");
     fstat(fd, &sb);
 	//std::cout << sb.st_size << std::endl;
     res.resize(sb.st_size);
     read(fd, (char*)(res.data()), sb.st_size);
     close(fd);
-	debug("Locator::readBody", "readBody Ending body file opened and read");
+	//debug("Locator::readBody", "readBody Ending body file opened and read");
     return res;
 	// int fd = open(path.c_str(), O_RDONLY);
 	// if (fd == -1)
@@ -929,17 +935,17 @@ int Locator::isredirection()
 {
 	std::vector<std::vector<std::string> > redirections = getWorkingLocation()->getRedirections();
 	int size = redirections.size();
-	debug("Locator::isredirection", "isredirection Starting");
+	//debug("Locator::isredirection", "isredirection Starting");
 	for (int i = 0; i < size; i++)
 	{
 		std::vector<std::string> it = redirections[i];
 		if (it[0] == cl->getReadyRequest()->get_request_parsing_data().get_http_path())
 		{
-			debug("Locator::isredirection", "isredirection Ending: " + it[1]);
+			//debug("Locator::isredirection", "isredirection Ending: " + it[1]);
 			return (i);
 		}
 	}
-	debug("Locator::isredirection", "isredirection Ending: -1");
+	//debug("Locator::isredirection", "isredirection Ending: -1");
 	return (-1);
 }
 
@@ -969,7 +975,7 @@ bool Locator::isCgi(std::string path)
 	}
 	if (endsWith(path, ".php"))
 	{
-		debug("Locator::isCgi", "isCgi Ending: true");
+		//debug("Locator::isCgi", "isCgi Ending: true");
 		return true;
 	}	
 	return false;
@@ -1061,7 +1067,7 @@ std::string getLink(std::string const &dirEntry, std::string const &dirName, std
 
 std::string GetHandler::setAutoindexResponse(void)
 {
-	debug("GetHandler::setAutoindexResponse", "setAutoindexResponse Starting");
+	//debug("GetHandler::setAutoindexResponse", "setAutoindexResponse Starting");
 	std::string oldpath = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
 	std::cout << "	call to setAutoindexResponse" << std::endl;
 	std::string path	= godFather->getResourceFullPath();
@@ -1096,7 +1102,7 @@ std::string GetHandler::setAutoindexResponse(void)
     </body>\n\
     </html>\n";
     closedir(dir);
-	debug("GetHandler::setAutoindexResponse", "setAutoindexResponse Ending");
+	//debug("GetHandler::setAutoindexResponse", "setAutoindexResponse Ending");
 	return page;
 }
 
@@ -1104,7 +1110,7 @@ void	Locator::setIndex(void)
 {
 	std::string index;
 
-	debug("Locator::setIndex", "setIndex Starting");
+	//debug("Locator::setIndex", "setIndex Starting");
 	if (Locate->getLocation()->get_index().size() > 0)
 	{
 		indexfile = setindexfile();
@@ -1115,7 +1121,7 @@ void	Locator::setIndex(void)
 	}
 	else
 		hasIndex = false;
-	debug("Locator::setIndex", "setIndex Ending" + indexfile);
+	//debug("Locator::setIndex", "setIndex Ending" + indexfile);
 }
 
 void GetHandler::setGodFather(Locator *_godFather)
@@ -1125,20 +1131,20 @@ void GetHandler::setGodFather(Locator *_godFather)
 
 int GetHandler::handle()
 {
-	debug("GetHandler::handle", "handle Starting");
+	//debug("GetHandler::handle", "handle Starting");
 	if (godFather->getResourceType() == NO)
 	{
-		debug("GetHandler::handle", "handle Ending " + std::string("NOT_FOUND"));
+		//debug("GetHandler::handle", "handle Ending " + std::string("NOT_FOUND"));
 		error = NOT_FOUND_CODE;
 	}
 	else if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
 	{
-		debug("GetHandler::handle", "handle Ending " + std::string("CALL TO handleFiles"));
+		//debug("GetHandler::handle", "handle Ending " + std::string("CALL TO handleFiles"));
 		handleFiles();
 	}
 	else
 	{
-		debug("GetHandler::handle", "handle Ending " + std::string("CALL TO handleDirectories"));
+		//debug("GetHandler::handle", "handle Ending " + std::string("CALL TO handleDirectories"));
 		HandleDir();
 	}
 	buildresponse();
@@ -1149,11 +1155,11 @@ int GetHandler::HandleDir(void)
 {
 	std::string newpath;
 
-	debug("GetHandler::HandleDir", "HandleDir Starting");
+	//debug("GetHandler::HandleDir", "HandleDir Starting");
 	if (!godFather->gedEnd())
 	{
 		//std::cout << "no slash" << std::endl;
-		debug("GetHandler::HandleDir", "HandleDir Ending " + std::string("MOVED_PERMANENTLY"));
+		//debug("GetHandler::HandleDir", "HandleDir Ending " + std::string("MOVED_PERMANENTLY"));
 		//newpath = godFather->getResourceFullPath() + "/";
 		newpath = cl->getReadyRequest()->get_request_parsing_data().get_http_path() + "/";
 		godFather->setResourceFullPath(newpath);
@@ -1165,7 +1171,7 @@ int GetHandler::HandleDir(void)
 			error = AUTOINDEX_CODE;
 		else
 			error = FORBIDDEN_CODE;
-		debug("GetHandler::HandleDir", "HandleDir Ending " + std::to_string(error));
+		//debug("GetHandler::HandleDir", "HandleDir Ending " + std::to_string(error));
 	}
 	else
 	{
@@ -1173,17 +1179,17 @@ int GetHandler::HandleDir(void)
 		std::cout << "newpath" << newpath << std::endl;
 		godFather->setResourceFullPath(newpath);
 		handleFiles();
-		debug("GetHandler::HandleDir", "HandleDir Ending " + std::string("CALL TO handleFiles"));
+		//debug("GetHandler::HandleDir", "HandleDir Ending " + std::string("CALL TO handleFiles"));
 	}
 	return (1);
 }
 
 int GetHandler::handleFiles()
 {
-	debug("GetHandler::handleFiles", "handleFiles Starting");
+	//debug("GetHandler::handleFiles", "handleFiles Starting");
 	if (godFather->isCgi(godFather->getResourceFullPath()))
 	{
-		debug("GetHandler::handleFiles", "handleFiles Ending " + std::string("CALL TO handleCgi"));
+		//debug("GetHandler::handleFiles", "handleFiles Ending " + std::string("CALL TO handleCgi"));
 		godFather->HandleCGI();
 		statusLine = godFather->getLine();
 		response_body = godFather->getBody();
@@ -1191,7 +1197,7 @@ int GetHandler::handleFiles()
 	}
 	else
 		error = 200;
-	debug("GetHandler::handleFiles", "handleFiles Ending");
+	//debug("GetHandler::handleFiles", "handleFiles Ending");
 	return (1);
 }
 
@@ -1390,14 +1396,14 @@ void PostHandler::setGodFather(Locator *_godFather)
 
 bool PostHandler::supportAppload()
 {
-	debug("PostHandler::supportAppload", "called");
+	//debug("PostHandler::supportAppload", "called");
 	std::cout << godFather->getWorkingLocation()->getLocation()->get_upload_path() << std::endl;
 	if (godFather->getWorkingLocation()->getLocation()->get_upload_path() != std::string(""))
 	{
-		debug("PostHandler::supportAppload", "returning true");
+		//debug("PostHandler::supportAppload", "returning true");
 		return true;
 	}
-	debug("PostHandler::supportAppload", "return false");
+	//debug("PostHandler::supportAppload", "return false");
 	return false;
 }
 
@@ -1411,7 +1417,7 @@ int PostHandler::creator(std::string path)
 {
 	std::string we = path;
 
-	debug("PostHandler::creator", "Starting");
+	//debug("PostHandler::creator", "Starting");
 	std::string newf = godFather->getWorkingLocation()->getLocation()->get_root() +  godFather->getWorkingLocation()->getLocation()->get_upload_path();	
 	if (newf.find_last_of("/") != newf.size() - 1)
 		newf += "/";
@@ -1425,7 +1431,7 @@ int PostHandler::creator(std::string path)
 
 	if (new_fd == -1 || old_fd == -1)
 	{
-		debug("PostHandler::Creator", "Ending :" + std::string(strerror(errno)));
+		//debug("PostHandler::Creator", "Ending :" + std::string(strerror(errno)));
 		return (500);
 	}
 	lseek(old_fd, 0, SEEK_SET);
@@ -1437,7 +1443,7 @@ int PostHandler::creator(std::string path)
 			write(new_fd, buffer, ret);
         else
 		{
-			debug("PostHandler::Creator", "Ending :" + std::string(strerror(errno)));
+			//debug("PostHandler::Creator", "Ending :" + std::string(strerror(errno)));
             return 500;
 		}
 	}
@@ -1446,34 +1452,34 @@ int PostHandler::creator(std::string path)
 	close(old_fd);
 	unlink(getClient()->getReadyRequest()->get_request_parsing_data().get_path_body().c_str());
 	remove(getClient()->getReadyRequest()->get_request_parsing_data().get_path_body().c_str());
-	debug("PostHandler::Creator", "Ending");
+	//debug("PostHandler::Creator", "Ending");
 	return (1);
 }
 
 int PostHandler::handle()
 {
-	debug("PostHandler::handle", "Starting");	
+	//debug("PostHandler::handle", "Starting");	
 	if (supportAppload() == true)
 	{
 		if (creator(godFather->getResourceFullPath()) == 500)
 			error = INTERNAL_SERVER_ERROR_CODE;
 		else
 			error = CREATED_CODE;
-		debug("PostHandler::handle", "Ending " + std::to_string(error));
+		//debug("PostHandler::handle", "Ending " + std::to_string(error));
 	}
 	if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
 	{
-		debug("PostHandler::handle", "Ending :call to HandlerFiles");
+		//debug("PostHandler::handle", "Ending :call to HandlerFiles");
 		handleFiles();
 	}
 	else if (godFather->getResourceType() == DIRE)
 	{
-		debug("PostHandler::handle", "Ending :call to HandlerDire");
+		//debug("PostHandler::handle", "Ending :call to HandlerDire");
 		HandleDir();
 	}
 	else
 	{
-		debug("PostHandler::handle", "Ending :call to NOT_FOUND");
+		//debug("PostHandler::handle", "Ending :call to NOT_FOUND");
 		error = NOT_FOUND_CODE;
 	}
 	buildresponse();
@@ -1482,10 +1488,10 @@ int PostHandler::handle()
 
 int PostHandler::handleFiles(void)
 {
-	debug("PostHandler::handleFiles", "Starting");
+	//debug("PostHandler::handleFiles", "Starting");
 	if (godFather->isCgi(cl->getReadyRequest()->get_request_parsing_data().get_http_path()))
 	{
-		debug("PostHandler::handleFiles", "Ending :call to handleCGI");
+		//debug("PostHandler::handleFiles", "Ending :call to handleCGI");
 		godFather->HandleCGI();
 		statusLine = godFather->getLine();
 		response_body = godFather->getBody();

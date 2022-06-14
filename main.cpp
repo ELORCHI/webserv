@@ -68,5 +68,6 @@ int main(int argc, char *argv[])
 
     
     // std::cout << ss << std::endl;
+    system("leaks webserver");
     return (0);
 }
