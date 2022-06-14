@@ -1,18 +1,19 @@
 #include "servers.hpp"
 
-
-
-
-httpServers::httpServers(int argc, char **argv)
+httpServers::httpServers(int argc, char **argv, std::vector<std::string> lines)
 {
     parse_config conf;
     std::vector<server> parsed_servers_data;
     std::map<int, socket_data *> shared_sockets;
     std::set<int> bindedSharedPorts;
-    if(!httpServer::parsing_conf(argc, argv, &conf))
-		return ;
+     std::cout << parsed_servers_data.size() << " servers found" << std::endl;
 
+    if(!conf.parsing_conf(argc, argv, lines))
+		return ;
+    std::cout << "-------------------------------------------------------------------" << std::endl;
+    conf.read_server();
 	parsed_servers_data = conf.get_server_vect();
+    std::cout << "-------------------------------------------------------------------" << std::endl;
     std::set<int> sharedPorts = httpServer::getRepeatedPorts(parsed_servers_data);
     
     for (int i = 0; (unsigned long)i < parsed_servers_data.size(); i++)
@@ -51,12 +52,14 @@ void httpServers::httpServers_repl()
 
     while (1)
     {
+        std::cerr << "checker : " << _servers.size() << std::endl;
         for (int i = 0; (unsigned long )i < _servers.size(); i++)
 		{
+			std::cerr << "BEFOOORE" << std::endl;
             num_events = kevent(KqueueFd, NULL, 0, _eventList, MAX_EVENTS, NULL);
-			// std::cerr << "WEWEWEWEWEWEWEWEWEWEWEWE" << std::endl;
+			std::cerr << "WEWEWEWEWEWEWEWEWEWEWEWE" << std::endl;
             _servers[i].run(num_events, _eventList);
-			// std::cerr << "WAWAWAWAWAWAWAWAWAWAWAWA" << std::endl;
+			std::cerr << "WAWAWAWAWAWAWAWAWAWAWAWA" << std::endl;
 		}
 	}
 }

@@ -57,7 +57,7 @@ void execute_cgi::set_environement(parse_request request, std::string file_full_
         struct stat st;
 
         stat(to_dup.c_str(), &st);
-        std::cout << "___ BODY SIZE = " << st.st_size << "____________ "<< std::endl;
+        //std::cout << "___ BODY SIZE = " << st.st_size << "____________ "<< std::endl;
         setenv( "CONTENT_TYPE", request.get_http_headers().find("Content-Type")->second.c_str(),1);
         setenv( "CONTENT_LENGTH", std::to_string(st.st_size).c_str(),1);
     }
@@ -116,18 +116,18 @@ int execute_cgi::start_execute_cgi(std::string to_dup, std::string file_full_pat
 {
     // parse_request tmp_request(request);
 
-    std::cout << "*****************************************************************************************" << std::endl;
-    std::cout << "start_execute_cgi" << std::endl;
-    std::cout << "file_full_path :" << file_full_path << std::endl;
-    std::cout << "cgi_path :" << cgi_path << std::endl;
-    std::cout << "method : " << request.get_http_method() << std::endl;
-    std::cout << "query : " << request.get_http_query() << std::endl;
-    std::cout << "path : " << request.get_path_body() << std::endl;
-    std::cout << "to_dup : " << to_dup << std::endl;
-    std::cout <<  "PATH_INFO : " << request.get_http_path().c_str() << std::endl;
-    std::cout <<  "SCRIPT_FILENAME : " << file_full_path.c_str() << std::endl; //need full path
-    std::cout <<  "QUERY_STRING : " << request.get_http_query().c_str() << std::endl;
-    std::cout <<  "REQUEST_METHOD : " << request.get_http_method().c_str() << std::endl;
+    // std::cout << "*****************************************************************************************" << std::endl;
+    // std::cout << "start_execute_cgi" << std::endl;
+    // std::cout << "file_full_path :" << file_full_path << std::endl;
+    // std::cout << "cgi_path :" << cgi_path << std::endl;
+    // std::cout << "method : " << request.get_http_method() << std::endl;
+    // std::cout << "query : " << request.get_http_query() << std::endl;
+    // std::cout << "path : " << request.get_path_body() << std::endl;
+    // std::cout << "to_dup : " << to_dup << std::endl;
+    // std::cout <<  "PATH_INFO : " << request.get_http_path().c_str() << std::endl;
+    // std::cout <<  "SCRIPT_FILENAME : " << file_full_path.c_str() << std::endl; //need full path
+    // std::cout <<  "QUERY_STRING : " << request.get_http_query().c_str() << std::endl;
+    // std::cout <<  "REQUEST_METHOD : " << request.get_http_method().c_str() << std::endl;
 
     pid_t   pid = -1;
     int fd[2] = {-1};

@@ -12,7 +12,16 @@
 #include <dirent.h>
 // #include "servers.hpp"
 
-
+int basic_error(std::string error_message, char const *av, std::string error_message2)
+{
+    if (av && error_message2 != "" && error_message != "")
+        std::cout << error_message << av << error_message2 << std::endl;
+    else if (av && error_message != "")
+        std::cout << error_message << av << std::endl;
+    else if (error_message != "")
+        std::cout << error_message << std::endl;    
+    return (0);
+}
 
 int main(int argc, char *argv[])
 {
@@ -21,15 +30,41 @@ int main(int argc, char *argv[])
     int i = stat(argv[1], &buffer);
     signal(SIGPIPE, SIG_IGN);
 
-    // int set = 1;
-// setsockopt(sd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
     if (i == -1)
     {
         std::cout << "Error: openning conf file" << std::endl;
         return 0;
     }
-	httpServers srvrs(argc, argv);
+    if (argc != 2)
+        return (basic_error("Usage: ./parse_confile <path_to_config_file>", NULL, ""));
+	std::ifstream file(argv[1]);
+	if (!file.is_open())
+        return (basic_error("Error: file " , argv[1] , " not found"));
+	std::string line;
+	std::vector<std::string> lines;
+    std::cout << "BEFORE WHILE" << std::endl;
+	while (std::getline(file, line))
+	{
+		std::replace( line.begin(), line.end(), '\t', ' ');
+		// if (line.size() > 0 && line[0] != '#')
+		// 	lines.push_back(line);
+        size_t i = 0;
+		while (i < line.size() && line[i] == ' ')
+        {
+            // std::cout << "i = " << i << " line[i] = [" << line[i] << "]" << std::endl;
+			i++;
+        }
+		if (line != " " && line != "" && (i != line.size()))
+			lines.push_back(line);	
+	}
+    file.close();
+    // int set = 1;
+// setsockopt(sd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+	httpServers srvrs(argc, argv, lines);
+    // srvrs.set_parse_lines(lines);
+	std::cout << "srvrs.httpServers_repl();" << std::endl;
 	srvrs.httpServers_repl();
+    std::cout << "srvrs.httpServers_repl();" << std::endl;
     // struct stat s;
     // if (stat("./root/hangover-master/", &s) == 0)
     // {

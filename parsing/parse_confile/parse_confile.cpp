@@ -105,9 +105,10 @@ unsigned int   parse_config::server_parsing(unsigned int &i)
 void    parse_config::specified_words(std::string &tmp)
 {
     std::string err;
-    err = "Error: ";
+    err = "Error: [";
     err += tmp;
-    err += " undefined";
+    err += "] is not a valid word";
+    err += "undefined";
     if (tmp != "server_names" && tmp != "server" && tmp != "cgi_path" && tmp != "root" &&
         tmp != "allow_methods" && tmp != "upload_path" && tmp != "index"
         && tmp != "error_page" && tmp != "autoindex" && tmp != "redirection"
@@ -167,11 +168,15 @@ void    parse_config::check_host_server_names_error()
 
 void    parse_config::start_parsing()
 {
+    std::cout << "Hello" << std::endl;
     split_by_space();
     if (_words.size() == 0)
         throw std::runtime_error("Error: no words in the file");
+    std::cout << "BYE" << std::endl;
     accolade_error();
+    std::cout << "THREE" << std::endl;
     syntax_error();
+    std::cout << "FOUR" << std::endl;
     for (unsigned int i = 0; i < _words.size(); i++)
     {
 		if (_words[i] == "server" && ((i + 1) < _words.size()))
@@ -337,28 +342,8 @@ int parse_config::basic_error(std::string error_message, char const *av, std::st
     return (0);
 }
 
-int parse_config::parsing_conf(int ac, char const **av)
+int parse_config::parsing_conf(int ac, char **av, std::vector<std::string> lines)
 {
-	if (ac != 2)
-        return (basic_error("Usage: ./parse_confile <path_to_config_file>", NULL, ""));
-	std::ifstream file(av[1]);
-	if (!file.is_open())
-        return (basic_error("Error: file " , av[1] , " not found"));
-	std::string line;
-	std::vector<std::string> lines;
-	while (std::getline(file, line))
-	{
-		std::replace( line.begin(), line.end(), '	', ' ');
-		// if (line.size() > 0 && line[0] != '#')
-		// 	lines.push_back(line);
-		size_t i = 0;
-		while (i < line.size() && line[i] == ' ')
-			i++;
-		if (line != " " && line != "" && (i != line.size()))
-			lines.push_back(line);
-			
-	}
-	file.close();
 	set_lines(lines);
 	try
 	{
@@ -371,6 +356,7 @@ int parse_config::parsing_conf(int ac, char const **av)
 	}
 	return (1);
 }
+
 //--------getters-------------
 
 std::string parse_config::get_lines(int i) const

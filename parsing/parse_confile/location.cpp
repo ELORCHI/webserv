@@ -17,7 +17,8 @@ location::location() : _locations_path(""),
                         _root(""),
                         _client_max_body_size(-1),  
                         _index(std::vector<std::string>()),
-                        _autoindex(false)
+                        _autoindex(false),
+                        _upload_path("")
                         {}
 location::~location() {}
 
@@ -167,6 +168,7 @@ location    &location::operator=(location const &rhs)
     this->_autoindex = rhs._autoindex;
     this->_client_max_body_size = rhs._client_max_body_size;
     this->_index = rhs._index;
+    this->_upload_path = rhs._upload_path;
     return *this;
 }
 
@@ -181,3 +183,4 @@ bool location::not_predefined(std::string &word) const
             return (1);
     return (0);
 }
+

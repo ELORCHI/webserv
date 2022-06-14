@@ -497,13 +497,13 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 	}
 	if (match.size() == 0)
 	{
-		//debug("workingLocation::searchLocation:" , "no match found");
+		debug("workingLocation::searchLocation:" , "no match found");
 		delete loc;
 		return NULL;
 	}
 	else if (match.size() == 1)
 	{
-		//debug("workingLocation::searchLocation:" , "match foud: " + match[0].get_locations_path());
+		debug("workingLocation::searchLocation:" , "match foud: " + match[0].get_locations_path());
 		*loc = match[0];
 		return loc;
 	}
@@ -519,7 +519,7 @@ location* workingLocation::searchLocation(std::vector<location> locations, std::
 				index = i;
 			}
 		}
-		//debug("workingLocation::searchLocation:" , "match foud: " + match[index].get_locations_path());
+		debug("workingLocation::searchLocation:" , "match foud: ++" + match[index].get_locations_path());
 		*loc = match[index];
 		return loc;
 	}
@@ -532,11 +532,14 @@ void workingLocation::setlocation(request *request)
 	location *loc = this->searchLocation(request->get_server()->get_location(), request->get_request_parsing_data().get_http_path(), request->get_server());
 	if (loc == NULL)
 	{
+		debug("workingLocation::setlocation:" , "no match found");
 		loc = this->defaultLocation(request->get_server());
 	}
-	//std::cout << "selected location is " << loc->get_locations_path() <<std::endl;
 	serverlocation = loc;
-	loc->set_upload_path("/somewhere/");
+	debug("workingLocation::setlocation:" , "location set: " + loc->get_locations_path());
+	debug("workingLocation::setlocation:" , "UPLOAD: " + std::string("dsfdfsfdfdsfdsfdd ") + loc->get_upload_path());
+	debug("workingLocation::setlocation:" , "allow_Methods: " + loc->get_methods()[0]);
+	debug("workingLocation::setlocation:" , "client_max_body_size: " + std::to_string(loc->get_client_max_body_size()));
 	setRedirections(request->get_server());
 	setDefaultError(request->get_server()); 
 	if (request->get_server()->get_cgi_size() != 0)
@@ -689,13 +692,18 @@ void Locator::checker(void)
 	{
 		if (s.st_mode & S_IFDIR)
 		{
-			//debug("Locator::checker", "is a directory");
+			debug("Locator::checker", "is a directory");
+			if (resourceFullPath.back() != '/')
+			{
+				resourceFullPath += "/";
+			}
+			std::cout << "resourceFullPath: " << resourceFullPath << std::endl;
 			resourceType = DIRE;
 			setIndex();
 		}
 		else
 		{
-			//debug("Locator::checker", "is a file");
+			debug("Locator::checker", "is a file");
 			if (access(resourceFullPath.c_str(), R_OK) == 0)
 			{
 				resourceType = FI;
@@ -721,7 +729,8 @@ void Locator::checker(void)
 	}
 	setAutoIndexResponse(false);
 	//debug("Locator::checker", "checker Ending");
-	if (Locate->getLocation()->get_client_max_body_size() < cl->getReadyRequest()->get_request_parsing_data().get_body_size())
+	std::cerr << Locate->getLocation()->get_client_max_body_size() << " | " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
+	if (Locate->getLocation()->get_client_max_body_size() != -1 && load > Locate->getLocation()->get_client_max_body_size())
 	{
 		debug("Locator::checker", "body size is too big");
 		std::cout << "body size is too big" << std::endl;
@@ -789,7 +798,11 @@ std::string Locator::setindexfile(void)
 	struct stat s;
 	for (int i = 0; i < size; i++)
 	{
-		indexfile = getWorkingLocation()->getLocation()->get_root() + _indexs[i];
+		indexfile = getWorkingLocation()->getLocation()->get_root();
+		if (indexfile.back() != '/')
+			indexfile += "/";
+		indexfile += _indexs[i];
+		std::cout << "indexfile: " << indexfile << std::endl;
 		if (stat(indexfile.c_str(), &s) == 0)
 		{
 			//std::cout << "indexfile " << indexfile << std::endl;
@@ -948,7 +961,7 @@ int Locator::handle()
 		error = RESPONSE_BAD_REQUEST;
 	else if (isredirection() != -1)
 		error = MOVED_PERMANENTLY;
-	else if (load > Locate->getLocation()->get_client_max_body_size())
+	else if (error == PAYLOAD_TOO_LARGE_CODE)
 	{
 		std::cout << "sdlfkdsfdsfkkds;fds;jkf;dkfdlfkdlfkdsl;fdks;fldksfl;dkfldsfklds;fk" << std::endl;
 		error = PAYLOAD_TOO_LARGE_CODE;
@@ -1177,7 +1190,7 @@ int GetHandler::HandleDir(void)
 	else
 	{
 		newpath = godFather->getResourceFullPath() + godFather->getindexfile();
-		std::cout << "newpath" << newpath << std::endl;
+		//std::cout << "newpath" << newpath << std::endl;
 		godFather->setResourceFullPath(newpath);
 		handleFiles();
 		//debug("GetHandler::HandleDir", "HandleDir Ending " + std::string("CALL TO handleFiles"));
@@ -1397,14 +1410,15 @@ void PostHandler::setGodFather(Locator *_godFather)
 
 bool PostHandler::supportAppload()
 {
-	//debug("PostHandler::supportAppload", "called");
+	debug("PostHandler::supportAppload", "called");
 	//std::cout << godFather->getWorkingLocation()->getLocation()->get_upload_path() << std::endl;
 	if (godFather->getWorkingLocation()->getLocation()->get_upload_path() != std::string(""))
 	{
-		//debug("PostHandler::supportAppload", "returning true");
+		std::cout << godFather->getWorkingLocation()->getLocation()->get_upload_path() << std::endl;
+		debug("PostHandler::supportAppload", "returning true");
 		return true;
 	}
-	//debug("PostHandler::supportAppload", "return false");
+	debug("PostHandler::supportAppload", "return false");
 	return false;
 }
 
@@ -1634,7 +1648,8 @@ responseHandler *getResponse(client  *cl, long long playload)
 {
 	responseHandler *res = get(cl, playload);
 
-	//std::cout << "response Finished" << std::endl;
+	// std::cout << res->getBuffer() << std::endl;
+	// std::cout << "response Finished" << std::endl;
 	//std::cout << "==========================================================" << std::endl;
 	//std::cout << "==========================================================" << std::endl;
 	//std::cout << "==========================================================" << std::endl;

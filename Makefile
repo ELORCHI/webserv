@@ -10,7 +10,7 @@ OBJECT = $(SRC:.cpp=.o)
 all : $(NAME)
 
 $(NAME):
-	@c++ -Wall -Wextra -Werror  -std=c++98 $(SRC) -o $(NAME) 
+	@c++ -g3 $(SRC) -o $(NAME) 
 	@echo "✅✅✅"
 
 debug: 

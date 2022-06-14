@@ -1,1 +1,0 @@
-c++ -g main.cpp src/*.cpp parsing/parse_confile/*.cpp parsing/parse_request/main.cpp parsing/parse_request/parse_request.cpp parsing/parse_request/set_extentions.cpp response/srcs/response.cpp cgi/execute_cgi.cpp 

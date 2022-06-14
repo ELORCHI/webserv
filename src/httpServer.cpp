@@ -97,6 +97,7 @@ socket_data *httpServer::create_listening_socket(int port, std::string host)
     }
     if (sd->listenServerFd == INVALID_SOCKET)
         throw MyException("failed at creating the server socket!");
+    // std::cout << "BIND:"
     int bind_r = bind(sd->listenServerFd, (struct sockaddr*)&(sd->listeningServAddr), sizeof(sd->listeningServAddr));
 	
 	//std::cout << "port is: " << port << " host is: " << host <<  std::endl;
@@ -107,41 +108,48 @@ socket_data *httpServer::create_listening_socket(int port, std::string host)
     return sd;
 }
 
-int	httpServer::parsing_conf(int ac, char **av,parse_config *conf)
-{
-	// parse_server_config *conf = new parse_server_config;
-	// parse_config conf;
+// int	httpServer::parsing_conf(int ac, char **av,parse_config *conf)
+// {
+// 	// parse_server_config *conf = new parse_server_config;
+// 	// parse_config conf;
 
-	if (ac != 2)
-	{
-		//std::cout << "Usage: ./parse_confile <path_to_config_file>" << std::endl;
-		return (0);
-	}
-	std::ifstream file(av[1]);
-	if (!file.is_open())
-	{
-		//std::cout << "Error: file " << av[1] << " not found" << std::endl;
-		return (0);
-	}
-	std::string line;
-	std::vector<std::string> lines;
-	while (std::getline(file, line))
-		lines.push_back(line);
-	file.close();
-	conf->set_lines(lines);
-	// conf.read_lines();
-	try
-	{
-		conf->start_parsing();
-	}
-	catch (std::runtime_error &e)
-	{
-		//std::cout << e.what() << std::endl;
-		return (0);
-	}
-	// conf->read_server();
-	return (1);
-}
+//     if (ac != 2)
+//         return (conf->basic_error("Usage: ./parse_confile <path_to_config_file>", NULL, ""));
+// 	std::ifstream file(av[1]);
+// 	if (!file.is_open())
+//         return (conf->basic_error("Error: file " , av[1] , " not found"));
+// 	std::string line;
+// 	std::vector<std::string> lines;
+// 	while (std::getline(file, line))
+// 	{
+// 		std::replace( line.begin(), line.end(), '\t', ' ');
+// 		// if (line.size() > 0 && line[0] != '#')
+// 		// 	lines.push_back(line);
+//         size_t i = 0;
+// 		while (i < line.size() && line[i] == ' ')
+//         {
+//             // std::cout << "i = " << i << " line[i] = [" << line[i] << "]" << std::endl;
+// 			i++;
+//         }
+// 		if (line != " " && line != "" && (i != line.size()))
+// 			conf->lines.push_back(line);
+			
+// 	}
+// 	file.close();
+// 	conf->set_lines(lines);
+// 	// conf.read_lines();
+// 	try
+// 	{
+// 		conf->start_parsing();
+// 	}
+// 	catch (std::runtime_error &e)
+// 	{
+// 		//std::cout << e.what() << std::endl;
+// 		return (0);
+// 	}
+// 	// conf->read_server();
+// 	return (1);
+// }
 
 // httpServer::httpServer(int port)
 // {
@@ -444,13 +452,14 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                             run_once = true;
                             // //std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
                             //std::cout << "************************----------------fdsfsfd" << cl->get_pr().get_body_size() << std::endl;
+                            // std::cout << "********************" <<cl->getReadyRequest()->get_server()->get_location(0).get_upload_path() << std::endl;
                             responseHandler *rh = getResponse(cl, cl->get_pr().get_body_size());
                             write_to_client(&cl,  _eventList[i].data, rh->getBuffer());
                             delete rh;
                         }
                         if (cl && cl->is_sending_to_complete())
                         {
-                            //std::cerr << "hold on bruh" << std::endl;
+                            //` << "hold on bruh" << std::endl;
                             disconnectClient(cl, true);
                         }
                        // if (rh)
