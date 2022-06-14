@@ -59,10 +59,11 @@ class httpServer
     std::map<int, client*>clientmap;
     bool is_shared_port;
     server server_parsed_data;
+    std::vector<server> servers_parsed_data;
 	int run_once;
     public:
         // httpServer(int port);
-        httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd, int KqueueFd);
+        httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd, int KqueueFd, std::vector<server> servers_data);
         ~httpServer() {}
         bool start();
         void stop();
@@ -74,7 +75,9 @@ class httpServer
         void read_from_client(client **c, long data_length);
         void write_to_client(client **cl, long data_length, std::string response_buffer);                         
         bool doesHttpRequestBelongs(request *rq);
+        server  *getRightHTtpRequestServerData(request *rq, client *cl);
         int getServerFd();
+        // int httpServer::whichServerTheRequestBelongs(request *rq);
         server *getServerParsedData() { 
             server *s = new server;
             *s = server_parsed_data;

@@ -32,27 +32,42 @@ size_t file_size(std::string path)
 	return size;
 }
 
+// bool httpServer::doesHttpRequestBelongs(request *rq)
+// {
+
+//     for (int i = 0; (unsigned int)i < servers_parsed_data.size(); i++)
+//     {
+//         if (servers_parsed_data[i].get_name(i) == rq->getHost())
+//         {
+//             doesRequestHostBelong = true;
+//             return true;
+//             //std::cout << "Host: " << rq->getHost() << " belongs to server" << std::endl;
+//             //std::cout << "server host: " << server_parsed_data.get_name(i) << std::endl;
+//             //std::cout << "server port: " << this->listenServerPort << std::endl;
+//         }
+//    // //std::cout << "request port: " << rq->getPort() << std::endl;
+//     }
+//     // if (server_parsed_data.get_listen_port() == rq->getPort())
+//     // {
+//     //     doesRequestPortBelong = true;
+//     //     //std::cout << "Port: " << rq->getPort() << " belongs to server" << std::endl;
+//     // }
+//     // if (doesRequestHostBelong && doesRequestPortBelong)
+//     //     return true;
+//     return false;
+// }
+
+
 bool httpServer::doesHttpRequestBelongs(request *rq)
 {
-    bool doesRequestHostBelong = false;
-    bool doesRequestPortBelong = false;
-    for (int i = 0; (unsigned int)i < server_parsed_data.get_name_size(); i++)
+    for (int i = 0; (unsigned int)i < servers_parsed_data.size(); i++)
     {
-        if (server_parsed_data.get_name(i) == rq->getHost())
+        if (servers_parsed_data[i].get_name(0) == rq->getHost() &&  server_parsed_data.get_name(0) == rq->getHost())
         {
-            doesRequestHostBelong = true;
-            //std::cout << "Host: " << rq->getHost() << " belongs to server" << std::endl;
-            //std::cout << "server host: " << server_parsed_data.get_name(i) << std::endl;
-            //std::cout << "server port: " << this->listenServerPort << std::endl;
+            return true;
         }
-   // //std::cout << "request port: " << rq->getPort() << std::endl;
     }
-    if (server_parsed_data.get_listen_port() == rq->getPort())
-    {
-        doesRequestPortBelong = true;
-        //std::cout << "Port: " << rq->getPort() << " belongs to server" << std::endl;
-    }
-    if (doesRequestHostBelong && doesRequestPortBelong)
+    if (servers_parsed_data[0].get_name(0) == server_parsed_data.get_name(0))
         return true;
     return false;
 }
@@ -163,9 +178,10 @@ socket_data *httpServer::create_listening_socket(int port, std::string host)
 //     listeningServAddr.sin_addr.s_addr = htonl(INADDR_ANY); //accept all connections aka set address to 0.0.0.0
 // }
 
-httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd, int KqueueFd)
+httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_data *sd, int KqueueFd, std::vector<server> servers_data)
 {
     listenServerFd = INVALID_SOCKET;
+    this->servers_parsed_data = servers_data;
     listenServerPort = server_parsed_data.get_listen_port(); 
     canRun = false;
     this->serverKqFd = KqueueFd;
@@ -261,6 +277,25 @@ void httpServer::disconnectClient(client *c, bool is_delete)
         clientmap.erase(c->getClientFd());
     }
     delete c;
+}
+server *httpServer::getRightHTtpRequestServerData(request *rq, client *cl)
+{
+    server *s = new server;
+    for (int i = 0; (unsigned int)i < servers_parsed_data.size(); i++)
+    {
+        for (unsigned int j = 0; j < servers_parsed_data[i].get_name_size(); j++)
+        {
+          
+        if (servers_parsed_data[i].get_name(j) == rq->getHost() && servers_parsed_data[j].get_listen_port() == this->listenServerPort)
+        {
+            std::cerr << "$$$$$$$$$$$$#################%%%%%%%%%%%%%%%%%%%found another server" << std::endl;
+            *s = servers_parsed_data[i];
+            return s;
+         }
+        }
+    }
+    *s = server_parsed_data;
+    return s;
 }
 
 void httpServer::disconnectClientImprv(client **c_, bool is_delete)
@@ -420,14 +455,20 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         // //std::cout << "testiiiiiiin" << std::endl;
                         // //std::cout << spd->get_upload_path() << std::endl;
                         request *r = new request(cl->get_pr(), spd);
-                        
+
+                        server *spd_ = getRightHTtpRequestServerData(r, cl);
+                        delete r->get_server();
+                        r->set_server(spd_);
+                        int server_index = -1;
                         // if (doesHttpRequestBelongs(r))
+                        // {
                         //     cl->setRequest(r);
+                        // }
                         // else
                         // {
-                        //     delete r;
+                        // //     delete r;
                         //     disconnectClient(cl, true);
-                        //     continue;
+                        //     return ;
                         // }
                         cl->setRequest(r);
                         // //std::cout << "req complete" << std::endl;
