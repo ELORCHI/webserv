@@ -223,11 +223,12 @@ std::string getResponseBody(int status, std::string bodyMsg, Locator *info)
 		defaultEr = getDefaultError(status, info);
 		if (defaultEr != "")
 		{
-			//debug("getResponseBody", defaultEr);
+			debug("getResponseBody", defaultEr);
 			return (defaultEr);
 		}
+		debug("getResponseBody", "no default error");
 	}
-	//debug("getResponseBody", "status: " + std::to_string(status));
+	debug("getResponseBody", "status: " + std::to_string(status));
 	return (bodyMsg);
 }
 
@@ -240,11 +241,13 @@ std::string getDefaultError(int status, Locator *info)
 		path = info->getWorkingLocation()->getDefaultError(status);
 		if (path != std::string(""))
 		{
-			//debug("getDefaultError", "status: " + std::to_string(status));
+			debug("getDefaultError", "status: " + std::to_string(status) + std::string(" path: ") + path);
 			body = info->readBody(path);
+			std::cout << "body: " << body << std::endl;
 		}
+		debug("getDefaultError", "status: " + std::to_string(status) + std::string(" path: ") + path);
 	}
-	//debug("getDefaultError", "status: " + std::to_string(status));
+	debug("getDefaultError             dsfsf", "status: " + std::to_string(status));
 	return (body);
 }
 
@@ -919,7 +922,7 @@ std::string Locator::readBody(std::string path)
     int fd = open(path.c_str(), O_RDONLY);
     if (fd < 0) 
 	{
-        //debug("Locator::readBody", "file not found" + path);
+        debug("Locator::readBody", "file not found" + path);
 		return "";
     }
 	// std::cout << "yoooow 2" << std::endl;
@@ -935,6 +938,8 @@ std::string Locator::readBody(std::string path)
 	}
 	else
 	{
+		debug("Locator::readBody",  std::to_string(ret) + " bytes read");
+		debug("Locator::readBody", "readBody Ending: error");
 		close(fd);
 		return "";
 	}
