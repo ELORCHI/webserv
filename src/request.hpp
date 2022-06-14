@@ -27,6 +27,10 @@ class request {
         {
             return server_parsed_data;
         }
+        void set_server(server *server_parsed_data)
+        {
+            this->server_parsed_data = server_parsed_data;
+        }
 
     // static int get_content_length(std::string astring);
     public:
