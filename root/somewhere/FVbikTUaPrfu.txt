@@ -1,9 +1,0 @@
-------WebKitFormBoundary9gGWwqTLIHbBXgVi
-Content-Disposition: form-data; name="name"
-
-mohamed khames
-------WebKitFormBoundary9gGWwqTLIHbBXgVi
-Content-Disposition: form-data; name="email"
-
-yhebbat@student.1337.ma
-------WebKitFormBoundary9gGWwqTLIHbBXgVi--
