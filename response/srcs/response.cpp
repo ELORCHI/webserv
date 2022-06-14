@@ -318,6 +318,8 @@ std::string Locator::getContentType(void)
 
 	if (error >= 400 || autoindexResponse == true)
 		return ("text/html");
+	if (error == CREATED_CODE)
+		return ("text/html");
 	if (i != std::string::npos)
 	{
 		res = resourceFullPath.substr(i, resourceFullPath.length() - i);
@@ -1539,8 +1541,8 @@ int PostHandler::handleFiles(void)
 	}
 	else if (error == CREATED_CODE)
 		return (CREATED_CODE);
-	// else
-	// 	error = FORBIDDEN_CODE;
+	else if (error != -1)
+		error = FORBIDDEN_CODE;
 	return (1);
 }
 
