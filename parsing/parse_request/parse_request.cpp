@@ -179,10 +179,18 @@ void	parse_request::set_chunked_http_body()
 		{
 			if ((int)_data.size() > _chunk_size + 2)
 			{
-				write(_file_descriptor, _data.c_str(), _chunk_size);
+				int t = write(_file_descriptor, _data.c_str(), _chunk_size);
+				if (t == -1)
+				{
+					_is_request_complete = true;
+					close(_file_descriptor);
+					_code_status = 500;
+				}
 				_my_body_size += _chunk_size;
 				_data.erase(0, _chunk_size + 2);
 				_chunk_size = -1;
+				if (t == 0)
+					continue;
 			}
 			else
 				break ;
@@ -204,7 +212,14 @@ void	parse_request::set_unchunked_http_body()
 		close(_file_descriptor);
 		return ;
 	}
-	write(_file_descriptor, _data.data(), _data.size());
+	int t = write(_file_descriptor, _data.data(), _data.size());
+	if (t == -1)
+	{
+		_is_request_complete = true;
+		close(_file_descriptor);
+		_code_status = 500;
+		return ;
+	}
 	_my_content_length += _data.size();
 	_my_body_size = _my_content_length;
 	if (_my_content_length >= content_length)

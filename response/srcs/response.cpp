@@ -616,7 +616,9 @@ void Locator::setResourceFullPath()
 	std::string p = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
 	std::string rmlink = "";
 	resourceFullPath = Locate->getLocation()->get_root();
+	debug("Locator::setResourceFullPath:" , "resourceFullPath:(root) " + resourceFullPath);
 	std::string loc_path = Locate->getLocation()->get_locations_path();
+	debug("Locator::setResourceFullPath:" , "loc_path: " + loc_path);
 	size_t i = p.find_first_of(loc_path);
 	//std::cout << "p before: " << p << std::endl;
 	//std::cout << "loc_path: " << loc_path << std::endl;
@@ -684,6 +686,7 @@ void Locator::checker(void)
 	setResourceFullPath();
 	setAutoIndex();
 	//printLocation(Locate->getLocation());
+	// std::cerr << "full_Path_check : " << resourceFullPath << std::endl;
 	if (isCgi(resourceFullPath))
 	{
 		resourceType = CG;
@@ -714,7 +717,7 @@ void Locator::checker(void)
 	}
 	else
 	{
-		//debug("Locator::checker", "file not found");
+		debug("Locator::checker", "file not found");
 		resourceType = NO;
 	}
 	if (resourceFullPath[resourceFullPath.size() - 1] == '/')
@@ -732,8 +735,6 @@ void Locator::checker(void)
 	std::cerr << Locate->getLocation()->get_client_max_body_size() << " | " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
 	if (Locate->getLocation()->get_client_max_body_size() != -1 && load > Locate->getLocation()->get_client_max_body_size())
 	{
-		debug("Locator::checker", "body size is too big");
-		std::cout << "body size is too big" << std::endl;
 		error = 413;
 	}
 }
@@ -913,6 +914,7 @@ std::string Locator::readBody(std::string path)
 	//debug("Locator::readBody", "readBody Starting");
  	struct stat sb;
     std::string res;
+	int 		ret = 0;
 
     int fd = open(path.c_str(), O_RDONLY);
     if (fd < 0) 
@@ -925,10 +927,18 @@ std::string Locator::readBody(std::string path)
     fstat(fd, &sb);
 	//std::cout << sb.st_size << std::endl;
     res.resize(sb.st_size);
-    read(fd, (char*)(res.data()), sb.st_size);
-    close(fd);
+    ret = read(fd, (char*)(res.data()), sb.st_size);
+	if (ret == sb.st_size)
+	{
+		close(fd);
+    	return res;
+	}
+	else
+	{
+		close(fd);
+		return "";
+	}
 	//debug("Locator::readBody", "readBody Ending body file opened and read");
-    return res;
 	// int fd = open(path.c_str(), O_RDONLY);
 	// if (fd == -1)
 	// 	//std::cout << strerror(errno) << std::endl;
@@ -1455,8 +1465,14 @@ int PostHandler::creator(std::string path)
 		memset(buffer, 0, 2000);
 		ret = read(old_fd, buffer, 2000 - 1);
 		if (ret >= 0)
-			write(new_fd, buffer, ret);
-        else
+		{
+			int t = write(new_fd, buffer, ret);
+			if (t == -1)
+				return (500);
+			else if (t != ret && ret != 0)
+				return (500);
+		}
+		else
 		{
 			//debug("PostHandler::Creator", "Ending :" + std::string(strerror(errno)));
             return 500;

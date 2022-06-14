@@ -5,7 +5,6 @@
 #include <sys/socket.h>
 #include <utility>
 
-
 void send_file_to_socket(int fd, char *path)
 {
 	std::ifstream file(path, std::ios::binary);

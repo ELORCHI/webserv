@@ -52,14 +52,11 @@ void httpServers::httpServers_repl()
 
     while (1)
     {
-        std::cerr << "checker : " << _servers.size() << std::endl;
         for (int i = 0; (unsigned long )i < _servers.size(); i++)
 		{
-			std::cerr << "BEFOOORE" << std::endl;
             num_events = kevent(KqueueFd, NULL, 0, _eventList, MAX_EVENTS, NULL);
-			std::cerr << "WEWEWEWEWEWEWEWEWEWEWEWE" << std::endl;
             _servers[i].run(num_events, _eventList);
-			std::cerr << "WAWAWAWAWAWAWAWAWAWAWAWA" << std::endl;
+	
 		}
 	}
 }

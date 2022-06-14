@@ -33,6 +33,7 @@ protected:
 public:
     location();
     ~location();
+    location (const location &obj);
     void                        set_upload_path(std::string upload_path);
     std::string                 get_upload_path() const;
     std::string                 get_locations_path() const;

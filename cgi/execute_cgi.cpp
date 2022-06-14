@@ -206,7 +206,10 @@ int execute_cgi::start_execute_cgi(std::string to_dup, std::string file_full_pat
         {
             fd[1] = open(_file_full_path.c_str(), O_RDWR, 0644);
             if (fd[1] == -1)
+            {
+                close(fd[1]);
                 return 500;
+            }
             char buffer[2000] = {0};
             std::string output;
             std::string headers;
@@ -217,6 +220,11 @@ int execute_cgi::start_execute_cgi(std::string to_dup, std::string file_full_pat
             {
                 memset(buffer, 0, 2000);
                 ret = read(fd[1], buffer, 2000 - 1);
+                if (ret == -1)
+                {
+                    close(fd[1]);
+                    return 500;
+                }
                 output += buffer;
                 if (output.find("\r\n\r\n") != std::string::npos && !headers_done)
                 {
@@ -237,6 +245,8 @@ int execute_cgi::start_execute_cgi(std::string to_dup, std::string file_full_pat
                         close(last_fd);
                         return 500;
                     }
+                    else if (t == 0)
+                        continue;
                 }
             }
             // remove(_file_full_path.c_str());

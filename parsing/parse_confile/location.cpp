@@ -22,6 +22,14 @@ location::location() : _locations_path(""),
                         {}
 location::~location() {}
 
+//copy constructor
+location::location(const location &obj)
+{
+    if (this != &obj)
+    {
+        *this = obj;
+    }
+}
 
 /*
 * GETTERS

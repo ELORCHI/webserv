@@ -105,3 +105,47 @@ int main(int argc, char *argv[])
     // std::cout << ss << std::endl;
     return (0);
 }
+
+
+
+// // // // // write with Select
+// // // // int						write_select (int fd, std::string &buffer, size_t size) {
+// // // // 	fd_set	wset;
+
+// // // // 	FD_ZERO(&wset);
+// // // // 	FD_SET(fd, &wset);
+// // // // 	int status = select(fd + 1, NULL, &wset, NULL, NULL);
+// // // // 	if (status < 0) {
+// // // // 		std::cerr << "Select Failed!" << std::endl;
+// // // // 		return -1;
+// // // // 	}
+// // // // 	if (FD_ISSET(fd, &wset)) {
+// // // // 		int ret = write(fd, buffer.c_str(), size);
+// // // // 		return ret;
+// // // // 	}
+// // // // 	return -1;
+// // // // }
+
+// // // // // read with Select
+// // // // int						read_select (int fd, std::string &buffer, size_t size) {
+
+// // // // 	char buff[size + 1];
+// // // // 	fd_set	rset;
+// // // // 	int read_ret = 0;
+
+// // // // 	FD_ZERO(&rset);
+// // // // 	FD_SET(fd, &rset);
+// // // // 	int status = select(fd + 1, &rset, NULL, NULL, NULL);
+// // // // 	if (status < 0)
+// // // // 		std::cerr << "Select Failed!" << std::endl;
+// // // // 	if (FD_ISSET(fd, &rset))
+// // // // 	{
+// // // // 		read_ret = read(fd, buff, size);
+// // // // 		if (read_ret > 0)
+// // // // 		{
+// // // // 			buff[read_ret] = '\0';
+// // // // 			buffer = std::string(buff, read_ret);
+// // // // 		}
+// // // // 	}
+// // // // 	return read_ret;
+// // // // }
