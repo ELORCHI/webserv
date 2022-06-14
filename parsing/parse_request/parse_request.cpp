@@ -45,7 +45,7 @@ parse_request::parse_request(parse_request const& rh)
 //copy constructor
 parse_request::parse_request(parse_request & rh)
 {
-	std::cout << "copy constructor" << std::endl;
+	//std::cout << "copy constructor" << std::endl;
 	_http_version = rh._http_version;
 	_http_method = rh._http_method;
 	_http_path = rh._http_path;
@@ -338,7 +338,7 @@ int    parse_request::start_parsing(char *buff, size_t size)
 					_my_body_size = 0;
 					//if !_code_status then _code_status = 200
 					_is_request_complete = true;
-					std::cout << "****************************************body_size: " << get_body_size() << std::endl;
+					//std::cout << "****************************************body_size: " << get_body_size() << std::endl;
 					return _is_request_complete;
 				}
 			}
@@ -369,10 +369,10 @@ int    parse_request::start_parsing(char *buff, size_t size)
 		close(_file_descriptor);
 		_code_status = 200;
 	}
-	if (_is_request_complete)
-		std::cout << "****************************************body_size: " << get_body_size() << std::endl;
-	// std::cout << "Path: " << get_http_path() << std::endl;
+	// if (_is_request_complete)
 	return _is_request_complete;
+		//std::cout << "****************************************body_size: " << get_body_size() << std::endl;
+	// std::cout << "Path: " << get_http_path() << std::endl;
 	// std::cout << "Method: " << get_http_method() << std::endl;
 	// std::cout << "Version: " << get_http_version() << std::endl;
 	// std::cout << "Query: " << get_http_query() << std::endl;

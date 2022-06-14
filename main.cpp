@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 // setsockopt(sd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
     if (i == -1)
     {
-        std::cout << "Error : file not found" << std::endl;
+        std::cout << "Error: openning conf file" << std::endl;
         return 0;
     }
 	httpServers srvrs(argc, argv);
@@ -68,6 +68,5 @@ int main(int argc, char *argv[])
 
     
     // std::cout << ss << std::endl;
-    system("leaks webserver");
     return (0);
 }

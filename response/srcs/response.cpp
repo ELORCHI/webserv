@@ -394,7 +394,7 @@ void responseHandler::setClient(client *_cl)
 
 int system_block_response::handle()
 {
-	std::cout << "Loaddddd :" << load << std::endl;
+	// std::cout << "Loaddddd :" << load << std::endl;
 	int err = 0;
  	if (this->isMethodImplemented(cl->getReadyRequest()->get_request_parsing_data().get_http_method()))
 		err = 1;
@@ -534,7 +534,7 @@ void workingLocation::setlocation(request *request)
 	{
 		loc = this->defaultLocation(request->get_server());
 	}
-	std::cout << "selected location is " << loc->get_locations_path() <<std::endl;
+	//std::cout << "selected location is " << loc->get_locations_path() <<std::endl;
 	serverlocation = loc;
 	loc->set_upload_path("/somewhere/");
 	setRedirections(request->get_server());
@@ -567,7 +567,7 @@ location *workingLocation::defaultLocation(server *server)
 	loc->set_autoindex(server->get_autoindex());
 	loc->fill_allowed_methodes(server->get_allowed_methods());
 	loc->set_upload_path(server->get_upload_path());
-	std::cout << "default Location is " << loc->get_locations_path() << std::endl;
+	//" << loc->get_locations_path() << std::endl;
 	return loc;
 }
 
@@ -615,12 +615,12 @@ void Locator::setResourceFullPath()
 	resourceFullPath = Locate->getLocation()->get_root();
 	std::string loc_path = Locate->getLocation()->get_locations_path();
 	size_t i = p.find_first_of(loc_path);
-	std::cout << "p before: " << p << std::endl;
-	std::cout << "loc_path: " << loc_path << std::endl;
+	//std::cout << "p before: " << p << std::endl;
+	//std::cout << "loc_path: " << loc_path << std::endl;
 	if (i != std::string::npos)
 	{
 		p.erase(i, loc_path.size());
-		std::cout << "p == " +  p << " rmlink == " + rmlink << std::endl;
+		//std::cout << "p == " +  p << " rmlink == " + rmlink << std::endl;
 	}
 	resourceFullPath += p;
 	while (resourceFullPath.find("//") != std::string::npos)
@@ -673,14 +673,14 @@ void Locator::setClient(client *_cl)
 
 void Locator::checker(void)
 {
-	debug("Locator::checker", "checker Starting");
+	//debug("Locator::checker", "checker Starting");
 	struct stat s;
 	std::string path = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
 	////debug("Locator::checker", "path: " + path);
 	setworkingLocation();
 	setResourceFullPath();
 	setAutoIndex();
-	printLocation(Locate->getLocation());
+	//printLocation(Locate->getLocation());
 	if (isCgi(resourceFullPath))
 	{
 		resourceType = CG;
@@ -905,10 +905,9 @@ std::string Locator::readBody(std::string path)
     if (fd < 0) 
 	{
         //debug("Locator::readBody", "file not found" + path);
-		std::cout << "yoooow" << std::endl;
 		return "";
     }
-	std::cout << "yoooow 2" << std::endl;
+	// std::cout << "yoooow 2" << std::endl;
 	//debug("Locator::readBody", "readBody Ending body file opened and read");
     fstat(fd, &sb);
 	//std::cout << sb.st_size << std::endl;
@@ -1071,7 +1070,7 @@ std::string GetHandler::setAutoindexResponse(void)
 {
 	//debug("GetHandler::setAutoindexResponse", "setAutoindexResponse Starting");
 	std::string oldpath = cl->getReadyRequest()->get_request_parsing_data().get_http_path();
-	std::cout << "	call to setAutoindexResponse" << std::endl;
+	//std::cout << "	call to setAutoindexResponse" << std::endl;
 	std::string path	= godFather->getResourceFullPath();
 	std::string host	= cl->getReadyRequest()->get_server()->get_listen_host();
 	int port			= cl->getReadyRequest()->get_server()->get_listen_port();
@@ -1399,7 +1398,7 @@ void PostHandler::setGodFather(Locator *_godFather)
 bool PostHandler::supportAppload()
 {
 	//debug("PostHandler::supportAppload", "called");
-	std::cout << godFather->getWorkingLocation()->getLocation()->get_upload_path() << std::endl;
+	//std::cout << godFather->getWorkingLocation()->getLocation()->get_upload_path() << std::endl;
 	if (godFather->getWorkingLocation()->getLocation()->get_upload_path() != std::string(""))
 	{
 		//debug("PostHandler::supportAppload", "returning true");
@@ -1424,8 +1423,8 @@ int PostHandler::creator(std::string path)
 	if (newf.find_last_of("/") != newf.size() - 1)
 		newf += "/";
 	newf += getClient()->getReadyRequest()->get_request_parsing_data().get_path_body();
-	std::cout << "==================================" << std::endl;
-	std::cout << "newf 01: " << newf << std::endl;	
+	//std::cout << "==================================" << std::endl;
+	//std::cout << "newf 01: " << newf << std::endl;	
 	int new_fd = open(newf.c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
 	int old_fd = open(getClient()->getReadyRequest()->get_request_parsing_data().get_path_body().c_str(), O_RDONLY, 0644);
 	char buffer[2000] = {0};
@@ -1578,12 +1577,12 @@ void PostHandler::buildresponse()
 
 responseHandler *get(client  *cl, long long playload)
 {
-	std::cout << "LOAD IS :" << playload << std::endl;
+	//std::cout << "LOAD IS :" << playload << std::endl;
 	responseHandler *systemResponse = new system_block_response(cl, playload);
 	Locator *locationHandler = new Locator(cl, playload);
 	std::string method = cl->getReadyRequest()->get_request_parsing_data().get_http_method();
-	std::cout << "Hello from getResponse" << std::endl;
-	std::cout << "playload: " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
+	//std::cout << "Hello from getResponse" << std::endl;
+	//std::cout << "playload: " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;
 	if (systemResponse->handle())
 	{
 		//std::cout << "system response handle" << std::endl;
@@ -1594,7 +1593,7 @@ responseHandler *get(client  *cl, long long playload)
 		locationHandler->checker();	
 	if (locationHandler->handle())
 	{
-		std::cout << "location handler" << std::endl;
+		//std::cout << "location handler" << std::endl;
 		//std::cout << locationHandler->getBuffer() << std::endl;
 		delete systemResponse;
 		return locationHandler;
@@ -1611,7 +1610,7 @@ responseHandler *get(client  *cl, long long playload)
 	}
 	if (method == std::string("GET"))
 	{
-		std::cout << "GetHandler" << std::endl;
+		//std::cout << "GetHandler" << std::endl;
 		responseHandler *_getHandler = new GetHandler(locationHandler);
 		_getHandler->handle();
 		//std::cout << "check if buffer is empty:" <<  _getHandler->getBuffer() << std::endl;
@@ -1635,10 +1634,10 @@ responseHandler *getResponse(client  *cl, long long playload)
 {
 	responseHandler *res = get(cl, playload);
 
-	std::cout << "response Finished" << std::endl;
-	std::cout << "==========================================================" << std::endl;
-	std::cout << "==========================================================" << std::endl;
-	std::cout << "==========================================================" << std::endl;
+	//std::cout << "response Finished" << std::endl;
+	//std::cout << "==========================================================" << std::endl;
+	//std::cout << "==========================================================" << std::endl;
+	//std::cout << "==========================================================" << std::endl;
 	return (res);
 }
 

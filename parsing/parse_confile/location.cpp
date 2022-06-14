@@ -65,7 +65,7 @@ bool location::is_number(const std::string& str)
 
 void    location::set_client_max_body_size(std::string client_max_body_size)
 {
-    std::cout << "inside location " << client_max_body_size << std::endl;
+   // std::cout << "inside location " << client_max_body_size << std::endl;
     if (not_predefined(client_max_body_size) && is_number(client_max_body_size))
        this->_client_max_body_size =std::stoi(client_max_body_size);
     else
@@ -151,7 +151,7 @@ std::string                 location::get_methods(unsigned int i) const
 
 void    location::set_client_max_body_size(long long int client_max_body_size)
 {
-    std::cout << "inside location 55" << client_max_body_size << std::endl;
+    //std::cout << "inside location 55" << client_max_body_size << std::endl;
     _client_max_body_size = client_max_body_size;
 }
 

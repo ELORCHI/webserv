@@ -41,16 +41,16 @@ bool httpServer::doesHttpRequestBelongs(request *rq)
         if (server_parsed_data.get_name(i) == rq->getHost())
         {
             doesRequestHostBelong = true;
-            std::cout << "Host: " << rq->getHost() << " belongs to server" << std::endl;
-            std::cout << "server host: " << server_parsed_data.get_name(i) << std::endl;
-            std::cout << "server port: " << this->listenServerPort << std::endl;
+            //std::cout << "Host: " << rq->getHost() << " belongs to server" << std::endl;
+            //std::cout << "server host: " << server_parsed_data.get_name(i) << std::endl;
+            //std::cout << "server port: " << this->listenServerPort << std::endl;
         }
-   // std::cout << "request port: " << rq->getPort() << std::endl;
+   // //std::cout << "request port: " << rq->getPort() << std::endl;
     }
     if (server_parsed_data.get_listen_port() == rq->getPort())
     {
         doesRequestPortBelong = true;
-        std::cout << "Port: " << rq->getPort() << " belongs to server" << std::endl;
+        //std::cout << "Port: " << rq->getPort() << " belongs to server" << std::endl;
     }
     if (doesRequestHostBelong && doesRequestPortBelong)
         return true;
@@ -70,7 +70,7 @@ std::set<int> httpServer::getRepeatedPorts(std::vector<server> parsed_servers_da
         if (std::count(ports.begin(), ports.end(), parsed_servers_data[i].get_listen_port()) > 1)
         {
             repeatedPorts.insert(parsed_servers_data[i].get_listen_port());
-            // std::cout << parsed_servers_data[i].get_listen_port() << std::endl;
+            // //std::cout << parsed_servers_data[i].get_listen_port() << std::endl;
         }
     }
     return (repeatedPorts);
@@ -99,7 +99,7 @@ socket_data *httpServer::create_listening_socket(int port, std::string host)
         throw MyException("failed at creating the server socket!");
     int bind_r = bind(sd->listenServerFd, (struct sockaddr*)&(sd->listeningServAddr), sizeof(sd->listeningServAddr));
 	
-	std::cout << "port is: " << port << " host is: " << host <<  std::endl;
+	//std::cout << "port is: " << port << " host is: " << host <<  std::endl;
     if (bind_r != 0)
         throw MyException("binding address to socket failed!");
     if (listen(sd->listenServerFd, 100) != 0) 
@@ -114,13 +114,13 @@ int	httpServer::parsing_conf(int ac, char **av,parse_config *conf)
 
 	if (ac != 2)
 	{
-		std::cout << "Usage: ./parse_confile <path_to_config_file>" << std::endl;
+		//std::cout << "Usage: ./parse_confile <path_to_config_file>" << std::endl;
 		return (0);
 	}
 	std::ifstream file(av[1]);
 	if (!file.is_open())
 	{
-		std::cout << "Error: file " << av[1] << " not found" << std::endl;
+		//std::cout << "Error: file " << av[1] << " not found" << std::endl;
 		return (0);
 	}
 	std::string line;
@@ -136,7 +136,7 @@ int	httpServer::parsing_conf(int ac, char **av,parse_config *conf)
 	}
 	catch (std::runtime_error &e)
 	{
-		std::cout << e.what() << std::endl;
+		//std::cout << e.what() << std::endl;
 		return (0);
 	}
 	// conf->read_server();
@@ -185,7 +185,7 @@ httpServer::httpServer(server server_parsed_data,  bool is_shared_port, socket_d
     struct kevent _kEvent;
     EV_SET(&_kEvent, listenServerFd, EVFILT_READ, EV_ADD, 0, 0, NULL);
     kevent(serverKqFd, &_kEvent, 1, NULL, 0, NULL);
-    // std::cout << "daaaah" << std::endl;
+    // //std::cout << "daaaah" << std::endl;
     canRun = true;
 	run_once = false;
     delete sd;
@@ -311,7 +311,7 @@ void httpServer::read_from_client(client **c_, long data_length)
     char *c_buffer = new char[data_length];
 	// std::cerr << "DBG_00" << std::endl;
     int bytesRead = recv(c->getClientFd(), c_buffer, data_length, 0);
-    // std::cout << c_buffer << std::endl;
+    // //std::cout << c_buffer << std::endl;
     
 
 	if (bytesRead <= 0)
@@ -325,7 +325,7 @@ void httpServer::read_from_client(client **c_, long data_length)
         int k = c->get_pr().start_parsing(c_buffer, bytesRead);
         if (k)
             c->set_reading_status(true);
-        std::cout << "******* ***** *** ** * :"<< c->get_pr().get_body_size() << std::endl;
+        //std::cout << "******* ***** *** ** * :"<< c->get_pr().get_body_size() << std::endl;
     }
 	
     delete[] c_buffer;
@@ -393,24 +393,24 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                     // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
                     // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
                     // close(_eventList[i].ident);
-					// std::cout << "cl is null" << std::endl;              
+					// //std::cout << "cl is null" << std::endl;              
                     continue ;
                 }
 
                 // if (_eventList[i].flags & EV_EOF) {
-				// 	// std::cout << "yo am i here" << std::endl;
+				// 	// //std::cout << "yo am i here" << std::endl;
                 //     disconnectClient(cl, true);
                 //     continue;
                 // }
                 if (_eventList[i].filter == EVFILT_READ && cl)
                 { 
 					read_from_client(&cl, _eventList[i].data);
-                    // std::cout << "cl: " << cl << std::endl;
+                    // //std::cout << "cl: " << cl << std::endl;
                     if (cl && cl->is_reading_complete())
                     {
                         server *spd = getServerParsedData();
-                        // std::cout << "testiiiiiiin" << std::endl;
-                        // std::cout << spd->get_upload_path() << std::endl;
+                        // //std::cout << "testiiiiiiin" << std::endl;
+                        // //std::cout << spd->get_upload_path() << std::endl;
                         request *r = new request(cl->get_pr(), spd);
                         
                         // if (doesHttpRequestBelongs(r))
@@ -422,7 +422,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         //     continue;
                         // }
                         cl->setRequest(r);
-                        // std::cout << "req complete" << std::endl;
+                        // //std::cout << "req complete" << std::endl;
                         EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_DISABLE, 0, 0, NULL);
                         kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
                         EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_ENABLE, 0, 0, NULL);
@@ -442,8 +442,8 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         if (cl->is_sending_to_complete() == false)
                         {
                             run_once = true;
-                            // std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
-                            std::cout << "************************----------------fdsfsfd" << cl->get_pr().get_body_size() << std::endl;
+                            // //std::cout << "coco: " << cl->getReadyRequest()->get_request_parsing_data().get_http_method() << std::endl;
+                            //std::cout << "************************----------------fdsfsfd" << cl->get_pr().get_body_size() << std::endl;
                             responseHandler *rh = getResponse(cl, cl->get_pr().get_body_size());
                             write_to_client(&cl,  _eventList[i].data, rh->getBuffer());
                             delete rh;
@@ -454,7 +454,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                             disconnectClient(cl, true);
                         }
                        // if (rh)
-						// std::cout << "request complete" << std::endl;
+						// //std::cout << "request complete" << std::endl;
                         // EV_SET(&kEv, _eventList[i].ident, EVFILT_READ, EV_ENABLE, 0, 0, NULL);
                         // kevent(serverKqFd, &kEv, 1, NULL, 0, NULL);
                         // EV_SET(&kEv, _eventList[i].ident, EVFILT_WRITE, EV_DISABLE, 0, 0, NULL);
@@ -499,9 +499,9 @@ void httpServer::run(int num_events, struct kevent *_eventList)
 					// {
 						// std::fstream fs("test.txt", std::fstream::in | std::fstream::out);
 						// fs << cl->getReadBxxuffer();
-						//std::cout << cl->getReadBuffer();
+						////std::cout << cl->getReadBuffer();
 						
-						// std::cout << "bro" << std::endl;
+						// //std::cout << "bro" << std::endl;
 						// disconnectClient(cl, true);
 					// }
                     // if (cl->isThereARequestReady() == true)
