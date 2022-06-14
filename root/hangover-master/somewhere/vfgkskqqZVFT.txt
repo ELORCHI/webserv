@@ -1,0 +1,10 @@
+------WebKitFormBoundaryeqZCebxyeUAYgLfA
+Content-Disposition: form-data; name="fileToUpload"; filename=""
+Content-Type: application/octet-stream
+
+
+------WebKitFormBoundaryeqZCebxyeUAYgLfA
+Content-Disposition: form-data; name="submit"
+
+Upload Image
+------WebKitFormBoundaryeqZCebxyeUAYgLfA--

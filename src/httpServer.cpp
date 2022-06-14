@@ -288,7 +288,8 @@ server *httpServer::getRightHTtpRequestServerData(request *rq, client *cl)
         for (unsigned int j = 0; j < servers_parsed_data[i].get_name_size(); j++)
         {
           
-        if (servers_parsed_data[i].get_name(j) == rq->getHost() && servers_parsed_data[j].get_listen_port() == this->listenServerPort)
+        if (servers_parsed_data[i].get_name(j) == rq->getHost() && servers_parsed_data[j].get_listen_port() == this->listenServerPort
+        && this->server_parsed_data.get_name(j) == servers_parsed_data[i].get_name(j))
         {
             // std::cerr << "$$$$$$$$$$$$#################%%%%%%%%%%%%%%%%%%%found another server" << std::endl;
             *s = servers_parsed_data[i];
