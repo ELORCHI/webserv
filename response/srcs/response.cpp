@@ -1404,7 +1404,7 @@ void DeleteHandler::buildresponse(void)
 		break;
 	case NOT_FOUND_CODE:
 		response_body = getResponseBody(NOT_FOUND_CODE, NOT_FOUND_RESPONSE_MSG, godFather);
-		statusLine = getResponseStatusLine(NOT_FOUND_CODE, FORBIDDEN_MSG);
+		statusLine = getResponseStatusLine(NOT_FOUND_CODE, NOT_FOUND_MSG);
 		headers = getResponseHeaders(NOT_FOUND_CODE, godFather, response_body.size());
 		break;
 	default:
