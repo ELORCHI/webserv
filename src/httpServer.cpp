@@ -36,7 +36,7 @@ bool httpServer::doesHttpRequestBelongs(request *rq)
 {
     bool doesRequestHostBelong = false;
     bool doesRequestPortBelong = false;
-    for (int i = 0; i < server_parsed_data.get_name_size(); i++)
+    for (int i = 0; (unsigned int)i < server_parsed_data.get_name_size(); i++)
     {
         if (server_parsed_data.get_name(i) == rq->getHost())
         {
@@ -62,10 +62,10 @@ std::set<int> httpServer::getRepeatedPorts(std::vector<server> parsed_servers_da
     std::vector<int> ports;
     std::set<int> repeatedPorts;
 
-    for (int i = 0; i < parsed_servers_data.size(); i++)
+    for (int i = 0; (unsigned long) i < parsed_servers_data.size(); i++)
         ports.push_back(parsed_servers_data[i].get_listen_port());
     
-    for (int i = 0; i < parsed_servers_data.size(); i++)
+    for (int i = 0; (unsigned long) i < parsed_servers_data.size(); i++)
     {
         if (std::count(ports.begin(), ports.end(), parsed_servers_data[i].get_listen_port()) > 1)
         {
@@ -371,7 +371,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
 		}
         for (int i = 0; i < num_events; i++)
         {
-            if (_eventList[i].ident == listenServerFd) //a client is waiting to connect
+            if (_eventList[i].ident == (unsigned long)listenServerFd) //a client is waiting to connect
 			{
                 acceptConnection();
                 //std::cerr << "bruuuuuuuuuuuuuh" << std::endl;

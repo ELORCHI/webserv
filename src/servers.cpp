@@ -15,7 +15,7 @@ httpServers::httpServers(int argc, char **argv)
 	parsed_servers_data = conf.get_server_vect();
     std::set<int> sharedPorts = httpServer::getRepeatedPorts(parsed_servers_data);
     
-    for (int i = 0; i < parsed_servers_data.size(); i++)
+    for (int i = 0; (unsigned long)i < parsed_servers_data.size(); i++)
     {
         int port = parsed_servers_data[i].get_listen_port();
         if (std::find(sharedPorts.begin(), sharedPorts.end(), port) != sharedPorts.end()) {
@@ -28,7 +28,7 @@ httpServers::httpServers(int argc, char **argv)
     if ((this->KqueueFd = kqueue()) == -1)
         throw MyException("failure at creating the kernel queue");
 
-    for (int i = 0; i < parsed_servers_data.size(); i++)
+    for (int i = 0; (unsigned long)i < parsed_servers_data.size(); i++)
     {
         int port = parsed_servers_data[i].get_listen_port();
         if (std::find(sharedPorts.begin(), sharedPorts.end(), port) != sharedPorts.end())
@@ -51,7 +51,7 @@ void httpServers::httpServers_repl()
 
     while (1)
     {
-        for (int i = 0; i < _servers.size(); i++)
+        for (int i = 0; (unsigned long )i < _servers.size(); i++)
 		{
             num_events = kevent(KqueueFd, NULL, 0, _eventList, MAX_EVENTS, NULL);
 			// std::cerr << "WEWEWEWEWEWEWEWEWEWEWEWE" << std::endl;

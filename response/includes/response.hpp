@@ -167,7 +167,7 @@ class Locator : public responseHandler
 {
 	public:
 		Locator();
-		Locator(client *_cl);
+		Locator(client *_cl, long long payload);
 		~Locator();
 		int				handle();
 		int				getResourceType(void);
@@ -227,6 +227,7 @@ class Locator : public responseHandler
 		bool			hasIndex;
 		bool			autoindex;
 		bool			autoindexResponse;
+		long long		load;
 };
 
 class GetHandler : public responseHandler

@@ -131,7 +131,7 @@ void workingLocation::setUpload(std::string path)
 
 system_block_response::system_block_response(client *cl, long long playload): responseHandler(cl)
 {
-	
+	load = playload;
 }
 
 
@@ -405,11 +405,6 @@ int system_block_response::handle()
 		err = 1;
 		error = INTERNAL_SERVER_ERROR_CODE;
 	}
-	else if (load > cl->getReadyRequest()->get_server()->get_client_max_body_size())
-	{
-		err = 1;
-		error = PAYLOAD_TOO_LARGE_CODE;
-	}
 	else
 		return (0);
 	if (err == 1)
@@ -452,11 +447,6 @@ void system_block_response::buildresponse()
 		case INTERNAL_SERVER_ERROR_CODE:
 			response_body = getErroBody(error, INTERNAL_SERVER_ERROR_RESPONSE_MSG, cl);
 			statusLine = getResponseStatusLine(error, INTERNAL_SERVER_ERROR_MSG);		
-			headers = 	getResponseHeaders(error, response_body.size());
-			break;
-		case PAYLOAD_TOO_LARGE_CODE:
-			response_body = getErroBody(error, PAYLOAD_TOO_LARGE_RESPONSE_MSG, cl);
-			statusLine = getResponseStatusLine(error, PLAYLOAD_TOO_LARGE_MSG);
 			headers = 	getResponseHeaders(error, response_body.size());
 			break;
 		default:
@@ -598,7 +588,7 @@ std::vector<std::vector<std::string> > workingLocation::getRedirections()
 }
 
 
-Locator::Locator(client *_cl): responseHandler(_cl)
+Locator::Locator(client *_cl, long long payload): responseHandler(_cl)
 {
 	// this->setClient(cl);
 	Locate = new workingLocation;
@@ -609,6 +599,7 @@ Locator::Locator(client *_cl): responseHandler(_cl)
 	statusLine = "";
 	headers = "";
 	response_body = "";
+	load = payload;
 }
 
 Locator::~Locator()
@@ -958,6 +949,12 @@ int Locator::handle()
 		error = RESPONSE_BAD_REQUEST;
 	else if (isredirection() != -1)
 		error = MOVED_PERMANENTLY;
+	else if (load > Locate->getLocation()->get_client_max_body_size())
+	{
+		std::cout << "sdlfkdsfdsfkkds;fds;jkf;dkfdlfkdlfkdsl;fdks;fldksfl;dkfldsfklds;fk" << std::endl;
+		error = PAYLOAD_TOO_LARGE_CODE;
+		std::cout << "payload too large" << std::endl;
+	}
 	if (error != 0)
 	{
 		buildresponse();
@@ -1011,6 +1008,11 @@ void Locator::buildresponse()
 		response_body = getResponseBody(FORBIDDEN_CODE, FORBIDDEN_RESPONSE_MSG, this);
 		statusLine = getResponseStatusLine(FORBIDDEN_CODE, FORBIDDEN_MSG);
 		headers = getResponseHeaders(FORBIDDEN_CODE, this, response_body.size());
+		break;
+	case PAYLOAD_TOO_LARGE_CODE:
+		response_body = getResponseBody(PAYLOAD_TOO_LARGE_CODE, PAYLOAD_TOO_LARGE_RESPONSE_MSG, this);
+		statusLine = getResponseStatusLine(PAYLOAD_TOO_LARGE_CODE, PLAYLOAD_TOO_LARGE_MSG);
+		headers = getResponseHeaders(PAYLOAD_TOO_LARGE_CODE, this, response_body.size());
 		break;
 	default:
 		break;
@@ -1520,7 +1522,7 @@ int PostHandler::HandleDir(void)
 			godFather->setResourceFullPath(newpath);
 			handleFiles();
 		}
-		else
+		else if (error != CREATED_CODE)
 		{
 			//std::cout << "no index files" << std::endl;
 			error = FORBIDDEN_CODE;
@@ -1578,7 +1580,7 @@ responseHandler *get(client  *cl, long long playload)
 {
 	std::cout << "LOAD IS :" << playload << std::endl;
 	responseHandler *systemResponse = new system_block_response(cl, playload);
-	Locator *locationHandler = new Locator(cl);
+	Locator *locationHandler = new Locator(cl, playload);
 	std::string method = cl->getReadyRequest()->get_request_parsing_data().get_http_method();
 	std::cout << "Hello from getResponse" << std::endl;
 	std::cout << "playload: " << cl->getReadyRequest()->get_request_parsing_data().get_body_size() << std::endl;

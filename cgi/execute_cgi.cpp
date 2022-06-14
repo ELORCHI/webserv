@@ -182,7 +182,8 @@ int execute_cgi::start_execute_cgi(std::string to_dup, std::string file_full_pat
         close(fd[1]);
         if (fd[0] > 0)
             close(fd[0]); 
-        int status, stats, timeout;
+        int status = 0, stats = 0, timeout = 0;
+        stats = stats + 1 - 1;
         timeout = 0;
         while (difftime(time(NULL),  t) <= 60)
         {
