@@ -40,6 +40,7 @@ protected:
 public:
     server();
     ~server();
+    server(const server &src);
     void                         set_to_default();
     void                         set_name(std::string name);
     void                         set_listen(std::string listen);

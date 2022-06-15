@@ -50,6 +50,14 @@ void    server::set_name(std::string name)
     _name.push_back(name);
 }
 
+server::server(const server &src)
+{
+    if (this != &src)
+    {
+        *this = src;
+    }
+}
+
 void    server::set_upload_path(std::string upload_path)
 {
     if (not_predefined(upload_path))

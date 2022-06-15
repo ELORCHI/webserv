@@ -103,12 +103,12 @@ socket_data *httpServer::create_listening_socket(int port, std::string host)
 
     // inet_pton(AF_INET, host.c_str(), &(sd->listeningServAddr.sin_addr));
     sd->listenServerFd = socket(AF_INET, SOCK_STREAM, 0);
-    int wahd = 1;
-    if (setsockopt(sd->listenServerFd, SOL_SOCKET, SO_REUSEADDR, &wahd, sizeof(wahd)) == -1)
-    {
-        std::cerr << "setsockopt failed" << std::endl;
-        exit(1);
-    }
+    // int wahd = 1;
+    // if (setsockopt(sd->listenServerFd, SOL_SOCKET, SO_REUSEADDR, &wahd, sizeof(wahd)) == -1)
+    // {
+        // std::cerr << "setsockopt failed" << std::endl;
+        // exit(1);
+    // }
     if (sd->listenServerFd == INVALID_SOCKET)
         throw MyException("failed at creating the server socket!");
     // std::cout << "BIND:"
@@ -279,24 +279,45 @@ void httpServer::disconnectClient(client *c, bool is_delete)
     }
     delete c;
 }
+
+
+
 server *httpServer::getRightHTtpRequestServerData(request *rq, client *cl)
 {
     (void)cl;  
     server *s = new server;
-    for (int i = 0; (unsigned int)i < servers_parsed_data.size(); i++)
+    std::vector<std::string> server_names;
+    //add server_parse_data to server_names one by one
+    for (unsigned int i = 0; i < server_parsed_data.get_name_size(); i++) 
+        server_names.push_back(server_parsed_data.get_name(i));
+    if (std::find(server_names.begin(), server_names.end(), rq->getHost()) != server_names.end())
+    {
+        *s = server_parsed_data;
+        return s;
+    }
+
+    for (unsigned int i = 0; (unsigned int)i < servers_parsed_data.size(); i++)
     {
         for (unsigned int j = 0; j < servers_parsed_data[i].get_name_size(); j++)
-        {
-          
+        {      
         if (servers_parsed_data[i].get_name(j) == rq->getHost() && servers_parsed_data[j].get_listen_port() == this->listenServerPort)
         {
-            // std::cerr << "$$$$$$$$$$$$#################%%%%%%%%%%%%%%%%%%%found another server" << std::endl;
             *s = servers_parsed_data[i];
             return s;
          }
         }
     }
-    *s = server_parsed_data;
+    for (unsigned int i = 0; i < servers_parsed_data.size(); i++)
+    {
+        if (servers_parsed_data[i].get_listen_port() == this->listenServerPort)
+        {
+            *s = servers_parsed_data[i];
+            return s;
+        }
+    }
+
+    *s = servers_parsed_data[0];
+    return s;
     return s;
 }
 
@@ -461,6 +482,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                         server *spd_ = getRightHTtpRequestServerData(r, cl);
                         delete spd;
                         r->set_server(spd_);
+                        std::cerr << " " << r->getHost() << std::endl;
                         // if (doesHttpRequestBelongs(r))
                         // {
                         //     cl->setRequest(r);
@@ -486,7 +508,7 @@ void httpServer::run(int num_events, struct kevent *_eventList)
                 {
                     if (cl->is_reading_complete())
 					{
-						std::string rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 37\r\n\r\n<html><body><h2>ok</h2></body></html>";
+						//std::string rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: 37\r\n\r\n<html><body><h2>ok</h2></body></html>";
 						// int s = send(cl->getClientFd(), rep.c_str(), rep.length(), 0);
                         //responseHandler *rh = NULL;
                         if (cl->is_sending_to_complete() == false)
