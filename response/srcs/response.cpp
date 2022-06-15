@@ -1097,10 +1097,12 @@ std::string getLink(std::string const &dirEntry, std::string const &dirName, std
 	(void)port;
 	// int portt = port; *************** NOT USED
 	// portt +=port;	(****** NOT USED)
-    std::stringstream   ss;
+    std::string  ss = "";
 	std::cerr << "dirnme: " << dirName << std::endl; 
-    ss << "\t\t<p><a href=\"http://" + host + ":" + std::to_string(port) + dirName + "/" + dirEntry << "\">" + dirEntry + "</a></p>\n";
-    return ss.str();
+
+    ss += "\t\t<p><a href=\"http://" + host + ":" + std::to_string(port) + dirName + "/" + dirEntry + "\">" + dirEntry + "</a></p>\n";
+	// replace two consecutive slashes with one
+	return (ss);
 }
 
 std::string GetHandler::setAutoindexResponse(void)

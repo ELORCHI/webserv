@@ -63,7 +63,10 @@ void    server::set_upload_path(std::string upload_path)
     if (not_predefined(upload_path))
         _upload_path = upload_path;
     else
-        throw std::runtime_error("Error: upload_path is empty");
+    {
+        std::cout << "Error: upload_path in server not well defined" << std::endl;
+        exit(1);
+    }
 }
 
 void    server::set_to_default()
@@ -90,7 +93,10 @@ void    server::check_host(std::string listen_host)
             i++;
         }
         if (t != 3)
-            throw std::runtime_error("Error: host not valid");
+        {
+            std::cout << "Error: host not valid" << std::endl;
+            exit(1);
+        }
         i = 0;
         char * cstr = new char [listen_host.length()+1];
         std::strcpy (cstr, listen_host.c_str());
@@ -100,26 +106,34 @@ void    server::check_host(std::string listen_host)
             if (!is_number(p))
             {
                 delete[] cstr;
-                throw std::runtime_error("Error: host not valid");
+                std::cout << "Error: host not valid" << std::endl;
+                exit(1);
             }
             int tmp = std::atoi(p);
             if (tmp < 0 || tmp > 255)
             {
                 delete[] cstr;
-                throw std::runtime_error("Error: host not valid");
+                std::cout << "Error: host not valid" << std::endl;
+                exit(1);
             }
             i++;
             p = std::strtok (NULL,".");
         }
         delete[] cstr;
         if (i != 4)
-            throw std::runtime_error("Error: host not valid");
+        {
+            std::cout << "Error: host not valid" << std::endl;
+            exit(1);
+        }
     }
 }
 void    server::set_listen(std::string listen)
 {
     if (!_listen_host.empty() || _listen_port != -1)
-        throw std::runtime_error("Error: listen already set");
+    {
+        std::cout << "Error: listen already set" << std::endl;
+        exit(1);
+    }
     std::size_t found=listen.find(':');
     if (found != std::string::npos)
     {
@@ -131,7 +145,10 @@ void    server::set_listen(std::string listen)
             if (is_number(tmp))
                 _listen_port = std::stoi(tmp);
             else
-                throw std::runtime_error("Error: port should be a number");
+            {
+                std::cout << "Error: port should be a number" << std::endl;
+                exit(1);
+            }
         }
         else if (found == 0 && (listen.size() - found == 1))
         {
@@ -148,7 +165,7 @@ void    server::set_listen(std::string listen)
             if (is_number(tmp))
                 _listen_port = std::stoi(tmp);
             else
-                throw std::runtime_error("Error: port should be a number");
+                std::cout << "Error: port should be a number" << std::endl;
         }
     }
     else
@@ -164,7 +181,10 @@ void    server::set_allowed_methods(std::string allowed_methods)
     if (allowed_methods == "POST" || allowed_methods == "GET" || allowed_methods == "DELETE")
         _allowed_methods.push_back(allowed_methods);
     else
-        throw std::runtime_error("Error: allowed methods not well defined");
+    {
+        std::cout << "Error: allowed methods not well defined" << std::endl;
+        exit(1);
+    }
 }
 
 void    server::set_index(std::string index)
@@ -175,7 +195,10 @@ void    server::set_index(std::string index)
 void    server::set_error_pages(std::string error_pages, std::string number_error)
 {
     if (!not_predefined(error_pages) || !not_predefined(number_error))
-        throw std::runtime_error("Error: error_pages or number_of_error not well defined");
+    {
+        std::cout << "Error: error_pages or number_of_error not well defined" << std::endl;
+        exit(1);
+    }
     else
     {
         std::vector<std::string>    tmp;
@@ -188,7 +211,10 @@ void    server::set_error_pages(std::string error_pages, std::string number_erro
 void    server::set_redirections(std::string redirection_from, std::string redirection_to)
 {
     if (!not_predefined(redirection_from) || !not_predefined(redirection_to))
-        throw std::runtime_error("Error: redirections not well defined");
+    {
+        std::cout << "Error: redirections not well defined" << std::endl;
+        exit(1);
+    }
     else
     {
         std::vector<std::string>    tmp;
@@ -203,7 +229,10 @@ void    server::set_root(std::string root)
     if (not_predefined(root))
         _root = root;
     else
-        throw std::runtime_error("Error: root not well defined");
+    {
+        std::cout << "Error: root not well defined" << std::endl;
+        exit (1);
+    }
 }
 
 bool server::is_number(const std::string& str)
@@ -223,7 +252,10 @@ void    server::set_client_max_body_size(std::string client_max_body_size)
     if (not_predefined(client_max_body_size) && is_number(client_max_body_size))
         _client_max_body_size =std::stoi(client_max_body_size);
     else
-        throw std::runtime_error("Error: client max body size should be number");
+    {
+        std::cout << "Error: client_max_body_size not well defined" << std::endl;
+        exit(1);
+    }
 }
 
 void    server::set_client_max_body_size(long long int client_max_body_size)
@@ -345,7 +377,10 @@ unsigned int server::fill_allowed_methods(std::vector<std::string> words, unsign
         i++;
     }
     if (get_allowed_methods_size() == 0)
-            throw std::runtime_error("Error: server allow_method is empty");
+    {
+        std::cout << "Error: allowed methods not well defined" << std::endl;
+        exit(1);            
+    }
     i--;
     return i;
 }
@@ -364,7 +399,10 @@ unsigned int server::fill_name(std::vector<std::string> words, unsigned int i)
         i++;
     }
     if (get_name_size() == 0)
-            throw std::runtime_error("Error: server name is empty");
+    {
+        std::cout << "Error: name not well defined" << std::endl;
+        exit(1);
+    }
     i--;
     return i;
 }
@@ -400,7 +438,10 @@ unsigned int server::fill_index(std::vector<std::string> words, unsigned int i)
         i++;
     }
     if (get_index_size() == 0)
-            throw std::runtime_error("Error: server index is empty");
+    {
+        std::cout << "Error: index not well defined" << std::endl;
+        exit(1);
+    }
     i--;
     return i;
 }
@@ -438,15 +479,18 @@ unsigned int server::fill_location(std::vector<std::string> words, unsigned int 
             l.set_upload_path(words[i + 1]);
         else if (words[i] == "cgi")
         {
-            throw std::runtime_error("Error: No cgi inside location");
-            // i = l.fill_cgi(words, i, cgi_flag);
+            std::cout << "Error: no cgi inside Location" << std::endl;
+            exit(1);
         }
         i++;
     }
     location_flag = false;
     set_location(l);
     if (l.get_methods().empty() || l.get_root().empty())
-        throw std::runtime_error("Error: location need more info!!");
+    {
+        std::cout << "Error: location not well defined" << std::endl;
+        exit(1);
+    }
     return i;
 }
 
@@ -479,7 +523,10 @@ std::string                  server::get_index(int i) const
 unsigned int server::fill_cgi(std::vector<std::string> words, unsigned int i, bool &cgi_flag)
 {
     if (_cgi.size())
-        throw std::runtime_error("Error : NO multiple cgi");
+    {
+        std::cout << "Error: cgi already defined" << std::endl;
+        exit(1);
+    }
     cgi_flag = true;
     cgi c;
     c.set_cgi_name(words[i + 1]);

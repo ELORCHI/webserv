@@ -26,7 +26,10 @@ void cgi::set_cgi_path(std::string cgi_path)
     if (not_predefined(cgi_path))
        this->_cgi_path = cgi_path;
     else
-        throw std::runtime_error("Error: cgi path not well defined");
+    {
+        std::cout << "Error: cgi path not well defined" << std::endl;
+        exit(0);
+    } 
     
 }
 
@@ -36,7 +39,10 @@ void cgi::set_cgi_methods(std::string methods)
     if (methods == "POST" || methods == "GET" || methods == "DELETE")
         this->_allow_methods.push_back(methods);
     else
-        throw std::runtime_error("Error: allowed methods in cgi not well defined");
+    {
+        std::cout << "Error: allowed methods in cgi not well defined" << std::endl;
+        exit(0);
+    } 
 }
 
 void    cgi::set_cgi_name(std::string name)
@@ -44,7 +50,10 @@ void    cgi::set_cgi_name(std::string name)
     if (not_predefined(name))
        this->_name = name;
     else
-        throw std::runtime_error("Error: cgi name not well defined");
+    {
+        std::cout << "Error: cgi name not well defined" << std::endl;
+        exit(0);
+    } 
     
 }
 

@@ -51,13 +51,20 @@ void location::set_methods(std::string methods)
     if (methods == "POST" || methods == "GET" || methods == "DELETE")
         _allow_methods.push_back(methods);
     else
-        throw std::runtime_error("Error: allowed methods in location not well defined");
+    {
+        std::cout << "Error: allowed methods in location not well defined" << std::endl;
+        exit(1);
+    }
 }
 void location::set_root(std::string root) {
     if (not_predefined(root))
         this->_root = root;
     else
-        throw std::runtime_error("Error: root in location not well defined");}
+    {
+        std::cout << "Error: root in location not well defined" << std::endl;
+        exit(1);
+    }
+}
 void location::set_autoindex(bool autoindex) { this->_autoindex = autoindex; }
 void location::set_index(std::string index) { this->_index.push_back(index); }
 bool location::is_number(const std::string& str)
@@ -78,7 +85,10 @@ void    location::set_client_max_body_size(std::string client_max_body_size)
     if (not_predefined(client_max_body_size) && is_number(client_max_body_size))
        this->_client_max_body_size =std::stoi(client_max_body_size);
     else
-        throw std::runtime_error("Error: client max body size should be number");
+    {
+        std::cout << "Error: client max body size should be number" << std::endl;
+        exit(1);
+    }
 }
 
 void    location::set_upload_path(std::string upload_path)
@@ -86,7 +96,10 @@ void    location::set_upload_path(std::string upload_path)
     if (not_predefined(upload_path))
         _upload_path = upload_path;
     else
-        throw std::runtime_error("Error: upload_path is empty");
+    {
+        std::cout << "Error: upload_path is empty" << std::endl; 
+        exit(1);
+    }
 }
 
 /*
@@ -103,7 +116,10 @@ unsigned int location::fill_allowed_methods(std::vector<std::string> words, unsi
         i++;
     }
     if (get_methods_size() == 0)
-            throw std::runtime_error("Error: location allow_method is empty");
+    {
+        std::cout << "Error: location allow_method is empty" << std::endl;
+        exit(1);
+    }
     i--;
     return i;
 }
@@ -122,7 +138,10 @@ unsigned int location::fill_index(std::vector<std::string> words, unsigned int i
         i++;
     }
     if (get_index_size() == 0)
-            throw std::runtime_error("Error: location index is empty");
+    {
+        std::cout << "Error: location index is empty" << std::endl; 
+        exit(1);
+    }
     i--;
     return i;
 }

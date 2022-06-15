@@ -42,7 +42,10 @@ void    parse_config::accolade_error()
         ++i;
     }
     if (accolade != 0)
-        throw std::runtime_error("Error: File Not Well Formated(accolade error)");
+    {
+        std::cout <<"Error: File Not Well Formated(accolade error)" << std::endl;
+        exit(1); 
+    }
 }
 
 void       parse_config::split_by_space()
@@ -114,7 +117,10 @@ void    parse_config::specified_words(std::string &tmp)
         && tmp != "error_page" && tmp != "autoindex" && tmp != "redirection"
         && tmp != "client_max_body_size" && tmp != "location" && tmp != "cgi"
         && tmp != "{" && tmp != "}" && tmp != "listen")
-        throw std::runtime_error(err);
+        {
+            std::cout << err << std::endl;
+            exit(1);    
+        }
 }
 
 void    parse_config::syntax_error()
@@ -154,7 +160,10 @@ void    parse_config::check_host_server_names_error()
                     while (y < _servers[k].get_name_size())
                     {
                         if (_servers[i].get_name(t).compare(_servers[k].get_name(y)) == 0)
-                            throw std::runtime_error("Error: there is two server have same server_name and port");
+                        {    
+                            std::cout <<"Error: there is two server have same server_name and port" << std::endl;
+                            exit(1);
+                        }
                         y++;
                     }
                     t++;
@@ -171,7 +180,10 @@ void    parse_config::start_parsing()
     std::cout << "Hello" << std::endl;
     split_by_space();
     if (_words.size() == 0)
-        throw std::runtime_error("Error: no words in the file");
+    {
+        std::cout <<"Error: File Not Well Formated(no word)" << std::endl;
+        exit(1);
+    }
     std::cout << "BYE" << std::endl;
     accolade_error();
     std::cout << "THREE" << std::endl;
@@ -186,7 +198,10 @@ void    parse_config::start_parsing()
 				i = parse_config::server_parsing(i);
 		}
 		else
-            throw std::runtime_error("Error: every server configuration must be startes by server");
+        {
+            std::cout <<"Error: every server configuration must be startes by server" << std::endl;
+            exit(1);
+        }
 	}
     check_host_server_names_error();
 }
