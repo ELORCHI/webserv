@@ -5,57 +5,6 @@
 #include <sys/socket.h>
 #include <utility>
 
-void send_file_to_socket(int fd, char *path)
-{
-	std::ifstream file(path, std::ios::binary);
-	if (!file.is_open())
-		return;
-	char buffer[4096];
-	while (!file.eof())
-	{
-		file.read(buffer, 4096);
-		int size = file.gcount();
-		send(fd, buffer, size, 0);
-	}
-	file.close();
-}
-
-size_t file_size(std::string path)
-{
-	std::ifstream file(path, std::ios::binary);
-	if (!file.is_open())
-		return 0;
-	file.seekg(0, std::ios::end);
-	size_t size = file.tellg();
-	file.close();
-	return size;
-}
-
-// bool httpServer::doesHttpRequestBelongs(request *rq)
-// {
-
-//     for (int i = 0; (unsigned int)i < servers_parsed_data.size(); i++)
-//     {
-//         if (servers_parsed_data[i].get_name(i) == rq->getHost())
-//         {
-//             doesRequestHostBelong = true;
-//             return true;
-//             //std::cout << "Host: " << rq->getHost() << " belongs to server" << std::endl;
-//             //std::cout << "server host: " << server_parsed_data.get_name(i) << std::endl;
-//             //std::cout << "server port: " << this->listenServerPort << std::endl;
-//         }
-//    // //std::cout << "request port: " << rq->getPort() << std::endl;
-//     }
-//     // if (server_parsed_data.get_listen_port() == rq->getPort())
-//     // {
-//     //     doesRequestPortBelong = true;
-//     //     //std::cout << "Port: " << rq->getPort() << " belongs to server" << std::endl;
-//     // }
-//     // if (doesRequestHostBelong && doesRequestPortBelong)
-//     //     return true;
-//     return false;
-// }
-
 
 bool httpServer::doesHttpRequestBelongs(request *rq)
 {

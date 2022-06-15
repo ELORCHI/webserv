@@ -781,12 +781,12 @@ int Locator::HandleCGI()
 		// }
 		// else
 			statusLine = getResponseStatusLine(200, OK_MSG);
-		std::cout <<"------------------------------------------------------------" << std::endl;
-		std::cout << "statusLine: " << statusLine << std::endl;
+		// std::cout <<"------------------------------------------------------------" << std::endl;
+		// std::cout << "statusLine: " << statusLine << std::endl;
 	}
 	response_body = readBody(cgiHandler.get_file_body_path());
-	std::cout << "bodyy from cgii" << std::endl;
-	std::cout << response_body << std::endl;
+	// std::cout << "bodyy from cgii" << std::endl;
+	// std::cout << response_body << std::endl;
 	std::map <std::string, std::string> tmp = cgiHandler.get_headers();
 	for(std::map <std::string, std::string>::iterator it = tmp.begin(); it!=tmp.end(); ++it)
 		headers += it->first + ": " + it->second + "\r\n";
