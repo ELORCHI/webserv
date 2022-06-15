@@ -1,9 +1,0 @@
-------WebKitFormBoundaryKj3DqCIsB8vNgmMW
-Content-Disposition: form-data; name="name"
-
-YHEBBAT LIMITED
-------WebKitFormBoundaryKj3DqCIsB8vNgmMW
-Content-Disposition: form-data; name="email"
-
-yhebbat@student.1337.ma
-------WebKitFormBoundaryKj3DqCIsB8vNgmMW--

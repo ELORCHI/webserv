@@ -318,6 +318,8 @@ std::string Locator::getContentType(void)
 
 	if (error >= 400 || autoindexResponse == true)
 		return ("text/html");
+	if (error == CREATED_CODE)
+		return ("text/html");
 	if (i != std::string::npos)
 	{
 		res = resourceFullPath.substr(i, resourceFullPath.length() - i);
@@ -1096,7 +1098,8 @@ std::string getLink(std::string const &dirEntry, std::string const &dirName, std
 	// int portt = port; *************** NOT USED
 	// portt +=port;	(****** NOT USED)
     std::stringstream   ss;
-    ss << "\t\t<p><a href=\"" + dirName + "/" + dirEntry << "\">" + dirEntry + "</a></p>\n";
+	std::cerr << "dirnme: " << dirName << std::endl; 
+    ss << "\t\t<p><a href=\"http://" + host + ":" + std::to_string(port) + dirName + "/" + dirEntry << "\">" + dirEntry + "</a></p>\n";
     return ss.str();
 }
 
@@ -1501,14 +1504,11 @@ int PostHandler::creator(std::string path)
 int PostHandler::handle()
 {
 	//debug("PostHandler::handle", "Starting");	
-	if (supportAppload() == true)
-	{
-		if (creator(godFather->getResourceFullPath()) == 500)
-			error = INTERNAL_SERVER_ERROR_CODE;
-		else
-			error = CREATED_CODE;
+	if (creator(godFather->getResourceFullPath()) == 500)
+		error = INTERNAL_SERVER_ERROR_CODE;
+	else
+		error = CREATED_CODE;
 		//debug("PostHandler::handle", "Ending " + std::to_string(error));
-	}
 	if (godFather->getResourceType() == FI || godFather->getResourceType() == CG)
 	{
 		//debug("PostHandler::handle", "Ending :call to HandlerFiles");
@@ -1542,7 +1542,7 @@ int PostHandler::handleFiles(void)
 	}
 	else if (error == CREATED_CODE)
 		return (CREATED_CODE);
-	else
+	else if (error != -1)
 		error = FORBIDDEN_CODE;
 	return (1);
 }

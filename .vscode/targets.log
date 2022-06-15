@@ -4,11 +4,10 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software; see the source for copying conditions.
 # There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
- 
 
 # This program built for i386-apple-darwin11.3.0
 
-# Make data base, printed on Tue Jun 14 17:27:04 2022
+# Make data base, printed on Wed Jun 15 01:45:56 2022
 
 # Variables
 
@@ -27,7 +26,7 @@ VSCODE_LOG_NATIVE = false
 # automatic
 @F = $(notdir $@)
 # makefile
-CURDIR := /Users/yhebbat/Desktop/without cgi
+CURDIR := /Users/yhebbat/Desktop/newone
 # makefile
 SHELL = /bin/sh
 # environment
@@ -41,7 +40,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/0s/y5xktj1s6pdflymrkrdtklzh0000gn/T/vscode-ipc-683a9921-6c37-4121-8fd8-ae72121638bf.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/0s/y5xktj1s6pdflymrkrdtklzh0000gn/T/vscode-ipc-fa9cb75d-ffbb-40db-9d3d-e8cdfd16c194.sock
 # environment
 VSCODE_CWD = /
 # environment
@@ -63,7 +62,7 @@ SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.9r729xS0NZ/Listeners
 # environment
 VSCODE_PIPE_LOGGING = true
 # environment
-PWD = /Users/yhebbat/Desktop/without cgi
+PWD = /Users/yhebbat/Desktop/newone
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # environment
@@ -77,7 +76,7 @@ VSCODE_CODE_CACHE_PATH = /Users/yhebbat/Library/Application Support/Code/CachedD
 # environment
 LOGNAME = yhebbat
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
 ZSH = /Users/yhebbat/.oh-my-zsh
 # environment
@@ -145,12 +144,11 @@ SUFFIXES :=
 # environment
 MAKELEVEL := 0
 # environment
- 
 LANG = C
 # environment
 VSCODE_PID = 62055
 # variable set hash-table stats:
-# Load=68/1024=7%, Rehash=0, Collisions=1/93=1%
+# Load=68/1024=7%, Rehash=0, Collisions=1/97=1%
 
 # Pattern-specific Variable Values
 
@@ -158,9 +156,9 @@ VSCODE_PID = 62055
 
 # Directories
 
-# . (device 16777233, inode 3396131): 26 files, no impossibilities.
+# . (device 16777233, inode 3411294): 40 files, no impossibilities.
 
-# 26 files, no impossibilities in 1 directories.
+# 40 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -173,15 +171,34 @@ all: webserver
 #  Implicit rule search has been done.
 #  File does not exist.
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/0=0%
+# Load=0/32=0%, Rehash=0, Collisions=0/4=0%
 
 webserver:
 #  Implicit rule search has not been done.
-#  Last modified 2022-06-14 17:20:22
+#  Implicit/static pattern stem: `'
+#  File does not exist.
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := webserver
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := 
+# automatic
+# | := 
+# automatic
+# < := 
+# automatic
+# ^ := 
+# automatic
+# ? := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=3/12=25%
 #  commands to execute (from `Makefile', line 13):
 	@c++ -Wall -Werror -Wextra -std=c++98 $(SRC) -o $(NAME) 
 	@echo "✅✅✅"
@@ -196,7 +213,7 @@ webserver:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-14 17:20:22
+#  Last modified 2022-06-15 01:44:58
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -240,7 +257,7 @@ clean:
 	
 
 # files hash-table stats:
-# Load=9/1024=1%, Rehash=0, Collisions=0/26=0%
+# Load=9/1024=1%, Rehash=0, Collisions=0/27=0%
 # VPATH Search Paths
 
 # No `vpath' search paths.
@@ -252,6 +269,6 @@ clean:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Tue Jun 14 17:27:04 2022
+# Finished Make data base on Wed Jun 15 01:45:56 2022
 
  

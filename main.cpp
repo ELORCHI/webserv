@@ -25,21 +25,29 @@ int basic_error(std::string error_message, char const *av, std::string error_mes
 
 int main(int argc, char *argv[])
 {
-    
+    std::ifstream file;
     struct stat buffer;
-    int i = stat(argv[1], &buffer);
     signal(SIGPIPE, SIG_IGN);
-
-    if (i == -1)
-    {
-        std::cout << "Error: openning conf file" << std::endl;
-        return 0;
-    }
-    if (argc != 2)
+    if (argc > 2)
         return (basic_error("Usage: ./parse_confile <path_to_config_file>", NULL, ""));
-	std::ifstream file(argv[1]);
-	if (!file.is_open())
-        return (basic_error("Error: file " , argv[1] , " not found"));
+    if (argc == 2)
+    {
+        int i = stat(argv[1], &buffer);
+        if (i == -1)
+        {
+            std::cout << "Error: openning conf file" << std::endl;
+            return 0;
+        }
+	    file.open(argv[1]);
+        if (!file.is_open())
+            return (basic_error("Error: file " , argv[1] , " not found"));
+    }
+    else
+    {
+        file.open("./conf/conf.conf");
+        if (!file.is_open())
+            return (basic_error("Error: default conf not found", NULL, ""));
+    }
 	std::string line;
 	std::vector<std::string> lines;
     std::cout << "BEFORE WHILE" << std::endl;
