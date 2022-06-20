@@ -1,9 +1,0 @@
-------WebKitFormBoundarycAymUjvU9TA8bojo
-Content-Disposition: form-data; name="name"
-
-HEBBAT YASSINE
-------WebKitFormBoundarycAymUjvU9TA8bojo
-Content-Disposition: form-data; name="email"
-
-yassine@gmail.com
-------WebKitFormBoundarycAymUjvU9TA8bojo--
